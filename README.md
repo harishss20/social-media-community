@@ -9,9 +9,9 @@ fork the repo which i have send in the whatsapp group (If any doubt check the re
 create a NewFolder and sync the forked repo with your local system
 if you are working with frontend
 
-> cd frontend
-> npm install
-> And make sure to install all other packages
+1 cd frontend
+2 npm install
+3 And make sure to install all other packages
 
 ## local system to forked repo pull request
 
