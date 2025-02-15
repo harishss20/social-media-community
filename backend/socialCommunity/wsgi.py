@@ -1,5 +1,5 @@
 """
-WSGI config for community project.
+WSGI config for socialCommunity project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'community.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'socialCommunity.settings')
 
 application = get_wsgi_application()
