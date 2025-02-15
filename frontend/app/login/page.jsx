@@ -38,7 +38,7 @@ export default function LoginPage() {
                 </span>
                 <input
                   type="email"
-                  className="peer w-full pl-10 pr-4 py-2 mt-1 border-b-2 border-gray-500 bg-[#1E1F26] focus:border-[#885cf6] text-[#CAC8FF] outline-none leading-6"
+                  className="peer w-full pl-10 pr-4 py-2 mt-1 border-b-2 border-[#2F3138] bg-[#2F3138] focus:border-[#885cf6] text-[#CAC8FF] outline-none leading-6"
                   placeholder="weall@gmail.com"
                   onChange={(e) => setEmailFilled(e.target.value.length > 0)}
                 />
@@ -58,7 +58,7 @@ export default function LoginPage() {
                 </span>
                 <input
                   type="password"
-                  className="peer w-full pl-10 pr-10 py-2 mt-1 border-b-2 border-gray-500 bg-[#1E1F26] focus:border-[#885cf6] text-[#CAC8FF] outline-none"
+                  className="peer w-full pl-10 pr-10 py-2 mt-1 border-b-2 border-[#2F3138] bg-[#2F3138] focus:border-[#885cf6] text-[#CAC8FF] outline-none"
                   placeholder="Enter a secure password"
                   onChange={(e) => setPasswordFilled(e.target.value.length > 0)}
                 />
@@ -71,7 +71,7 @@ export default function LoginPage() {
                 <input type="checkbox" className="mr-2" />
                 Remember me
               </label>
-              <a href="#" className="hover:text-[#8B5CF6]">
+              <a href="#" className="hover:text-[#A0A2E6]">
                 Forgot Password?
               </a>
             </div>
@@ -106,7 +106,7 @@ export default function LoginPage() {
             Login with Google
           </button>
 
-          <button className="w-full flex items-center justify-center bg-blue-600 text-white p-3 rounded-lg mt-3 hover:bg-blue-700 transition">
+          <button className="w-full flex items-center justify-center bg-blue-600 text-white p-3 rounded-lg mt-3 hover:bg-[#1877F2] transition">
             <img src="/fb_img.png" alt="Facebook" className="w-5 h-5 mr-2" />
             Login with Facebook
           </button>
