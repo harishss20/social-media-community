@@ -14,7 +14,12 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "fontawesome": "^5.6.3",
+<<<<<<< HEAD
     "next": "^15.1.7",
+=======
+    "fortawesome": "^0.0.1-security",
+    "next": "15.1.7",
+>>>>>>> 4377e8d400b52dc1d27b4a7dab1fa5cb4faf682c
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
