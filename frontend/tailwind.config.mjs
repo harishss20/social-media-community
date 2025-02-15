@@ -1,3 +1,5 @@
+import { Inter, Poppins } from 'next/font/google';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -7,6 +9,12 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily:{
+        sans: ['Inter', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+        Poppins: ['Poppins', 'sans-serif'],
+        Inter: ['Inter', 'sans-serif'],
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
