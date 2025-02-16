@@ -8,7 +8,7 @@ const formStyles = "flex flex-col space-y-5 min-w-[450px] p-12 rounded-2xl bg-[#
 const iconStyles = "absolute top-[35px] left-5 text-base text-[#a3a3a3] peer-focus:text-[#cac8ff]";
 
 
-export default function DummyPage() {
+export default function SignupPage() {
     return (
         <div className="wrapper text-sm font-Poppins">
             <div className="col1">
