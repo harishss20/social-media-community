@@ -28,7 +28,7 @@ export default function DummyPage() {
 
                     <div className="flex flex-col space-y-1 relative">
                         <label>Password</label>
-                        <input type="password" placeholder="***********" className={inputStyles}/>
+                        <input type="password" placeholder="*****" className={inputStyles}/>
                         <FontAwesomeIcon icon={faKey} className={iconStyles}/>
                         </div>
 
