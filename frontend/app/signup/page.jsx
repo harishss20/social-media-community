@@ -12,9 +12,13 @@ export default function SignupPage() {
     return (
         <div className="wrapper text-sm font-Poppins">
             <div className="col1">
-                <p>
-                    Logo
-                </p>
+        <div className="hidden md:block">
+          <img
+            src="/dummy.png"
+            alt="Dummy Image"
+            className="w-[800px] h-auto"
+          />
+          </div>
             </div>
 
             <div className="col2">

@@ -39,7 +39,7 @@ body {
   justify-content: center;
   align-items: center;
   display: flex;
-  background-color: #000000;
+  /* background-color: #000000; */
   padding: 20px;
   border-radius: 5px;
   margin: 0 0 20px 0;
