@@ -30,14 +30,11 @@ export default function SignupPage() {
           </div>
 
           <div className="flex flex-col space-y-1 relative">
-            <label>Password</label>
-            <input
-              type="password"
-              placeholder="***********"
-              className={inputStyles}
-            />
-            <FontAwesomeIcon icon={faKey} className={iconStyles} />
-          </div>
+              <label>Password</label>
+                 <input type="password" placeholder="*********" className={inputStyles}/>
+                    <FontAwesomeIcon icon={faKey} className={iconStyles}/>
+           </div>
+
 
           <div>
             <button className="min-w-full mt-3 py-3 rounded-md bg-[#ff3d3d] duringHover">

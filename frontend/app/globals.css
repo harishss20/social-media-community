@@ -3,6 +3,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -75,4 +76,10 @@ body {
   filter: brightness(1.4);
   transition-duration: 200ms;
   transition-timing-function: ease-in-out;
+}
+
+
+body {
+  height: 100%;
+  overflow: hidden;
 }
