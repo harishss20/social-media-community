@@ -122,7 +122,7 @@ export default function LoginPage() {
                 
                 <div className="w-full flex justify-evenly">
                     <p>Don't have an account?</p>
-                    <a href="/dummy" className="font-bold text-[#cac8ff]">Register</a>
+                    <a href="/signup" className="font-bold text-[#cac8ff]">Register</a>
                 </div>
 
                 </form>

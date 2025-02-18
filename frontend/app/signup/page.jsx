@@ -116,10 +116,8 @@ export default function SignupPage() {
                     />
 
                     {touched.username && errors.username && <p className="absolute right-0 top-[49px] text-[10px] text-red-500">{errors.username}</p>}
-                    
-                    {/* {touched.username && username.length > 2 && (available === true ? <p className="absolute right-0 top-[47px] text-[10px] text-green-400">Username Available</p> : <p className="absolute right-0 top-[47px] text-[10px] text-red-500">Username Taken</p>)} */}
 
-                    <FontAwesomeIcon icon={faUser} className={username == "" ? "absolute top-[25px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
+                    <FontAwesomeIcon icon={faUser} className={username == "" ? "absolute top-[26px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
                 </div>
 
                 <div className="inputContainer relative">
@@ -134,7 +132,7 @@ export default function SignupPage() {
                     />
                     {touched.email && errors.email && <p className="absolute right-0 top-[49px] text-[10px] text-red-500">{errors.email}</p>}
 
-                    <FontAwesomeIcon icon={faEnvelope} className={email == "" ? "absolute top-[25px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
+                    <FontAwesomeIcon icon={faEnvelope} className={email == "" ? "absolute top-[26px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
                 </div>
 
                 <div className="inputContainer relative">
@@ -148,7 +146,7 @@ export default function SignupPage() {
                         onBlur={() => setTouched((prev) => ({ ...prev, password: true }))} 
                     />
                     {touched.password && errors.password && <p className="absolute right-0 top-[49px] text-[10px] text-red-500">{errors.password}</p>} 
-                    <FontAwesomeIcon icon={faKey} className={password == "" ? "absolute top-[25px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
+                    <FontAwesomeIcon icon={faKey} className={password == "" ? "absolute top-[26px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
                 </div>
                 
                 <div className="inputContainer relative">
@@ -163,7 +161,7 @@ export default function SignupPage() {
                     />
                     {touched.confirmPassword && !errors.password && errors.confirmPassword && <p className="absolute right-0 top-[49px] text-[10px] text-red-500">{errors.confirmPassword}</p>} 
 
-                    <FontAwesomeIcon icon={faKey} className={confirmPassword == "" ? "absolute top-[25px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
+                    <FontAwesomeIcon icon={faKey} className={confirmPassword == "" ? "absolute top-[26px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
                 </div>
 
                 <button type="submit" className="mt-3 bg-[#ff3d3d]" disabled={!isFormValid} onSubmit={handleSubmit}>Register</button>
@@ -186,7 +184,7 @@ export default function SignupPage() {
                 
                 <div className="w-full flex justify-evenly">
                     <p>Already have an account?</p>
-                    <a href="/dummy2" className="font-bold text-[#cac8ff]">Login</a>
+                    <a href="/login" className="font-bold text-[#cac8ff]">Login</a>
                 </div>
 
                 </form>
