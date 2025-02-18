@@ -2,83 +2,196 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faKey, faUser } from "@fortawesome/free-solid-svg-icons";
 import { faGoogle, faFacebook } from "@fortawesome/free-brands-svg-icons";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-const inputStyles =
-  "peer py-3 px-12 rounded-md outline-none border-b-2 border-transparent bg-[#2f3138] text-[#cac8ff] placeholder:text-[#a3a3a3] focus:border-[#8b5cf6] duration-500 ease-out";
-const formStyles =
-  "flex flex-col space-y-5 min-w-[450px] p-12 rounded-2xl bg-[#292b34] shadow-2xl";
-const iconStyles =
-  "absolute top-[35px] left-5 text-base text-[#a3a3a3] peer-focus:text-[#cac8ff]";
 
 export default function SignupPage() {
-  return (
-    <div className="wrapper text-sm font-Poppins">
-      <div className="col1">
-        <img src="/dummy.png" alt="Dummy Image" className="w-10/12 h-auto" />
-      </div>
+    const router = useRouter();
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [isUsernameAvailable, setIsUsernameAvailable] = useState(null);
+    const [errors, setErrors] = useState({});
+    const [touched, setTouched] = useState({});
+    const [isFormValid, setIsFormValid] = useState(false);
+  
+    const checkUsernameAvailability = async (username) => {
+      if (username.length < 3) return;
+      try {
+        const response = await fetch(`/api/check-username?username=${username}`);
+        const data = await response.json();
+        setIsUsernameAvailable(data.available);
+      } catch (error) {
+        console.error("Error checking username:", error);
+      }
+    };
+  
+    useEffect(() => {
+      const newErrors = {};
+  
+      if (touched.username) {
+        if (username.length < 3 && username.length != "") {
+          newErrors.username = "Username must be at least 3 characters.";
+        } else if (isUsernameAvailable === false) {
+          newErrors.username = "Username is already taken.";
+        }
+      }
+  
+      if (touched.email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email) && email.length != "") {
+          newErrors.email = "Enter a valid email.";
+        }
+      }
 
-      <div className="col2">
-        <form className={formStyles}>
-          <div className="flex flex-col space-y-1 relative">
-            <label className="">Email</label>
-            <input
-              type="email"
-              placeholder="example@gmail.com"
-              className={inputStyles}
-            />
-            <FontAwesomeIcon icon={faEnvelope} className={iconStyles} />
-          </div>
+      if (touched.password) {
+        if (password.length < 8 && password.length != "") {
+            newErrors.password = "Password must be at least 8 characters.";
+        }
+    }
+  
+      if (touched.confirmPassword) {
+        if (password !== confirmPassword && confirmPassword != "") {
+          newErrors.confirmPassword = "Passwords do not match.";
+        }
+      }
+  
+      setErrors(newErrors);
+      (touched.username || touched.email || touched.password || touched.confirmPassword) && setIsFormValid(Object.keys(newErrors).length === 0);
+    }, [username, isUsernameAvailable, email, password, confirmPassword, touched]);
+      
 
-          <div className="flex flex-col space-y-1 relative">
-            <label>Password</label>
-            <input
-              type="password"
-              placeholder="*********"
-              className={inputStyles}
-            />
-            <FontAwesomeIcon icon={faKey} className={iconStyles} />
-          </div>
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const userData = { username, email, password, confirmPassword };
 
-          <div>
-            <button className="min-w-full mt-3 py-3 rounded-md duration-300 bg-[#ff3d3d] duringHover">
-              Register
-            </button>
-          </div>
+        try {
+            const response = await fetch("/api/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(userData),
+            });
+            const data = await response.json();
+            if (response.status === 201) {
+                alert("Signup successful!");
+                router.push("/preferences");
+              } else {
+                alert(data.error || "Something went wrong");
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              alert("Server error. Please try again.");
+            }
+    }
+    return (
+        <div className="mainContainer">
+            
+            <div>
+                <img
+                    src="/dummy.png"
+                    alt="Dummy Image"
+                />
+            </div>
 
-          <div className="flex items-center py-4">
-            <hr className="flex-1" />
-            <span className="mx-4">or</span>
-            <hr className="flex-1" />
-          </div>
+            <div className="formContainer">
+                <form className="formLayout text-xs">
 
-          <div className="relative">
-            <FontAwesomeIcon
-              icon={faGoogle}
-              className="absolute z-10 text-lg top-[13px] left-[75px]"
-            />
-            <button className="min-w-full py-3 duration-300 rounded-md bg-[#000] duringHover">
-              Continue with Google
-            </button>
-          </div>
+                <div className="inputContainer relative">
+                    <label className="">Username</label>
+                    <input maxLength={15}
+                    min={3}
+                        type="text" 
+                        placeholder=" " 
+                        className={username == "" ? "" : "text-[#cac8ff]"}
+                        value={username} 
+                        onChange={(e) => {
+                            setUsername(e.target.value);
+                            checkUsernameAvailability(e.target.value);
+                        }}  
+                        onBlur={() => setTouched((prev) => ({ ...prev, username: true }))}
+                    />
 
-          <div className="relative">
-            <FontAwesomeIcon
-              icon={faFacebook}
-              className="absolute z-10 text-lg top-[13px] left-[64px]"
-            />
-            <button className="min-w-full py-3 duration-300 rounded-md bg-[#1877F2] duringHover">
-              Continue with Facebook
-            </button>
-          </div>
+                    {touched.username && errors.username && <p className="absolute right-0 top-[49px] text-[10px] text-red-500">{errors.username}</p>}
+                    
+                    {/* {touched.username && username.length > 2 && (available === true ? <p className="absolute right-0 top-[47px] text-[10px] text-green-400">Username Available</p> : <p className="absolute right-0 top-[47px] text-[10px] text-red-500">Username Taken</p>)} */}
 
-          <div className="flex justify-center space-x-3">
-            <p>Already have an account?</p>
-            <a href="/login" className="text-sm font-bold text-[#cac8ff]">
-              Login
-            </a>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+                    <FontAwesomeIcon icon={faUser} className={username == "" ? "absolute top-[25px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
+                </div>
+
+                <div className="inputContainer relative">
+                    <label className="">Email</label>
+                    <input 
+                        type="email" tooltip="Enter a valid email address"
+                        placeholder=" " 
+                        className={email == "" ? "" : "text-[#cac8ff]"}
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)}  
+                        onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
+                    />
+                    {touched.email && errors.email && <p className="absolute right-0 top-[49px] text-[10px] text-red-500">{errors.email}</p>}
+
+                    <FontAwesomeIcon icon={faEnvelope} className={email == "" ? "absolute top-[25px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
+                </div>
+
+                <div className="inputContainer relative">
+                    <label className="">Password</label>
+                    <input 
+                        type="password" 
+                        placeholder=" " 
+                        className={password == "" ? "" : "text-[#cac8ff]"}
+                        value={password} 
+                        onChange={(e) => setPassword(e.target.value)} 
+                        onBlur={() => setTouched((prev) => ({ ...prev, password: true }))} 
+                    />
+                    {touched.password && errors.password && <p className="absolute right-0 top-[49px] text-[10px] text-red-500">{errors.password}</p>} 
+                    <FontAwesomeIcon icon={faKey} className={password == "" ? "absolute top-[25px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
+                </div>
+                
+                <div className="inputContainer relative">
+                    <label className="">Confirm Password</label>
+                    <input 
+                        type="password" 
+                        placeholder=" " 
+                        className={confirmPassword == "" ? "" : "text-[#cac8ff]"}
+                        value={confirmPassword} 
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        onBlur={() => setTouched((prev) => ({ ...prev, confirmPassword: true }))}  
+                    />
+                    {touched.confirmPassword && !errors.password && errors.confirmPassword && <p className="absolute right-0 top-[49px] text-[10px] text-red-500">{errors.confirmPassword}</p>} 
+
+                    <FontAwesomeIcon icon={faKey} className={confirmPassword == "" ? "absolute top-[25px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
+                </div>
+
+                <button type="submit" className="mt-3 bg-[#ff3d3d]" disabled={!isFormValid} onSubmit={handleSubmit}>Register</button>
+
+                <div className="flex items-center w-full">
+                    <hr className="flex-1"/>
+                    <span className="mx-4">or</span>
+                    <hr className="flex-1"/>
+                </div>
+
+                <div className="w-full relative">
+                    <FontAwesomeIcon icon={faGoogle} className="absolute top-2 left-9" />
+                    <button className="bg-[#1d1d21]">Continue with Google</button>
+                </div>
+
+                <div className="w-full relative">
+                    <FontAwesomeIcon icon={faFacebook} className="absolute top-2 left-7" />
+                    <button className="bg-[#1877F2]">Continue with Facebook</button>
+                </div>
+                
+                <div className="w-full flex justify-evenly">
+                    <p>Already have an account?</p>
+                    <a href="/dummy2" className="font-bold text-[#cac8ff]">Login</a>
+                </div>
+
+                </form>
+            </div>
+
+        </div>
+    );
 }
