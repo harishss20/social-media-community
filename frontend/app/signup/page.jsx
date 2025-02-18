@@ -14,7 +14,7 @@ export default function SignupPage() {
   return (
     <div className="wrapper text-sm font-Poppins">
       <div className="col1">
-        <p>Logo</p>
+        <img src="/dummy.png" alt="Dummy Image" className="w-10/12 h-auto" />
       </div>
 
       <div className="col2">
@@ -30,14 +30,17 @@ export default function SignupPage() {
           </div>
 
           <div className="flex flex-col space-y-1 relative">
-              <label>Password</label>
-                 <input type="password" placeholder="*********" className={inputStyles}/>
-                    <FontAwesomeIcon icon={faKey} className={iconStyles}/>
-           </div>
-
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="*********"
+              className={inputStyles}
+            />
+            <FontAwesomeIcon icon={faKey} className={iconStyles} />
+          </div>
 
           <div>
-            <button className="min-w-full mt-3 py-3 rounded-md bg-[#ff3d3d] duringHover">
+            <button className="min-w-full mt-3 py-3 rounded-md duration-300 bg-[#ff3d3d] duringHover">
               Register
             </button>
           </div>
@@ -53,7 +56,7 @@ export default function SignupPage() {
               icon={faGoogle}
               className="absolute z-10 text-lg top-[13px] left-[75px]"
             />
-            <button className="min-w-full py-3 rounded-md bg-[#000] duringHover">
+            <button className="min-w-full py-3 duration-300 rounded-md bg-[#000] duringHover">
               Continue with Google
             </button>
           </div>
@@ -63,7 +66,7 @@ export default function SignupPage() {
               icon={faFacebook}
               className="absolute z-10 text-lg top-[13px] left-[64px]"
             />
-            <button className="min-w-full py-3 rounded-md bg-[#1877F2] duringHover">
+            <button className="min-w-full py-3 duration-300 rounded-md bg-[#1877F2] duringHover">
               Continue with Facebook
             </button>
           </div>

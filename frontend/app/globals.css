@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -32,17 +32,17 @@ body {
   max-width: full;
   max-height: 100vh;
   padding: 1rem;
+
   /* margin: 7% auto; */
 }
 
-.col1{
+.col1 {
   visibility: hidden;
   justify-content: center;
   align-items: center;
   display: flex;
-  background-color: #000000;
   padding: 20px;
-  border-radius: 5px;
+
   margin: 0 0 20px 0;
 }
 .col2 {
@@ -58,13 +58,11 @@ body {
 @media screen and (min-width: 1000px) {
   .wrapper {
     display: flex;
-    
   }
 
   .col1 {
     visibility: visible;
     flex: 3;
-    margin-right: 5%;
   }
 
   .col2 {
@@ -72,12 +70,11 @@ body {
   }
 }
 
-.duringHover:hover{
+.duringHover:hover {
   filter: brightness(1.4);
   transition-duration: 200ms;
   transition-timing-function: ease-in-out;
 }
-
 
 body {
   height: 100%;
