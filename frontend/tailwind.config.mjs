@@ -1,4 +1,4 @@
-import { Inter, Poppins } from 'next/font/google';
+import { Inter, Nunito, Poppins } from 'next/font/google';
 
 /** @type {import('tailwindcss').Config} */
 export default {
