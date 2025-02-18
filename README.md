@@ -23,7 +23,6 @@ Do all changes in the code and push the code to your forked repo and "create pul
 
 1.  npm install fortawesome
 
-# backend
 
 1. py -m venv venv
 2. pip install djangorestframework-simplejwt mysqlclient
