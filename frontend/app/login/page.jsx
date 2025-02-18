@@ -2,9 +2,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
 import { faGoogle, faFacebook } from "@fortawesome/free-brands-svg-icons";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-
 
 export default function LoginPage() {
     const router = useRouter();
@@ -15,119 +12,101 @@ export default function LoginPage() {
     const [isFormValid, setIsFormValid] = useState(false);
   
   
-    useEffect(() => {
-      const newErrors = {};
-  
-      if (touched.email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email) && email.length != "") {
-          newErrors.email = "Enter a valid email.";
-        }
-      }
 
-      if (touched.password) {
-        if (password.length < 8 && password.length != "") {
-            newErrors.password = "Password must be at least 8 characters.";
-        }
-    }
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[#1E1F26] px-4 sm:px-0 overflow-hidden font-Poppins">
+      {/* Main Container: Two sections with a gap */}
+      <div className="flex flex-col md:flex-row items-center justify-center gap-40 w-full max-w-screen-xl">
+        {/* Left Side: Dummy SVG Image */}
+        <div className="hidden md:block w-full max-w-full">
+          <img src="/dummy.png" alt="Dummy Image" className="w-full h-auto" />
+        </div>
 
-      setErrors(newErrors);
-      (touched.email || touched.password) && setIsFormValid(Object.keys(newErrors).length === 0);
-    }, [email, password, touched]);
-      
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const userData = {email, password };
-
-        try {
-            const response = await fetch("/api/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(userData),
-            });
-            const data = await response.json();
-            if (response.status === 200) {
-                alert("Login successful!");
-                router.push("/home");
-              } else {
-                alert(data.error || "Something went wrong");
-              }
-            } catch (error) {
-              console.error("Error:", error);
-              alert("Server error. Please try again.");
-            }
-    }
-    return (
-        <div className="mainContainer">
-            
-            <div>
-                <img
-                    src="/dummy.png"
-                    alt="Dummy Image"
+        {/* Right Side: Login Form */}
+        <div className="w-full max-w-[450px] bg-[#292B34] p-8 rounded-2xl shadow-lg min-h-[30vh] mx-4 sm:mx-0">
+          <form action="">
+            {/* Email Field */}
+            <div className="mb-4 w-full max-w-[360px] mx-auto">
+              <label className="font-Poppins text-sm text-white">Email</label>
+              <div className="flex items-center bg-[#2F3138] rounded-md px-4 py-2 mt-1 border-b-2 border-[#2F3138] focus-within:border-[#885cf6] duration-300">
+                <FontAwesomeIcon
+                  icon={faEnvelope}
+                  className={`text-base transition-colors ${emailFilled ? "text-[#CAC8FF]" : "text-[#a3a3a3]"}`}
+                />
+                <input
+                  type="email"
+                  className="w-full bg-transparent pl-3 text-[#CAC8FF] text-sm outline-none placeholder:text-[#a3a3a3] placeholder:text-sm py-1"
+                  placeholder="example@gmail.com"
+                  onChange={(e) => setEmailFilled(e.target.value.length > 0)}
                 />
             </div>
-
-            <div className="formContainer">
-                <form className="formLayout text-xs">
-
-                <div className="inputContainer relative">
-                    <label className="">Email</label>
-                    <input 
-                        type="email" tooltip="Enter a valid email address"
-                        placeholder=" " 
-                        className={email == "" ? "" : "text-[#cac8ff]"}
-                        value={email} 
-                        onChange={(e) => setEmail(e.target.value)}  
-                        onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
-                    />
-                    {touched.email && errors.email && <p className="absolute right-0 top-[49px] text-[10px] text-red-500">{errors.email}</p>}
-
-                    <FontAwesomeIcon icon={faEnvelope} className={email == "" ? "absolute top-[26px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
-                </div>
-
-                <div className="inputContainer relative">
-                    <label className="">Password</label>
-                    <input 
-                        type="password" 
-                        placeholder=" " 
-                        className={password == "" ? "" : "text-[#cac8ff]"}
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)} 
-                        onBlur={() => setTouched((prev) => ({ ...prev, password: true }))} 
-                    />
-                    {touched.password && errors.password && <p className="absolute right-0 top-[49px] text-[10px] text-red-500">{errors.password}</p>} 
-                    <FontAwesomeIcon icon={faKey} className={password == "" ? "absolute top-[26px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
-                </div>
-           
-                <button type="submit" className="mt-3 bg-[#ff3d3d]" disabled={!isFormValid} onSubmit={handleSubmit}>Log In</button>
-
-                <div className="flex items-center w-full">
-                    <hr className="flex-1"/>
-                    <span className="mx-4">or</span>
-                    <hr className="flex-1"/>
-                </div>
-
-                <div className="w-full relative">
-                    <FontAwesomeIcon icon={faGoogle} className="absolute top-2 left-9" />
-                    <button className="bg-[#1d1d21]">Continue with Google</button>
-                </div>
-
-                <div className="w-full relative">
-                    <FontAwesomeIcon icon={faFacebook} className="absolute top-2 left-7" />
-                    <button className="bg-[#1877F2]">Continue with Facebook</button>
-                </div>
-                
-                <div className="w-full flex justify-evenly">
-                    <p>Don't have an account?</p>
-                    <a href="/signup" className="font-bold text-[#cac8ff]">Register</a>
-                </div>
-
-                </form>
+            </div>
+            {/* Password Field */}
+            <div className="mb-5 relative w-full max-w-[360px] mx-auto">
+              <label className="block text-[#EEEEEE] text-sm">Password</label>
+              <div className="flex items-center bg-[#2F3138] rounded-md px-4 py-2 mt-1 border-b-2 border-[#2F3138] focus-within:border-[#885cf6] duration-300">
+                <FontAwesomeIcon
+                  icon={faKey}
+                  className={`text-base transition-colors ${passwordFilled ? "text-[#CACBFF]" : "text-[#a3a3a3]"}`}
+                />
+                <input
+                  type="password"
+                  className="w-full bg-transparent pl-3 text-[#CAC8FF] text-sm outline-none placeholder:text-[#a3a3a3] placeholder:text-sm py-1 "
+                  placeholder="Enter a secure password"
+                  onChange={(e) => setPasswordFilled(e.target.value.length > 0)}
+                />
+              </div>
             </div>
 
+            {/* Remember Me & Forgot Password */}
+            <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-[#CAC8FF] mb-5 gap-2 text-center max-w-[360px] mx-auto">
+              <label className="flex items-center">
+                <input type="checkbox" className="mr-2" />
+                Remember me
+              </label>
+              <a href="#" className="hover:text-[#A0A2E6] duration-300">
+                Forgot Password?
+              </a>
+            </div>
+
+            {/* Login Button */}
+            <div className="mx-auto md:pl-3">
+              <button
+                type="submit"
+                className="w-full max-w-[360px] mx-auto bg-[#ff3d3d] text-white py-2 rounded-lg hover:bg-[#ff5959] hover:brightness-110 duration-300 hover:ease-in-out text-base"
+              >
+                Login
+              </button>
+            </div>
+          </form>
+
+          {/* Register Link */}
+          <p className="mt-5 max-w-[360px] mx-auto text-center text-sm ">
+            Don't have an account?{" "}
+            <a href="/signup" className="text-[#cac8ff] ">
+              Register
+            </a>
+          </p>
+
+          {/* OR Separator */}
+          <div className="flex items-center max-w-[360px] mx-auto my-6">
+            <hr className="flex-grow border-white" />
+            <span className="px-3 text-white text-sm">or</span>
+            <hr className="flex-grow border-white" />
+          </div>
+
+          {/* Social Login Buttons */}
+          <button className="w-full max-w-[360px] mx-auto flex items-center justify-center p-3 text-sm font-Poppins rounded-md bg-black hover:brightness-150 duration-300 hover:ease-in-out text-white">
+            <FontAwesomeIcon icon={faGoogle} className="pr-3 text-lg" />
+            Login with Google
+          </button>
+
+          <button className="w-full max-w-[360px] mx-auto flex items-center justify-center text-sm font-Poppins bg-blue-600 text-white p-3 rounded-lg mt-5 hover:brightness-150 duration-300 hover:ease-in-out">
+            <FontAwesomeIcon icon={faFacebook} className="pr-3 text-lg" />
+            Login with Facebook
+          </button>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
