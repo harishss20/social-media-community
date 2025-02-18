@@ -2,114 +2,90 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
+import { faGoogle, faFacebook } from "@fortawesome/free-brands-svg-icons";
 
 export default function LoginPage() {
   const [emailFilled, setEmailFilled] = useState(false);
   const [passwordFilled, setPasswordFilled] = useState(false);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#1E1F26] ">
+    <div className="flex min-h-screen items-center justify-center bg-[#1E1F26] px-4 sm:px-0 overflow-hidden">
+
       {/* Main Container: Two sections with a gap */}
-      <div className="flex items-center justify-start gap-40">
-        {" "}
-        {/* Moved the form more to the left */}
+      <div className="flex flex-col md:flex-row items-center justify-center gap-10 w-full max-w-screen-xl">
+
         {/* Left Side: Dummy SVG Image */}
-        <div className="hidden md:block">
-          <img
-            src="/dummy.png"
-            alt="Dummy Image"
-            className="w-[600px] h-auto"
-          />{" "}
-          {/* Increased size of SVG */}
+        <div className="hidden md:block w-full max-w-[600px]">
+          <img src="/dummy.png" alt="Dummy Image" className="w-full h-auto" />
         </div>
+
         {/* Right Side: Login Form */}
-        <div className="w-full max-w-md bg-[#292B34] p-8 rounded-2xl shadow-lg">
+        <div className="w-full max-w-[450px] bg-[#292B34] p-8 rounded-2xl shadow-lg min-h-[30vh] mx-4 sm:mx-0">
           <form action="">
+
             {/* Email Field */}
-            <div className="mb-4 relative">
-              <label className="block text-[#EEEEEE]">Email</label>
-              <div className="relative">
-                <span
-                  className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${
-                    emailFilled ? "text-[#CAC8FF]" : "text-gray-500"
-                  }`}
-                >
-                  <FontAwesomeIcon icon={faEnvelope} className="text-lg " />
-                </span>
-                <input
-                  type="email"
-                  className="peer w-full pl-10 pr-4 py-2 mt-1 border-b-2 border-[#2F3138] bg-[#2F3138] focus:border-[#885cf6] text-[#CAC8FF] outline-none leading-6"
-                  placeholder="weall@gmail.com"
-                  onChange={(e) => setEmailFilled(e.target.value.length > 0)}
-                />
+            <div className="mb-4 w-full max-w-[360px] mx-auto">
+              <label className="font-Poppins text-sm text-white">Email</label>
+              <div className="flex items-center bg-[#2F3138] rounded-md px-4 py-2 mt-1 border-b-2 border-[#2F3138] focus-within:border-[#885cf6]">
+                <FontAwesomeIcon icon={faEnvelope} className={`text-base transition-colors ${ emailFilled ? "text-[#CAC8FF]" : "text-[#a3a3a3]"}`}/>
+                <input type="email" className="w-full bg-transparent pl-3 text-[#CAC8FF] text-sm outline-none placeholder:text-[#a3a3a3] placeholder:text-sm py-1"
+                 placeholder="example@gmail.com"
+                 onChange={(e) => setEmailFilled(e.target.value.length > 0)}/>
               </div>
             </div>
 
             {/* Password Field */}
-            <div className="mb-4 relative">
-              <label className="block text-[#EEEEEE]">Password</label>
-              <div className="relative">
-                <span
-                  className={`absolute left-3 top-1/2 transform -translate-y-1/3 transition-colors ${
-                    passwordFilled ? "text-[#CACBFF]" : "text-gray-500"
-                  }`}
-                >
-                  <FontAwesomeIcon icon={faKey} className="text-lg" />
-                </span>
-                <input
-                  type="password"
-                  className="peer w-full pl-10 pr-10 py-2 mt-1 border-b-2 border-[#2F3138] bg-[#2F3138] focus:border-[#885cf6] text-[#CAC8FF] outline-none"
-                  placeholder="Enter a secure password"
-                  onChange={(e) => setPasswordFilled(e.target.value.length > 0)}
-                />
+            <div className="mb-5 relative w-full max-w-[360px] mx-auto">
+              <label className="block text-[#EEEEEE] text-sm">Password</label>
+              <div className="flex items-center bg-[#2F3138] rounded-md px-4 py-2 mt-1 border-b-2 border-[#2F3138] focus-within:border-[#885cf6]">
+                <FontAwesomeIcon icon={faKey} className={`text-base transition-colors ${ passwordFilled ? "text-[#CACBFF]" : "text-[#a3a3a3]" }`}/>
+                <input type="password" className="w-full bg-transparent pl-3 text-[#CAC8FF] text-sm outline-none placeholder:text-[#a3a3a3] placeholder:text-sm py-1" 
+                 placeholder="Enter a secure password"
+                 onChange={(e) => setPasswordFilled(e.target.value.length > 0)}/>
               </div>
             </div>
 
             {/* Remember Me & Forgot Password */}
-            <div className="flex justify-between items-center text-sm text-[#CAC8FF] mb-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-[#CAC8FF] mb-5 gap-2 text-center max-w-[360px] mx-auto">
               <label className="flex items-center">
                 <input type="checkbox" className="mr-2" />
                 Remember me
               </label>
-              <a href="#" className="hover:text-[#A0A2E6]">
-                Forgot Password?
-              </a>
+              <a href="#" className="hover:text-[#A0A2E6]">Forgot Password?</a>
             </div>
 
             {/* Login Button */}
-            <button
-              type="submit"
-              className="w-full bg-[#FF6F61] text-white py-2 rounded-lg hover:bg-[#FF9389] transition"
-            >
-              LOGIN
+            <div className="mx-auto md:pl-3">
+            <button type="submit" className="w-full max-w-[360px] mx-auto bg-[#ff3d3d] text-white py-2 rounded-lg hover:bg-[#ff5959] hover:brightness-110 hover:duration-200 hover:ease-in-out text-base">
+              Login
             </button>
+            </div>
           </form>
 
           {/* Register Link */}
-          <p className="mt-4 text-center text-sm text-[#CAC8FF]">
+          <p className="mt-5 max-w-[360px] mx-auto text-center text-sm text-[#CAC8FF]">
             Don't have an account?{" "}
-            <a href="/signup" className="text-[#8B5CF6]">
-              Register
-            </a>
+            <a href="/signup" className="text-[#8B5CF6]">Register</a>
           </p>
 
           {/* OR Separator */}
-          <div className="flex items-center my-6">
-            <hr className="flex-grow border-gray-300" />
-            <span className="px-3 text-gray-500">OR</span>
-            <hr className="flex-grow border-gray-300" />
+          <div className="flex items-center max-w-[360px] mx-auto my-6">
+            <hr className="flex-grow border-white" />
+            <span className="px-3 text-white text-sm">or</span>
+            <hr className="flex-grow border-white" />
           </div>
 
           {/* Social Login Buttons */}
-          <button className="w-full flex items-center justify-center border p-3 rounded-lg bg-gray-100 hover:bg-gray-200 transition text-black">
-            <img src="/google_img.png" alt="Google" className="w-5 h-5 mr-2" />
+          <button className="w-full max-w-[360px] mx-auto flex items-center justify-center p-3 text-sm font-Poppins rounded-md bg-black hover:brightness-125 hover:duration-200 hover:ease-in-out text-white">
+            <FontAwesomeIcon icon={faGoogle} className="pr-3 text-lg" /> 
             Login with Google
           </button>
 
-          <button className="w-full flex items-center justify-center bg-blue-600 text-white p-3 rounded-lg mt-3 hover:bg-[#1877F2] transition">
-            <img src="/fb_img.png" alt="Facebook" className="w-5 h-5 mr-2" />
+          <button className="w-full max-w-[360px] mx-auto flex items-center justify-center text-sm font-Poppins bg-blue-600 text-white p-3 rounded-lg mt-5 hover:brightness-110 hover:duration-200 hover:ease-in-out">
+            <FontAwesomeIcon icon={faFacebook} className="pr-3 text-lg" />
             Login with Facebook
           </button>
+          
         </div>
       </div>
     </div>
