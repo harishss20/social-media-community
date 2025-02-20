@@ -5,27 +5,19 @@ import { useState } from "react";
 export default function ProfilePage() {
     const savedUsername = "Fredwin";
     const savedBio = "Hey There Folks!";
-    const [username, setUsername] = useState("Fredwin");
-    const [bio, setBio] = useState("Hey There Folks!");
+    const [username, setUsername] = useState(savedUsername);
+    const [bio, setBio] = useState(savedBio);
     const bannerPic = "";
     const profilePic = "";
     const [bannerOpen, setBannerOpen] = useState(false);
     const [picOpen, setPicOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
 
-    const checkUsernameAvailability = async (username) => {
-        if (username.length < 3) return;
-        try {
-            const response = await fetch(`/api/check-username?username=${username}`);
-            const data = await response.json();
-            setIsUsernameAvailable(data.available);
-        } catch (error) {
-            console.error("Error checking username:", error);
-        }
-    };
+    //GET method to extract the total information of the user yet to be done
 
     const handleEditSubmit = (e) => {
         e.preventDefault();
+        //POST method yet to be done
         console.log(username, bio);
     }
     return (
@@ -115,7 +107,6 @@ export default function ProfilePage() {
 
             {editOpen &&
                 <div
-                    onClick={() => setEditOpen(false)}
                     className="fixed transition-all duration-500 ease-in-out hover:bg-black hover:bg-opacity-50 inset-0 z-10 flex flex-col"
                 >
 
@@ -140,7 +131,13 @@ export default function ProfilePage() {
                         ></textarea>
 
                         <div className="w-full flex flex-row items-center justify-end space-x-5">
-                            <button onClick={() => setEditOpen(false)}>Cancel</button>
+                            <button
+                                onClick={() => {
+                                    setUsername(savedUsername);
+                                    setBio(savedBio);
+                                    setEditOpen(false);
+                                }}
+                            >Cancel</button>
                             <button type="submit">Save</button>
 
                         </div>
