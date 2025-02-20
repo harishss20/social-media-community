@@ -67,18 +67,19 @@ export default function LoginPage() {
                 <img
                     src="/dummy.png"
                     alt="Dummy Image"
+                    className="loginSvg"
                 />
             </div>
 
-            <div className="formContainer">
-                <form className="formLayout text-xs">
+            <div className="">
+                <form className="loginFormLayout text-xs">
 
-                <div className="inputContainer relative">
+                <div className="loginInputContainer relative">
                     <label className="">Email</label>
                     <input 
                         type="email" tooltip="Enter a valid email address"
                         placeholder=" " 
-                        className={email == "" ? "" : "text-[#cac8ff]"}
+                        className={`loginInput  ${email == "" ? "" : "text-[#cac8ff]"}`}
                         value={email} 
                         onChange={(e) => setEmail(e.target.value)}  
                         onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
@@ -88,12 +89,12 @@ export default function LoginPage() {
                     <FontAwesomeIcon icon={faEnvelope} className={email == "" ? "absolute top-[26px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
                 </div>
 
-                <div className="inputContainer relative">
+                <div className="loginInputContainer relative">
                     <label className="">Password</label>
                     <input 
                         type="password" 
                         placeholder=" " 
-                        className={password == "" ? "" : "text-[#cac8ff]"}
+                        className={`loginInput  ${password == "" ? "" : "text-[#cac8ff]"}`}
                         value={password} 
                         onChange={(e) => setPassword(e.target.value)} 
                         onBlur={() => setTouched((prev) => ({ ...prev, password: true }))} 
@@ -102,7 +103,7 @@ export default function LoginPage() {
                     <FontAwesomeIcon icon={faKey} className={password == "" ? "absolute top-[26px] left-2 text-[#a3a3a3]" : "absolute top-[25px] left-2 text-[#cac8ff]"}/>
                 </div>
            
-                <button type="submit" className="mt-3 bg-[#ff3d3d]" disabled={!isFormValid} onSubmit={handleSubmit}>Log In</button>
+                <button type="submit" className="loginButton mt-3 bg-[#ff3d3d]" disabled={!isFormValid} onSubmit={handleSubmit}>Log In</button>
 
                 <div className="flex items-center w-full">
                     <hr className="flex-1"/>
@@ -112,12 +113,12 @@ export default function LoginPage() {
 
                 <div className="w-full relative">
                     <FontAwesomeIcon icon={faGoogle} className="absolute top-2 left-9" />
-                    <button className="bg-[#1d1d21]">Continue with Google</button>
+                    <button className="loginButton bg-[#1d1d21]">Continue with Google</button>
                 </div>
 
                 <div className="w-full relative">
                     <FontAwesomeIcon icon={faFacebook} className="absolute top-2 left-7" />
-                    <button className="bg-[#1877F2]">Continue with Facebook</button>
+                    <button className="loginButton bg-[#1877F2]">Continue with Facebook</button>
                 </div>
                 
                 <div className="w-full flex justify-evenly">
