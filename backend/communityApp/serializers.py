@@ -37,13 +37,27 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CommunitySerializer(serializers.ModelSerializer):
-    created_by = serializers.CharField(source='created_by.name', read_only=True)
-    members= serializers.SerializerMethodField()
+class CreateCommunitySerializer(serializers.ModelSerializer):
+    created_by = serializers.SerializerMethodField()
+    members = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Community
+        fields = '__all__'
+
+    def get_created_by(self, obj):
+        return obj.created_by.name if obj.created_by else "Unknown"
+       
+    def get_members(self, obj):
+        return [member.name for member in obj.members.all()] 
+   
+
+    
+class JoinAsMemberCommunitySerializer(serializers.ModelSerializer):
+   
     class Meta:
         model = Community
         fields ='__all__'
     
-    def get_members(self, obj):
-        return [member.name for member in obj.members.all()] 
+
    
