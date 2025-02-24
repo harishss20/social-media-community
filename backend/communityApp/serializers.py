@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser ,Profile
+from .models import  Community
 
 
 class LoginSerializer(serializers.Serializer):
@@ -27,3 +28,22 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         password = validated_data.get('password')
         user = CustomUser.objects.create_user(username=username, email=email, password=password)
         return user
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(format='hex_verbose')
+    class Meta:
+        model = Profile
+        fields = '__all__'
+
+
+class CommunitySerializer(serializers.ModelSerializer):
+    created_by = serializers.CharField(source='created_by.name', read_only=True)
+    members= serializers.SerializerMethodField()
+    class Meta:
+        model = Community
+        fields ='__all__'
+    
+    def get_members(self, obj):
+        return [member.name for member in obj.members.all()] 
+   
