@@ -50,6 +50,8 @@ class Profile(models.Model):
     bannerImage_url = models.URLField(blank=True, null=True)
     date_joined = models.DateField(auto_now_add=True, null=True)
     user_status = models.BooleanField(default=False)
+    
+
 
     def __str__(self):
         return f"{self.user.username}'s Profile"

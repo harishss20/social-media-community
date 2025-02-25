@@ -32,7 +32,11 @@ class LoginView(APIView):
 
             if user:
                 profile = user.profile
+
                 show_join_communities = not profile.user_status
+
+               
+
                 if show_join_communities:
                     profile.has_seen_join_communities = True
                     profile.save() 
