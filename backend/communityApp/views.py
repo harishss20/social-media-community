@@ -31,6 +31,11 @@ class LoginView(APIView):
             user = authenticate(request, email=email, password=password) 
 
             if user:
+                profile = user.profile
+                show_join_communities = not profile.has_seen_join_communities
+                if show_join_communities:
+                    profile.has_seen_join_communities = True
+                    profile.save() 
                 tokens = get_tokens_for_user(user)
                 return Response({
                     "message": "Login successful",
