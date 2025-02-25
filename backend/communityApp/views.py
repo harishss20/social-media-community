@@ -73,7 +73,6 @@ class ProfileView(APIView):
 
     def get(self, request):
         id = request.query_params.get('id', None)
-        print(id)
         if id:
             profile = Profile.objects.filter(id=id).first()
             if profile:
@@ -83,7 +82,22 @@ class ProfileView(APIView):
                 return Response({"message": "user is not register"}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({"error": "Username is required"}, status=status.HTTP_400_BAD_REQUEST)
-
+    
+    def patch(self, request):
+        id = request.query_params.get('id', None)
+        if id:
+            try:
+                profile = Profile.objects.get(id=id)
+            except Profile.DoesNotExist:
+                return Response({"error": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+            serializer = ProfileSerializer(profile, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "Profile updated successfully"}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Profile ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
 
 class CreateCommunityView(APIView):
     
@@ -106,6 +120,20 @@ class CreateCommunityView(APIView):
             serializer.save()
             return Response({"message": "community is created successfully"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request):
+        community_name = request.query_params.get('name', None)
+        if community_name:
+            try:
+                community = Community.objects.get(name=community_name)
+            except Community.DoesNotExist:
+                return Response({"error": "Community not found"}, status=status.HTTP_404_NOT_FOUND)
+            serializer = CreateCommunitySerializer(community, data=request.data, partial=True)  
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "Community is updated successfully"}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Community name is required"}, status=status.HTTP_400_BAD_REQUEST)
 
 class JoinCommunityView(APIView):
     def post(self, request):

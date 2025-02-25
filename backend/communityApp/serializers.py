@@ -35,18 +35,20 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = '__all__'
+        read_only_fields=['id','name','date_joined','user']
 
 
 class CreateCommunitySerializer(serializers.ModelSerializer):
-    created_by = serializers.SerializerMethodField()
+    owner = serializers.SerializerMethodField()
     members = serializers.SerializerMethodField()
     
     class Meta:
         model = Community
         fields = '__all__'
+        read_only_fields=['id','created_at','owner','members','name']
 
-    def get_created_by(self, obj):
-        return obj.created_by.name if obj.created_by else "Unknown"
+    def get_owner(self, obj):
+        return obj.owner.name if obj.owner else "Unknown"
        
     def get_members(self, obj):
         return [member.name for member in obj.members.all()] 
