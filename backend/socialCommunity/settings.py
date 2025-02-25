@@ -29,6 +29,7 @@ SECRET_KEY = 'django-insecure-&q-fn9j(j9!6$&!5rf!i$a*e52g8l(wh*7tfet+(@ltsy-mqia
 DEBUG = True
 
 ALLOWED_HOSTS = []
+  
 
 
 # Application definition
@@ -42,7 +43,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'communityApp',
     'rest_framework',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    "corsheaders",
+    
+
 ]
 
 REST_FRAMEWORK = {
@@ -62,6 +66,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
+]
+
+CORS_ALLOWED_ORIGINS = [
+
+    "http://localhost:3000", 
+    "http://127.0.0.1:3000",
 ]
 
 ROOT_URLCONF = 'socialCommunity.urls'

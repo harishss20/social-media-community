@@ -26,4 +26,9 @@ Do all changes in the code and push the code to your forked repo and "create pul
 # backend
 
 1. py -m venv venv
-2. pip install djangorestframework-simplejwt mysqlclient
+2. pip install djangorestframework-simplejwt
+3. pip install mysqlclient
+4. pip install crytography
+5. pip install django-cors-headers
+6. pip install djangorestframework
+7. pip install pymysql

@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractUser
 
@@ -21,14 +22,13 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True) 
-
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff=True.')
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self.create_user(username,email, password, **extra_fields)
-    
+
 class  CustomUser(AbstractUser):
 
     username = models.CharField(max_length=150, unique=True)
@@ -40,4 +40,36 @@ class  CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username;
+
+class Profile(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    bio = models.TextField(blank=True, null=True)
+    profileImage_url = models.URLField(blank=True, null=True)
+    bannerImage_url = models.URLField(blank=True, null=True)
+    date_joined = models.DateField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s Profile"
+
+
+
+
+class Community(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+    description= models.TextField(blank=True, null=True)
+    community_based_on=models.CharField(max_length=50)
+    rules=models.TextField(max_length=500,blank=True, null=True)
+    members= models.ManyToManyField(Profile, related_name="communities_joined",blank=True)
+    communityImage_url = models.URLField(blank=True, null=True)
+    bannerImage_url = models.URLField(blank=True, null=True)
+    created_by = models.ForeignKey(Profile,on_delete=models.CASCADE,related_name="communities_created")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self):
+        return self.name
+
 
