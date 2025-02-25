@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinAsMemberCommunitySerializer
+from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinCommunitySerializer
 from .models import Profile ,Community
 
 from django.shortcuts import get_object_or_404
@@ -115,7 +115,7 @@ class CreateCommunityView(APIView):
             return Response({"error": "community Id is required"}, status=status.HTTP_400_BAD_REQUEST)
         
     def post(self, request):
-        serializer = JoinAsMemberCommunitySerializer(data=request.data)
+        serializer = JoinCommunitySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "community is created successfully"}, status=status.HTTP_201_CREATED)

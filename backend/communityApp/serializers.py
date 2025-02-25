@@ -32,11 +32,16 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(format='hex_verbose')
+    community_created=serializers.SerializerMethodField()
+   
     class Meta:
         model = Profile
         fields = '__all__'
-        read_only_fields=['id','name','date_joined','user']
+        read_only_fields=['id','name','date_joined','user','community_created']
 
+    def get_community_created(self, obj):
+        return Community.objects.filter(owner=obj).count() 
+ 
 
 class CreateCommunitySerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
@@ -55,7 +60,7 @@ class CreateCommunitySerializer(serializers.ModelSerializer):
    
 
     
-class JoinAsMemberCommunitySerializer(serializers.ModelSerializer):
+class JoinCommunitySerializer(serializers.ModelSerializer):
    
     class Meta:
         model = Community
