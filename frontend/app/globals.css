@@ -25,17 +25,18 @@ body {
   margin: 0px;
   padding: 0px;
   font-family: Poppins, sans-serif;
+  height: 100vh;
   background: #1e1f26;
   overflow-x: hidden;
 }
 
-img {
+.loginSvg {
   width: 0vw;
   max-width: 100vh;
   min-width: 100px;
 }
 
-input {
+.loginInput {
   padding: 5px 25px;
   border-radius: 2px;
   width: 100%;
@@ -46,7 +47,7 @@ input {
   transition-duration: 500ms;
 }
 
-button {
+.loginButton {
   padding: 1vh;
   min-width: 100%;
   border-radius: 3px;
@@ -54,7 +55,7 @@ button {
   transition-timing-function: ease-in-out;
 }
 
-button:hover {
+.loginButton:hover {
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
 }
 
@@ -68,7 +69,7 @@ button:hover {
   height: 100vh;
 }
 
-.formLayout {
+.loginFormLayout {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -82,7 +83,7 @@ button:hover {
   /* border: white 1px solid; */
 }
 
-.inputContainer {
+.loginInputContainer {
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -96,12 +97,12 @@ button:hover {
   gap: 5px;
 }
 
-input:focus {
+.loginInput:focus {
   border-bottom: 1px solid #8b5cf6;
 }
 
 @media screen and (min-width: 600px) {
-  img {
+  .loginSvg {
     width: 40vw;
   }
   
