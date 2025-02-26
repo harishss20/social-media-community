@@ -34,13 +34,14 @@ class LoginView(APIView):
                 profile = user.profile
                 show_join_communities = not profile.user_status
                 if show_join_communities:
-                    profile.has_seen_join_communities = True
+                    profile.user_status = True
                     profile.save() 
                 tokens = get_tokens_for_user(user)
                 return Response({
                     "message": "Login successful",
                     "tokens": tokens,
-                    "user_status":show_join_communities
+                    "user_status":show_join_communities,
+                    "user_id": str(profile.id)
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Password is wrong "}, status=status.HTTP_401_UNAUTHORIZED)
