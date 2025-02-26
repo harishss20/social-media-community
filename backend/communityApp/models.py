@@ -51,8 +51,6 @@ class Profile(models.Model):
     date_joined = models.DateField(auto_now_add=True, null=True)
     user_status = models.BooleanField(default=False)
     
-
-
     def __str__(self):
         return f"{self.user.username}'s Profile"
 
