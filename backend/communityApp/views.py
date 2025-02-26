@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinAsMemberCommunitySerializer
+from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinCommunitySerializer
 from .models import Profile ,Community
 
 from django.shortcuts import get_object_or_404
@@ -31,10 +31,20 @@ class LoginView(APIView):
             user = authenticate(request, email=email, password=password) 
 
             if user:
+                profile = user.profile
+
+                show_join_communities = not profile.user_status
+
+               
+
+                if show_join_communities:
+                    profile.has_seen_join_communities = True
+                    profile.save() 
                 tokens = get_tokens_for_user(user)
                 return Response({
                     "message": "Login successful",
-                    "tokens": tokens
+                    "tokens": tokens,
+                    "user_status":show_join_communities
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Password is wrong "}, status=status.HTTP_401_UNAUTHORIZED)
@@ -73,7 +83,6 @@ class ProfileView(APIView):
 
     def get(self, request):
         id = request.query_params.get('id', None)
-        print(id)
         if id:
             profile = Profile.objects.filter(id=id).first()
             if profile:
@@ -83,7 +92,22 @@ class ProfileView(APIView):
                 return Response({"message": "user is not register"}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({"error": "Username is required"}, status=status.HTTP_400_BAD_REQUEST)
-
+    
+    def patch(self, request):
+        id = request.query_params.get('id', None)
+        if id:
+            try:
+                profile = Profile.objects.get(id=id)
+            except Profile.DoesNotExist:
+                return Response({"error": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+            serializer = ProfileSerializer(profile, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "Profile updated successfully"}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Profile ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
 
 class CreateCommunityView(APIView):
     
@@ -101,11 +125,25 @@ class CreateCommunityView(APIView):
             return Response({"error": "community Id is required"}, status=status.HTTP_400_BAD_REQUEST)
         
     def post(self, request):
-        serializer = JoinAsMemberCommunitySerializer(data=request.data)
+        serializer = JoinCommunitySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "community is created successfully"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request):
+        community_name = request.query_params.get('name', None)
+        if community_name:
+            try:
+                community = Community.objects.get(name=community_name)
+            except Community.DoesNotExist:
+                return Response({"error": "Community not found"}, status=status.HTTP_404_NOT_FOUND)
+            serializer = CreateCommunitySerializer(community, data=request.data, partial=True)  
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "Community is updated successfully"}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Community name is required"}, status=status.HTTP_400_BAD_REQUEST)
 
 class JoinCommunityView(APIView):
     def post(self, request):
