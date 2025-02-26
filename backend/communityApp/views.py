@@ -29,14 +29,9 @@ class LoginView(APIView):
             email = serializer.validated_data['email']
             password = serializer.validated_data['password']
             user = authenticate(request, email=email, password=password) 
-
             if user:
                 profile = user.profile
-
                 show_join_communities = not profile.user_status
-
-               
-
                 if show_join_communities:
                     profile.user_status = True
                     profile.save() 
