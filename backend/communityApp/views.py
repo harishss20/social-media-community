@@ -44,6 +44,7 @@ class LoginView(APIView):
                 return Response({
                     "message": "Login successful",
                     "tokens": tokens,
+
                     "user_status":show_join_communities,
                     "user_id": str(profile.id)
                 }, status=status.HTTP_200_OK)
