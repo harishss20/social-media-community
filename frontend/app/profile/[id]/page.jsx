@@ -134,46 +134,46 @@ export default function ProfilePage() {
 
                 <div className="w-full pl-14 pr-14 flex flex-col justify-start">
                     <div className="h-14 flex justify-between items-center">
-                        <h1 className="text-2xl text-accent">{userData.username}</h1>
+                        <h1 className="text-3xl text-accent"><b>{userData.username}</b></h1>
                     </div>
-                    <hr className="border-secondary" />
+                    <hr className="border-secondary border-[1px]" />
 
                     <div className="pt-5 pl-10 pr-10 flex flex-col space-y-10">
                         <section className="">
                             <div className="flex flex-row items-center space-x-3">
-                                <h1 className="text-lg text-secondary ">Bio</h1>
+                                <h1 className="text-xl text-secondary ">Bio</h1>
                                 {!editbio && <FontAwesomeIcon icon={faEdit} onClick={() => setEditbio(true)} className="cursor-pointer text-secondary" />}
                             </div>
                             {editbio ?
                                 <div className="w-full h-36 ">
-                                    <textarea maxLength={400} className="w-full p-2 text-sm h-[80%] resize-none bg-transparent border-2 border-white rounded-sm outline-none">
+                                    <textarea maxLength={400} className="w-full p-2 text-sm h-[80%] resize-none bg-transparent border-2 border-[#CAC8FF] rounded-sm outline-none text-white placeholder-white ">
                                     </textarea>
                                     <div className="w-full flex flex-row items-center justify-end space-x-5">
-                                        <button
+                                        <button className="text-white px-4 py-2 rounded-2xl hover:font-bold hover:bg-accent transition duration-300 mt-2"
                                             onClick={() => {
                                                 setBio(userData.bio);
                                                 setEditbio(false);
                                             }}
                                         >Cancel
                                         </button>
-                                        <button type="submit" onClick={handleSubmit}>Save</button>
+                                        <button className="text-white px-4 py-2 rounded-2xl hover:font-bold hover:bg-[#1E1F26] transition duration-300 mt-2" type="submit" onClick={handleSubmit}>Save</button>
 
                                     </div>
                                 </div>
                                 :
-                                <p className="text-xs px-4 text-white">{userData.bio}</p>
+                                <p className="text-lg px-4 text-white">{userData.bio}</p>
                             }
                         </section>
                         <div className="flex flex-row justify-between">
 
                             <section className="">
-                                <h1 className="text-lg text-secondary">Member since</h1>
-                                <p className="text-xs px-4 text-white">{userData.date_joined}</p>
+                                <h1 className="text-xl text-secondary">Member since</h1>
+                                <p className="text-lg px-4 text-white">{userData.date_joined}</p>
                             </section>
 
                             <section className="">
-                                <h1 className="text-lg text-secondary">Communities created</h1>
-                                <p className="text-xs px-4 text-white">{userData.community_created}</p>
+                                <h1 className="text-xl text-secondary">Communities created</h1>
+                                <p className="text-lg px-4 text-white">{userData.community_created}</p>
                             </section>
                         </div>
                     </div>
@@ -190,7 +190,7 @@ export default function ProfilePage() {
                         className="w-[200px] h-[100px] rounded-md absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center space-y-3 p-2 bg-slate-700"
                     >
                         <p className="cursor-pointer" onClick={() => setIsBannerZoomed(!isBannerZoomed)}>View Banner</p>
-                        <hr className="w-full " />
+                        <hr className="w-full" />
                         <input type="file" accept="image/*" ref={bannerFile} className="hidden" onChange={bannerHandle}></input>
                         <p className="cursor-pointer" onClick={() => bannerFile.current.click()}>Change Banner</p>
                     </div>
