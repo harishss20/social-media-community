@@ -50,7 +50,7 @@ class CreateCommunitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Community
         fields = '__all__'
-        read_only_fields=['id','created_at','owner','members','name']
+        read_only_fields=['id','created_at','owner','members']
 
     def get_owner(self, obj):
         return obj.owner.name if obj.owner else "Unknown"
