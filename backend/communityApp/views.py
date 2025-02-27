@@ -111,7 +111,6 @@ class CreateCommunityView(APIView):
     
     def get(self, request):
         community_name = request.query_params.get('name')
-        print(community_name)
         if community_name:
             community = Community.objects.filter(name=community_name).first()
             if community:
@@ -131,21 +130,18 @@ class CreateCommunityView(APIView):
     
     def patch(self, request):
         user_id = request.query_params.get('id',None)
-        print("user_id",user_id)
         community_name = request.data.get('name', None)
-        print("community_name",community_name)
+
         if community_name:
             try:
                 community = Community.objects.get(name=community_name)
-                print("community",community)
-                print("community.owner.id",community.owner.id)
             except Community.DoesNotExist:
                 return Response({"error": "Community not found"}, status=status.HTTP_404_NOT_FOUND)
             
             user_uuid= UUID(user_id)
             
             if not user_id or str(community.owner.id) != str(user_uuid):
-                    return Response({"Owner has the access to Edit"},status=status.HTTP_401_UNAUTHORIZED)   
+                    return Response({"error":"Owner has the access to Edit"},status=status.HTTP_401_UNAUTHORIZED)   
             
             serializer = CreateCommunitySerializer(community, data=request.data, partial=True)  
             if serializer.is_valid():
@@ -153,10 +149,28 @@ class CreateCommunityView(APIView):
                 return Response({"message": "Community is updated successfully"}, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({"error": "Community name is required"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request):
+        user_id=request.query_params.get('id',None)
+        community_name = request.data.get('name',None)
+        if community_name:
+            try:
+                community = Community.objects.get(name=community_name)
+            except Community.DoesNotExist:
+                return Response({"error": "Community not found"}, status=status.HTTP_404_NOT_FOUND)
+         
+            user_uuid = UUID(user_id)
+            if str(community.owner.id) != str(user_uuid):
+                return Response({"error": "Owner has the access to Delete Community"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            community.delete()
+            return Response({"message":"community deleted successfully"},status=status.HTTP_200_OK)
+
+
 
 class JoinCommunityView(APIView):
     def post(self, request):
-        user_id= request.query_params.get("id",None);
+        user_id= request.data.get("user_id");
         community_name = request.data.get("community_name")    
 
         if not user_id or not community_name:
