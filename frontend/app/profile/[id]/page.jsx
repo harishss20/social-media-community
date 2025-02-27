@@ -36,7 +36,7 @@ export default function ProfilePage() {
         try {
             setBannerOpen(false);
             setPicOpen(false);
-
+            
             //PATCH method for editing profile page
             const response = await fetch(`http://localhost:8000/api/profile?id=${userData.id}`, {
                 method: "PATCH",
@@ -45,10 +45,10 @@ export default function ProfilePage() {
                 },
                 body: JSON.stringify({ bannerImage_url, profileImage_url, bio }),
             });
-
+           
             if (response.ok) {
                 alert("Profile edited!");
-                setEditOpen(false);
+                setEditbio(false);
             } else {
                 alert(data.error || "Something went wrong");
             }
@@ -59,16 +59,47 @@ export default function ProfilePage() {
 
     };
 
-    const bannerHandle = (e) => {
-        userData.bannerImage_url = e.target.files[0];
-        handleSubmit(e);
-    }
+    const uploadToCloudinary = async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "Profile_img");
+        formData.append("cloud_name", "dttdxreiq");
+    
+        try {
+            const response = await fetch("https://api.cloudinary.com/v1_1/dttdxreiq/image/upload", {
+                method: "POST",
+                body: formData,
+            });
+    
+            const data = await response.json();
+            return data.secure_url; 
+        } catch (error) {
+            console.error("Cloudinary Upload Error:", error);
+            return null;
+        }
+    };
 
-    const profileHandle = (e) => {
-        e.preventDefault();
-        userData.profileImage_url = e.target.files[0];
-        handleSubmit(e);
-    }
+    const bannerHandle = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+    
+        const imageUrl = await uploadToCloudinary(file);
+        if (imageUrl) {
+            setBannerImage_url(imageUrl);
+            handleSubmit(e);
+        }
+    };
+
+    const profileHandle = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+    
+        const imageUrl = await uploadToCloudinary(file);
+        if (imageUrl) {
+            setProfileImage_url(imageUrl);
+            handleSubmit(e);
+        }
+    };
 
     if (error) return null;
     if (!userData.bannerImage_url || !userData.profileImage_url) return <p>Loading...</p>
@@ -77,7 +108,7 @@ export default function ProfilePage() {
 
 
             <div
-                className="w-[800px] pb-10 flex flex-col items-center space-y-28 bg-gray-500 rounded-xl relative">
+                className="w-[800px] pb-10 flex flex-col items-center space-y-28 bg-[#343538] rounded-xl relative">
 
                 <div
                     onClick={() => setBannerOpen(true)}
@@ -103,46 +134,46 @@ export default function ProfilePage() {
 
                 <div className="w-full pl-14 pr-14 flex flex-col justify-start">
                     <div className="h-14 flex justify-between items-center">
-                        <h1 className="text-2xl">{userData.username}</h1>
+                        <h1 className="text-3xl text-accent"><b>{userData.username}</b></h1>
                     </div>
-                    <hr />
+                    <hr className="border-secondary border-[1px]" />
 
                     <div className="pt-5 pl-10 pr-10 flex flex-col space-y-10">
                         <section className="">
                             <div className="flex flex-row items-center space-x-3">
-                                <h1 className="text-lg">Bio</h1>
-                                {!editbio && <FontAwesomeIcon icon={faEdit} onClick={() => setEditbio(true)} className="cursor-pointer" />}
+                                <h1 className="text-xl text-secondary ">Bio</h1>
+                                {!editbio && <FontAwesomeIcon icon={faEdit} onClick={() => setEditbio(true)} className="cursor-pointer text-secondary" />}
                             </div>
                             {editbio ?
                                 <div className="w-full h-36 ">
-                                    <textarea maxLength={400} className="w-full p-2 text-sm h-[80%] resize-none bg-transparent border-2 border-white rounded-sm outline-none">
+                                    <textarea maxLength={400} className="w-full p-2 text-sm h-[80%] resize-none bg-transparent border-2 border-[#CAC8FF] rounded-sm outline-none text-white placeholder-white ">
                                     </textarea>
                                     <div className="w-full flex flex-row items-center justify-end space-x-5">
-                                        <button
+                                        <button className="text-white px-4 py-2 rounded-2xl hover:font-bold hover:bg-accent transition duration-300 mt-2"
                                             onClick={() => {
                                                 setBio(userData.bio);
                                                 setEditbio(false);
                                             }}
                                         >Cancel
                                         </button>
-                                        <button type="submit" onClick={handleSubmit}>Save</button>
+                                        <button className="text-white px-4 py-2 rounded-2xl hover:font-bold hover:bg-[#1E1F26] transition duration-300 mt-2" type="submit" onClick={handleSubmit}>Save</button>
 
                                     </div>
                                 </div>
                                 :
-                                <p className="text-xs px-4">{userData.bio}</p>
+                                <p className="text-lg px-4 text-white">{userData.bio}</p>
                             }
                         </section>
                         <div className="flex flex-row justify-between">
 
                             <section className="">
-                                <h1 className="text-lg">Member since</h1>
-                                <p className="text-xs px-4">{userData.date_joined}</p>
+                                <h1 className="text-xl text-secondary">Member since</h1>
+                                <p className="text-lg px-4 text-white">{userData.date_joined}</p>
                             </section>
 
                             <section className="">
-                                <h1 className="text-lg">Communities created</h1>
-                                <p className="text-xs px-4">{userData.community_created}</p>
+                                <h1 className="text-xl text-secondary">Communities created</h1>
+                                <p className="text-lg px-4 text-white">{userData.community_created}</p>
                             </section>
                         </div>
                     </div>
