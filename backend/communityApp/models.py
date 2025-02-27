@@ -56,7 +56,7 @@ class Profile(models.Model):
 
 class Community(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100,unique=True)
     description = models.TextField(blank=True, null=True)
     community_based_on = models.CharField(max_length=50)
     rules = models.TextField(max_length=500, blank=True, null=True)
