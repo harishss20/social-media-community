@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faKey, faUser } from "@fortawesome/free-solid-svg-icons";
 import { faGoogle, faFacebook } from "@fortawesome/free-brands-svg-icons";
@@ -109,19 +109,19 @@ export default function SignupPage() {
   return (
     <div className="mainContainer">
       <div>
-        <img src="/dummy.png" alt="Dummy Image" />
+        <img src="/dummy.png" alt="Dummy Image" className="loginSvg" />
       </div>
 
-      <div className="formContainer">
-        <form className="formLayout text-xs" onSubmit={handleSubmit}>
-          <div className="inputContainer relative">
+      <div className="">
+        <form className="loginFormLayout text-xs" onSubmit={handleSubmit}>
+          <div className="loginInputContainer relative">
             <label className="">Username</label>
             <input
               maxLength={15}
               min={3}
               type="text"
               placeholder="Name"
-              className={username == "" ? "" : "text-[#cac8ff]"}
+              className={`loginInput  ${username == "" ? "" : "text-[#cac8ff]"}`}
               value={username}
               onChange={(e) => {
                 setUsername(e.target.value);
@@ -146,13 +146,13 @@ export default function SignupPage() {
             />
           </div>
 
-          <div className="inputContainer relative">
+          <div className="loginInputContainer relative">
             <label className="">Email</label>
             <input
               type="email"
               tooltip="Enter a valid email address"
               placeholder="example@gmail.com"
-              className={email == "" ? "" : "text-[#cac8ff]"}
+              className={`loginInput  ${email == "" ? "" : "text-[#cac8ff]"}`}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
@@ -173,12 +173,12 @@ export default function SignupPage() {
             />
           </div>
 
-          <div className="inputContainer relative">
+          <div className="loginInputContainer relative">
             <label className="">Password</label>
             <input
               type="password"
               placeholder="********"
-              className={password == "" ? "" : "text-[#cac8ff]"}
+              className={`loginInput  ${password == "" ? "" : "text-[#cac8ff]"}`}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onBlur={() => setTouched((prev) => ({ ...prev, password: true }))}
@@ -198,12 +198,12 @@ export default function SignupPage() {
             />
           </div>
 
-          <div className="inputContainer relative">
+          <div className="loginInputContainer relative">
             <label className="">Confirm Password</label>
             <input
               type="password"
               placeholder="********"
-              className={confirmPassword == "" ? "" : "text-[#cac8ff]"}
+              className={`loginInput  ${confirmPassword == "" ? "" : "text-[#cac8ff]"}`}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               onBlur={() =>
@@ -230,7 +230,7 @@ export default function SignupPage() {
 
           <button
             type="submit"
-            className="mt-3 bg-[#ff3d3d]"
+            className="loginButton mt-3 bg-[#ff3d3d]"
             disabled={!isFormValid}
           >
             Register
@@ -247,7 +247,7 @@ export default function SignupPage() {
               icon={faGoogle}
               className="absolute top-2 left-9"
             />
-            <button className="bg-[#1d1d21]">Continue with Google</button>
+            <button className="loginButton bg-[#1d1d21]">Continue with Google</button>
           </div>
 
           <div className="w-full relative">
@@ -255,7 +255,7 @@ export default function SignupPage() {
               icon={faFacebook}
               className="absolute top-2 left-7"
             />
-            <button className="bg-[#1877F2]">Continue with Facebook</button>
+            <button className="loginButton bg-[#1877F2]">Continue with Facebook</button>
           </div>
 
           <div className="w-full flex justify-evenly">
