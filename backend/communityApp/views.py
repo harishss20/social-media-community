@@ -111,6 +111,7 @@ class ProfileView(APIView):
 
 class CreateCommunityView(APIView):
     
+    
     def get(self, request):
         community_name = request.query_params.get('name')
         if community_name:
@@ -119,11 +120,21 @@ class CreateCommunityView(APIView):
                 serializer = CreateCommunitySerializer(community)
                 return Response({'data': serializer.data}, status=status.HTTP_200_OK)
             else:
-                return Response({"message": "Community name is not exists"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Community is not exists"}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({"error": "community Id is required"}, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response({"error": "community names is required"}, status=status.HTTP_400_BAD_REQUEST)
+      
     def post(self, request):
+        #gets all the community based on category
+        community_based_on=request.data.get('category')
+        print(community_based_on)
+        if community_based_on:
+            communities=Community.objects.filter(community_based_on__startswith=community_based_on)
+            if communities:
+                serializer=JoinCommunitySerializer(communities, many=True)
+                return Response({'data':serializer.data},status=status.HTTP_200_OK)
+        
+        #To create community
         serializer = JoinCommunitySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -167,8 +178,7 @@ class CreateCommunityView(APIView):
             
             community.delete()
             return Response({"message":"community deleted successfully"},status=status.HTTP_200_OK)
-
-
+                
 
 class JoinCommunityView(APIView):
     def post(self, request):
