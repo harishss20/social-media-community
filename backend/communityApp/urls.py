@@ -14,6 +14,5 @@ urlpatterns = [
     path('posts/', PostListCreateView.as_view(), name='post-list-create'),
     path('posts/<uuid:pk>/', PostRetrieveUpdateDestroyView.as_view(), name='post-detail'),
 
-]
 
 

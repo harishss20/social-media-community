@@ -1,6 +1,8 @@
 import pymysql
 pymysql.install_as_MySQLdb()
 
+from datetime import timedelta
+
 """
 Django settings for socialCommunity project.
 
@@ -51,6 +53,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=25), 
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    
 }
 
 

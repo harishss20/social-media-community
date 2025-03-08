@@ -75,7 +75,6 @@ class PostSerializer(serializers.ModelSerializer):
     )
     total_likes = serializers.ReadOnlyField()
 
-
     class Meta():
         model = Post
         fields ='__all__'
