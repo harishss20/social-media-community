@@ -164,7 +164,7 @@ class CreateCommunityView(APIView):
         return Response({"error": "Community name is required"}, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request):
-        user_id=request.query_params.get('id',None)
+        user_id=request.data.get('user_id',None)
         community_name = request.data.get('name',None)
         if community_name:
             try:
