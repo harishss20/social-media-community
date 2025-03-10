@@ -75,23 +75,16 @@ class UserRegistrationView(APIView):
 
 class ProfileView(APIView):
 
-    
-    # def get(self, request):
-    #     profiles = Profile.objects.all()
-    #     serializer= ProfileSerializer(profiles , many=True)
-    #     return Response({'data': serializer.data}, status=status.HTTP_200_OK)
-
-    def get(self, request):
-        id = request.query_params.get('id', None)
-        if id:
-            profile = Profile.objects.filter(id=id).first()
-            if profile:
-                serializer = ProfileSerializer(profile)
-                return Response({'data': serializer.data}, status=status.HTTP_200_OK)
-            else:
-                return Response({"message": "user is not register"}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({"error": "Username is required"}, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request):       
+        user_id = request.query_params.get('id', None);
+        if not user_id:
+            return Response({"error": "User ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        profile = get_object_or_404(Profile, id=user_id)
+        profile_serializer = ProfileSerializer(profile)
+       
+        return Response({
+            "profile": profile_serializer.data,
+        }, status=status.HTTP_200_OK)
     
     def patch(self, request):
         id = request.query_params.get('id', None)
@@ -110,8 +103,7 @@ class ProfileView(APIView):
         
 
 class CreateCommunityView(APIView):
-    
-    
+
     def get(self, request):
         community_name = request.query_params.get('name')
         if community_name:
@@ -179,6 +171,40 @@ class CreateCommunityView(APIView):
             community.delete()
             return Response({"message":"community deleted successfully"},status=status.HTTP_200_OK)
                 
+class ProfileBasedCommunityView(APIView):
+
+    def get(self, request):
+        user_id = request.query_params.get('id')
+        if user_id:
+            community = Community.objects.filter(owner_id=user_id)
+            print(community)
+            if community:
+                serializer = JoinCommunitySerializer(community, many=True)
+                return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message": "User Does not joined Any Community"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"error": "community Id is required"}, status=status.HTTP_400_BAD_REQUEST)
+      
+class userJoinedCommunityView(APIView):
+    def get(self, request):
+        user_id= request.query_params.get('id')
+                   
+        if user_id:
+            profile = get_object_or_404(Profile, id=user_id)
+            community = profile.communities_joined.all()
+
+            if community:
+                serializer= CreateCommunitySerializer(community, many=True)
+                return Response({"joined_community":serializer.data},status=status.HTTP_200_OK)
+
+        else:
+            return Response({"error": "User Id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        
+
+            
 
 class JoinCommunityView(APIView):
     def post(self, request):
