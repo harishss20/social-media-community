@@ -6,7 +6,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .permissions import IsAuthorOrReadOnly,IsOwnerOrReadOnly, IsAuthenticatedForCreation
+from rest_framework.permissions import IsAuthenticatedOrReadOnly,AllowAny
 from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinCommunitySerializer, PostSerializer
 from .models import Profile ,Community, Post
 
@@ -26,6 +27,7 @@ def get_tokens_for_user(user):
         'access': str(refresh.access_token),
     }
 class LoginView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -52,6 +54,7 @@ class LoginView(APIView):
 
 
 class UserRegistrationView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
     
         serializer = UserRegistrationSerializer(data=request.data)
@@ -74,6 +77,7 @@ class UserRegistrationView(APIView):
             
 
 class ProfileView(APIView):
+    permission_classes = [IsOwnerOrReadOnly]
 
     def get(self, request):       
         user_id = request.query_params.get('id', None);
@@ -103,6 +107,8 @@ class ProfileView(APIView):
         
 
 class CreateCommunityView(APIView):
+
+    permission_classes = [IsAuthenticatedForCreation]
 
     def get(self, request):
         community_name = request.query_params.get('name')
@@ -207,6 +213,8 @@ class userJoinedCommunityView(APIView):
             
 
 class JoinCommunityView(APIView):
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
     def post(self, request):
         user_id= request.data.get("user_id");
         community_name = request.data.get("community_name")    
