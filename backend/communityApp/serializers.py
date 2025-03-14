@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import CustomUser ,Profile
-from .models import  Community
+from .models import  Community, Post
 
 
 class LoginSerializer(serializers.Serializer):
@@ -67,4 +67,15 @@ class JoinCommunitySerializer(serializers.ModelSerializer):
         fields ='__all__'
     
 
-   
+class PostSerializer(serializers.ModelSerializer):
+    author = ProfileSerializer(read_only= True)
+    community = serializers.SlugRelatedField(
+        queryset=Community.objects.all(), 
+        slug_field='name'  
+    )
+    total_likes = serializers.ReadOnlyField()
+
+    class Meta():
+        model = Post
+        fields ='__all__'
+        read_only_fields = ['id', 'author', 'community', 'created_at', 'updated_at', 'total_likes']  
