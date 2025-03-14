@@ -65,7 +65,7 @@ class Community(models.Model):
     bannerImage_url = models.URLField(default="https://res.cloudinary.com/dttdxreiq/image/upload/v1740691299/vlcgkfx6ul17fvokugpv.png")
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="communities_created")
     created_at = models.DateTimeField(auto_now_add=True)
-
+    
     def __str__(self):
         return self.name
 
