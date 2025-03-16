@@ -114,7 +114,7 @@ function CommunityCard({ communities, handleFromChild }) {
           handleJoinButton(communities.name);
         }}
       >
-        {join ? "Joined" : "Join"}
+        {join ? "Leave" : "Join"}
       </button>
     </div>
   );
