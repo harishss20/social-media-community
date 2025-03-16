@@ -1,11 +1,10 @@
-'use client';
+"use client";
 
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import useUserData from "../hooks/useUserData";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
-
 
 export default function ProfilePage() {
     const id = localStorage.getItem("UserId");
@@ -16,15 +15,14 @@ export default function ProfilePage() {
     const [bannerImage_url, setBannerImage_url] = useState(userData.bannerImage_url);
     const [profileImage_url, setProfileImage_url] = useState(userData.profileImage_url);
 
-    const [bannerOpen, setBannerOpen] = useState(false);
-    const [picOpen, setPicOpen] = useState(false);
-    const [editbio, setEditbio] = useState(false);
-    const [isProfileZoomed, setIsProfileZoomed] = useState(false);
-    const [isBannerZoomed, setIsBannerZoomed] = useState(false);
+  const [bannerOpen, setBannerOpen] = useState(false);
+  const [picOpen, setPicOpen] = useState(false);
+  const [editbio, setEditbio] = useState(false);
+  const [isProfileZoomed, setIsProfileZoomed] = useState(false);
+  const [isBannerZoomed, setIsBannerZoomed] = useState(false);
 
-
-    const bannerFile = useRef(null);
-    const profileFile = useRef(null);
+  const bannerFile = useRef(null);
+  const profileFile = useRef(null);
 
     useEffect(() => {
         if (userData.bio) setBio(userData.bio);
@@ -168,16 +166,16 @@ export default function ProfilePage() {
                     />
                 </div>
 
-                <div
-                    onClick={() => setPicOpen(true)}
-                    className="w-32 h-32 rounded-full border-4 bg-black border-gray-800 absolute left-10 top-3 overflow-hidden cursor-pointer"
-                >
-                    <img
-                        src={profileImage_url || "defaultProfile.png"}
-                        alt="profile-pic"
-                        className={`w-full h-full object-cover duration-500 ease-in-out ${picOpen ? "brightness-50" : "hover:brightness-50"}`}
-                    />
-                </div>
+        <div
+          onClick={() => setPicOpen(true)}
+          className="w-32 h-32 rounded-full border-4 bg-black border-gray-800 absolute left-10 top-3 overflow-hidden cursor-pointer"
+        >
+          <img
+            src={profileImage_url || "defaultProfile.png"}
+            alt="profile-pic"
+            className={`w-full h-full object-cover duration-500 ease-in-out ${picOpen ? "brightness-50" : "hover:brightness-50"}`}
+          />
+        </div>
 
                 <div className="w-full pl-14 pr-14 flex flex-col justify-start">
                     <div className="h-14 flex justify-between items-center">
@@ -231,63 +229,95 @@ export default function ProfilePage() {
                 </div>
             </div>
 
-            {bannerOpen &&
-                <div
-                    onClick={() => setBannerOpen(false)}
-                    className="fixed transition-all duration-500 ease-in-out hover:bg-black hover:bg-opacity-50 inset-0 z-10 flex flex-col items-center justify-center"
-                >
-                    <div
-                        onClick={(e) => e.stopPropagation()}
-                        className="w-[200px] h-[100px] rounded-md absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center space-y-3 p-2 bg-slate-700"
-                    >
-                        <p className="cursor-pointer" onClick={() => setIsBannerZoomed(!isBannerZoomed)}>View Banner</p>
-                        <hr className="w-full" />
-                        <input type="file" accept="image/*" ref={bannerFile} className="hidden" onChange={bannerHandle}></input>
-                        <p className="cursor-pointer" onClick={() => bannerFile.current.click()}>Change Banner</p>
-                    </div>
-                </div>
-            }
-
-            {picOpen &&
-                <div
-                    onClick={() => setPicOpen(false)}
-                    className="fixed transition-all duration-500 ease-in-out hover:bg-black hover:bg-opacity-50 inset-0 z-10 flex flex-col"
-                >
-                    <div
-                        onClick={(e) => e.stopPropagation()}
-                        className="w-[200px] h-[100px] rounded-md absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center space-y-3 p-2 bg-slate-700"
-                    >
-                        <p onClick={() => setIsProfileZoomed(!isProfileZoomed)} className="cursor-pointer">View Profile</p>
-                        <hr className="w-full" />
-                        <input type="file" accept="image/*" ref={profileFile} className="hidden" onChange={profileHandle}></input>
-                        <p className="cursor-pointer" onClick={() => profileFile.current.click()}>Change Profile</p>
-                    </div>
-                </div>
-            }
-            {isProfileZoomed && (
-                <div
-                    onClick={() => setIsProfileZoomed(!isProfileZoomed)}
-                    className="fixed inset-0 z-20 bg-black bg-opacity-80 flex items-center justify-center"
-                >
-                    <img
-                        src={profileImage_url || "defaultProfile.png"}
-                        alt="zoomed-profile-pic"
-                        className="max-w-[90%] max-h-[90%] object-contain cursor-pointer"
-                    />
-                </div>
-            )}
-            {isBannerZoomed && (
-                <div
-                    onClick={() => setIsBannerZoomed(!isBannerZoomed)}
-                    className="fixed inset-0 z-20 bg-black bg-opacity-80 flex items-center justify-center"
-                >
-                    <img
-                        src={bannerImage_url || "defaultBanner.png"}
-                        alt="zoomed-profile-pic"
-                        className="max-w-[90%] max-h-[90%] object-contain cursor-pointer"
-                    />
-                </div>
-            )}
+      {bannerOpen && (
+        <div
+          onClick={() => setBannerOpen(false)}
+          className="fixed transition-all duration-500 ease-in-out hover:bg-black hover:bg-opacity-50 inset-0 z-10 flex flex-col items-center justify-center"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-[200px] h-[100px] rounded-md absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center space-y-3 p-2 bg-slate-700"
+          >
+            <p
+              className="cursor-pointer"
+              onClick={() => setIsBannerZoomed(!isBannerZoomed)}
+            >
+              View Banner
+            </p>
+            <hr className="w-full" />
+            <input
+              type="file"
+              accept="image/*"
+              ref={bannerFile}
+              className="hidden"
+              onChange={bannerHandle}
+            ></input>
+            <p
+              className="cursor-pointer"
+              onClick={() => bannerFile.current.click()}
+            >
+              Change Banner
+            </p>
+          </div>
         </div>
-    );
+      )}
+
+      {picOpen && (
+        <div
+          onClick={() => setPicOpen(false)}
+          className="fixed transition-all duration-500 ease-in-out hover:bg-black hover:bg-opacity-50 inset-0 z-10 flex flex-col"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-[200px] h-[100px] rounded-md absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center space-y-3 p-2 bg-slate-700"
+          >
+            <p
+              onClick={() => setIsProfileZoomed(!isProfileZoomed)}
+              className="cursor-pointer"
+            >
+              View Profile
+            </p>
+            <hr className="w-full" />
+            <input
+              type="file"
+              accept="image/*"
+              ref={profileFile}
+              className="hidden"
+              onChange={profileHandle}
+            ></input>
+            <p
+              className="cursor-pointer"
+              onClick={() => profileFile.current.click()}
+            >
+              Change Profile
+            </p>
+          </div>
+        </div>
+      )}
+      {isProfileZoomed && (
+        <div
+          onClick={() => setIsProfileZoomed(!isProfileZoomed)}
+          className="fixed inset-0 z-20 bg-black bg-opacity-80 flex items-center justify-center"
+        >
+          <img
+            src={profileImage_url || "defaultProfile.png"}
+            alt="zoomed-profile-pic"
+            className="max-w-[90%] max-h-[90%] object-contain cursor-pointer"
+          />
+        </div>
+      )}
+      {isBannerZoomed && (
+        <div
+          onClick={() => setIsBannerZoomed(!isBannerZoomed)}
+          className="fixed inset-0 z-20 bg-black bg-opacity-80 flex items-center justify-center"
+        >
+          <img
+            src={bannerImage_url || "defaultBanner.png"}
+            alt="zoomed-profile-pic"
+            className="max-w-[90%] max-h-[90%] object-contain cursor-pointer"
+          />
+        </div>
+      )}
+    </div>
+  );
 }

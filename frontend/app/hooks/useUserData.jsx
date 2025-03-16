@@ -2,18 +2,18 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const dummyData = {
-    id: 1,
-    community_created: 2,
-    username: "Fredwin",
-    bio: "Hey There folks!",
-    bannerImage_url: "../defaultBanner.png",
-    profileImage_url: "../defaultProfile.png",
-    date_joined: "12 December 2012"
-}
+  id: 1,
+  community_created: 2,
+  username: "Fredwin",
+  bio: "Hey There folks!",
+  bannerImage_url: "../defaultBanner.png",
+  profileImage_url: "../defaultProfile.png",
+  date_joined: "12 December 2012",
+};
 export default function useUserData(id) {
-    const [userData, setUserData] = useState({});
-    const [error, setError] = useState(null);
-    const router = useRouter();
+  const [userData, setUserData] = useState({});
+  const [error, setError] = useState(null);
+  const router = useRouter();
 
     useEffect(() => {
         console.log(localStorage.getItem("UserId"));
@@ -49,8 +49,8 @@ export default function useUserData(id) {
             }
         };
 
-        fetchUser();
-    }, [id, router]);
+    fetchUser();
+  }, [id, router]);
 
-    return { userData, error };
-};
+  return { userData, error };
+}

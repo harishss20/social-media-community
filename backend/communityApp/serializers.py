@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import CustomUser ,Profile
-from .models import  Community
+from .models import  Community, Post
 
 
 class LoginSerializer(serializers.Serializer):
@@ -33,6 +33,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(format='hex_verbose')
     community_created=serializers.SerializerMethodField()
+    community_joined= serializers.SerializerMethodField()
+ 
    
     class Meta:
         model = Profile
@@ -40,7 +42,14 @@ class ProfileSerializer(serializers.ModelSerializer):
         read_only_fields=['id','name','date_joined','user','community_created']
 
     def get_community_created(self, obj):
-        return Community.objects.filter(owner=obj).count() 
+        print(obj.id)
+        return Community.objects.filter(owner=obj).count()
+        
+    def get_community_joined(self, obj):
+        profile= Profile.objects.get(id=obj.id)
+        return profile.communities_joined.all().count() 
+    
+
  
 
 class CreateCommunitySerializer(serializers.ModelSerializer):
@@ -67,4 +76,15 @@ class JoinCommunitySerializer(serializers.ModelSerializer):
         fields ='__all__'
     
 
-   
+class PostSerializer(serializers.ModelSerializer):
+    author = ProfileSerializer(read_only= True)
+    community = serializers.SlugRelatedField(
+        queryset=Community.objects.all(), 
+        slug_field='name'  
+    )
+    total_likes = serializers.ReadOnlyField()
+
+    class Meta():
+        model = Post
+        fields ='__all__'
+        read_only_fields = ['id', 'author', 'community', 'created_at', 'updated_at']  

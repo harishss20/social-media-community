@@ -5,8 +5,11 @@ from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinCommunitySerializer
-from .models import Profile ,Community
+from rest_framework import generics
+from .permissions import IsAuthorOrReadOnly,IsOwnerOrReadOnly, IsAuthenticatedForCreation
+from rest_framework.permissions import IsAuthenticatedOrReadOnly,AllowAny, IsAuthenticated
+from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinCommunitySerializer, PostSerializer
+from .models import Profile ,Community, Post
 
 from django.shortcuts import get_object_or_404
  
@@ -24,6 +27,7 @@ def get_tokens_for_user(user):
         'access': str(refresh.access_token),
     }
 class LoginView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -50,6 +54,7 @@ class LoginView(APIView):
 
 
 class UserRegistrationView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
     
         serializer = UserRegistrationSerializer(data=request.data)
@@ -72,24 +77,18 @@ class UserRegistrationView(APIView):
             
 
 class ProfileView(APIView):
+    permission_classes = [IsOwnerOrReadOnly]
 
-    
-    # def get(self, request):
-    #     profiles = Profile.objects.all()
-    #     serializer= ProfileSerializer(profiles , many=True)
-    #     return Response({'data': serializer.data}, status=status.HTTP_200_OK)
-
-    def get(self, request):
-        id = request.query_params.get('id', None)
-        if id:
-            profile = Profile.objects.filter(id=id).first()
-            if profile:
-                serializer = ProfileSerializer(profile)
-                return Response({'data': serializer.data}, status=status.HTTP_200_OK)
-            else:
-                return Response({"message": "user is not register"}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({"error": "Username is required"}, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request):       
+        user_id = request.query_params.get('id', None);
+        if not user_id:
+            return Response({"error": "User ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        profile = get_object_or_404(Profile, id=user_id)
+        profile_serializer = ProfileSerializer(profile)
+       
+        return Response({
+            "profile": profile_serializer.data,
+        }, status=status.HTTP_200_OK)
     
     def patch(self, request):
         id = request.query_params.get('id', None)
@@ -108,7 +107,9 @@ class ProfileView(APIView):
         
 
 class CreateCommunityView(APIView):
-    
+
+    permission_classes = [IsAuthenticatedForCreation]
+
     def get(self, request):
         community_name = request.query_params.get('name')
         if community_name:
@@ -117,11 +118,21 @@ class CreateCommunityView(APIView):
                 serializer = CreateCommunitySerializer(community)
                 return Response({'data': serializer.data}, status=status.HTTP_200_OK)
             else:
-                return Response({"message": "Community name is not exists"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Community is not exists"}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({"error": "community Id is required"}, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response({"error": "community names is required"}, status=status.HTTP_400_BAD_REQUEST)
+      
     def post(self, request):
+        #gets all the community based on category
+        community_based_on=request.data.get('category')
+        print(community_based_on)
+        if community_based_on:
+            communities=Community.objects.filter(community_based_on__startswith=community_based_on)
+            if communities:
+                serializer=JoinCommunitySerializer(communities, many=True)
+                return Response({'data':serializer.data},status=status.HTTP_200_OK)
+        
+        #To create community
         serializer = JoinCommunitySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -151,7 +162,7 @@ class CreateCommunityView(APIView):
         return Response({"error": "Community name is required"}, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request):
-        user_id=request.query_params.get('id',None)
+        user_id=request.data.get('user_id',None)
         community_name = request.data.get('name',None)
         if community_name:
             try:
@@ -165,10 +176,45 @@ class CreateCommunityView(APIView):
             
             community.delete()
             return Response({"message":"community deleted successfully"},status=status.HTTP_200_OK)
+                
+class ProfileBasedCommunityView(APIView):
+
+    def get(self, request):
+        user_id = request.query_params.get('id')
+        if user_id:
+            community = Community.objects.filter(owner_id=user_id)
+            print(community)
+            if community:
+                serializer = JoinCommunitySerializer(community, many=True)
+                return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message": "User Does not joined Any Community"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"error": "community Id is required"}, status=status.HTTP_400_BAD_REQUEST)
+      
+class userJoinedCommunityView(APIView):
+    def get(self, request):
+        user_id= request.query_params.get('id')
+                   
+        if user_id:
+            profile = get_object_or_404(Profile, id=user_id)
+            community = profile.communities_joined.all()
+
+            if community:
+                serializer= CreateCommunitySerializer(community, many=True)
+                return Response({"joined_community":serializer.data},status=status.HTTP_200_OK)
+
+        else:
+            return Response({"error": "User Id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+        
+
+            
 
 class JoinCommunityView(APIView):
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
     def post(self, request):
         user_id= request.data.get("user_id");
         community_name = request.data.get("community_name")    
@@ -186,4 +232,46 @@ class JoinCommunityView(APIView):
         community.save()
 
         return Response({"message": f"{profile.name} has joined {community.name}."}, status=status.HTTP_200_OK)
+
+
+class PostListCreateView(generics.ListCreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+
+    def perform_create(self, serializer):
+        serializer.save(author = self.request.user.profile)
+
+class PostRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def perform_update(self, serializer):
+        serializer.save(author = self.request.user.profile)
+
+class LikePostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            post = Post.objects.get(id=pk)
+            data = request.data
+            action = data.get('action')
+
+            if action == 'like':
+                post.likes_count+=1
+            elif action == 'unlike':
+                if post.likes_count > 0:
+                    post.likes_count -= 1
+            
+            post.save()
+            return Response({'likes_count':post.likes_count},status=status.HTTP_200_OK)
+        
+        except Post.DoesNotExist:
+            return Response({'error':'Post not found'},status = status.HTTP_404_NOT_FOUND)
+    
+
+
 
