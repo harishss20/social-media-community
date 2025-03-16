@@ -228,8 +228,6 @@ class JoinCommunityView(APIView):
                 return Response({"message": "Community is not exists"}, status=status.HTTP_400_BAD_REQUEST)
        
 
-
-    
     def post(self, request):
         user_id= request.data.get("user_id");
         community_name = request.data.get("community_name")    
@@ -247,7 +245,21 @@ class JoinCommunityView(APIView):
         community.save()
 
         return Response({"message": f"{profile.name} has joined {community.name}."}, status=status.HTTP_200_OK)
+    
+    def patch(self, request):
+        user_id= request.data.get("user_id");
+        community_name = request.data.get("community_name")    
 
+        if not user_id or not community_name:
+            return Response({"error": "User ID and Community ID are required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        profile = get_object_or_404(Profile, id=user_id)
+        community = get_object_or_404(Community, name=community_name)
+        community.members.remove(profile)
+        community.save()
+
+        return Response({"message": f"{profile.name} has Leaved {community.name}."}, status=status.HTTP_200_OK)
+        
 
 class PostListCreateView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
