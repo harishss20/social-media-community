@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 from .permissions import IsAuthorOrReadOnly,IsOwnerOrReadOnly, IsAuthenticatedForCreation
-from rest_framework.permissions import IsAuthenticatedOrReadOnly,AllowAny
+from rest_framework.permissions import IsAuthenticatedOrReadOnly,AllowAny, IsAuthenticated
 from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinCommunitySerializer, PostSerializer
 from .models import Profile ,Community, Post
 
@@ -250,6 +250,27 @@ class PostRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_update(self, serializer):
         serializer.save(author = self.request.user.profile)
+
+class LikePostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            post = Post.objects.get(id=pk)
+            data = request.data
+            action = data.get('action')
+
+            if action == 'like':
+                post.likes_count+=1
+            elif action == 'unlike':
+                if post.likes_count > 0:
+                    post.likes_count -= 1
+            
+            post.save()
+            return Response({'likes_count':post.likes_count},status=status.HTTP_200_OK)
+        
+        except Post.DoesNotExist:
+            return Response({'error':'Post not found'},status = status.HTTP_404_NOT_FOUND)
     
 
 
