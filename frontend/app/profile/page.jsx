@@ -2,16 +2,17 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import useUserData from "../../hooks/useUserData";
+import useUserData from "../hooks/useUserData";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 
 
 export default function ProfilePage() {
-    const { id } = useParams();
+    const id = localStorage.getItem("UserId");
     const { userData, error } = useUserData(id);
 
     const [bio, setBio] = useState(userData.bio);
+    const [tempBio, setTempBio] = useState("");
     const [bannerImage_url, setBannerImage_url] = useState(userData.bannerImage_url);
     const [profileImage_url, setProfileImage_url] = useState(userData.profileImage_url);
 
@@ -26,53 +27,98 @@ export default function ProfilePage() {
     const profileFile = useRef(null);
 
     useEffect(() => {
-        setBio(userData.bio);
-        setBannerImage_url(userData.bannerImage_url);
-        setProfileImage_url(userData.profileImage_url);
-    }, [userData])
+        if (userData.bio) setBio(userData.bio);
+        if (userData.bannerImage_url) setBannerImage_url(userData.bannerImage_url);
+        if (userData.profileImage_url) setProfileImage_url(userData.profileImage_url);
+    }, [userData.bio, userData.bannerImage_url, userData.profileImage_url]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const updateBannerImage = async (imageUrl) => {
+        console.log(userData.id, imageUrl);
         try {
-            setBannerOpen(false);
-            setPicOpen(false);
-            
-            //PATCH method for editing profile page
-            const response = await fetch(`http://localhost:8000/api/profile?id=${userData.id}`, {
+            const response = await fetch(`http://localhost:8000/api/profile/?id=${userData.id}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ bannerImage_url, profileImage_url, bio }),
+                body: JSON.stringify({ bannerImage_url: imageUrl }),
             });
-           
+
             if (response.ok) {
-                alert("Profile edited!");
-                setEditbio(false);
+                alert("Banner updated!");
+                setBannerOpen(false);
+                setBannerImage_url(imageUrl);
             } else {
-                alert(data.error || "Something went wrong");
+                alert("Failed to update banner.");
             }
         } catch (error) {
             console.error("Error:", error);
             alert("Server error. Please try again.");
         }
-
     };
+
+    const updateProfileImage = async (imageUrl) => {
+        console.log(userData.id, imageUrl);
+        try {
+            const response = await fetch(`http://localhost:8000/api/profile/?id=${userData.id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ profileImage_url: imageUrl }),
+            });
+
+            if (response.ok) {
+                alert("Profile picture updated!");
+                setPicOpen(false);
+                setProfileImage_url(imageUrl);
+            } else {
+                alert("Failed to update profile picture.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Server error. Please try again.");
+        }
+    };
+
+    const updateBio = async () => {
+        try {
+            const response = await fetch(`http://localhost:8000/api/profile/?id=${userData.id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ bio: tempBio }),
+            });
+
+            if (response.ok) {
+                alert("Bio updated!");
+                setEditbio(false);
+                setBio(tempBio);
+                setEditbio(false);
+            } else {
+                alert("Failed to update bio.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Server error. Please try again.");
+        }
+    };
+
 
     const uploadToCloudinary = async (file) => {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", "Profile_img");
         formData.append("cloud_name", "dttdxreiq");
-    
+
         try {
             const response = await fetch("https://api.cloudinary.com/v1_1/dttdxreiq/image/upload", {
                 method: "POST",
                 body: formData,
             });
-    
+
             const data = await response.json();
-            return data.secure_url; 
+            return data.secure_url;
         } catch (error) {
             console.error("Cloudinary Upload Error:", error);
             return null;
@@ -82,27 +128,28 @@ export default function ProfilePage() {
     const bannerHandle = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-    
+
         const imageUrl = await uploadToCloudinary(file);
         if (imageUrl) {
-            setBannerImage_url(imageUrl);
-            handleSubmit(e);
+            // setBannerImage_url(imageUrl);
+            updateBannerImage(imageUrl);
         }
     };
 
     const profileHandle = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-    
+
         const imageUrl = await uploadToCloudinary(file);
+        console.log(imageUrl);
         if (imageUrl) {
-            setProfileImage_url(imageUrl);
-            handleSubmit(e);
+            // setProfileImage_url(imageUrl);
+            updateProfileImage(imageUrl);
         }
     };
 
     if (error) return null;
-    if (!userData.bannerImage_url || !userData.profileImage_url) return <p>Loading...</p>
+    if (!bannerImage_url || !profileImage_url) return <p>Loading...</p>
     return (
         <div className="flex justify-center min-h-full pb-10 rounded-lg">
 
@@ -134,7 +181,7 @@ export default function ProfilePage() {
 
                 <div className="w-full pl-14 pr-14 flex flex-col justify-start">
                     <div className="h-14 flex justify-between items-center">
-                        <h1 className="text-3xl text-accent"><b>{userData.username}</b></h1>
+                        <h1 className="text-3xl text-accent"><b>{userData.name}</b></h1>
                     </div>
                     <hr className="border-secondary border-[1px]" />
 
@@ -146,7 +193,7 @@ export default function ProfilePage() {
                             </div>
                             {editbio ?
                                 <div className="w-full h-36 ">
-                                    <textarea maxLength={400} className="w-full p-2 text-sm h-[80%] resize-none bg-transparent border-2 border-[#CAC8FF] rounded-sm outline-none text-white placeholder-white ">
+                                    <textarea maxLength={400} onChange={(e) => setTempBio(e.target.value)} className="w-full p-2 text-sm h-[80%] resize-none bg-transparent border-2 border-[#CAC8FF] rounded-sm outline-none text-white placeholder-white ">
                                     </textarea>
                                     <div className="w-full flex flex-row items-center justify-end space-x-5">
                                         <button className="text-white px-4 py-2 rounded-2xl hover:font-bold hover:bg-accent transition duration-300 mt-2"
@@ -156,19 +203,19 @@ export default function ProfilePage() {
                                             }}
                                         >Cancel
                                         </button>
-                                        <button className="text-white px-4 py-2 rounded-2xl hover:font-bold hover:bg-[#1E1F26] transition duration-300 mt-2" type="submit" onClick={handleSubmit}>Save</button>
+                                        <button className="text-white px-4 py-2 rounded-2xl hover:font-bold hover:bg-[#1E1F26] transition duration-300 mt-2" type="submit" onClick={updateBio}>Save</button>
 
                                     </div>
                                 </div>
                                 :
-                                <p className="text-lg px-4 text-white">{userData.bio}</p>
+                                <p className="text-lg px-4 text-white">{bio}</p>
                             }
                         </section>
                         <div className="flex flex-row justify-between">
 
                             <section className="">
-                                <h1 className="text-xl text-secondary">Member since</h1>
-                                <p className="text-lg px-4 text-white">{userData.date_joined}</p>
+                                <h1 className="text-xl text-secondary">Communities joined</h1>
+                                <p className="text-lg px-4 text-white">{userData.community_joined}</p>
                             </section>
 
                             <section className="">
@@ -176,6 +223,10 @@ export default function ProfilePage() {
                                 <p className="text-lg px-4 text-white">{userData.community_created}</p>
                             </section>
                         </div>
+                        <section className="">
+                            <h1 className="text-xl text-secondary">Member since</h1>
+                            <p className="text-lg px-4 text-white">{userData.date_joined}</p>
+                        </section>
                     </div>
                 </div>
             </div>
