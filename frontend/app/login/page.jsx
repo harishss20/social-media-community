@@ -5,6 +5,7 @@ import { faGoogle, faFacebook } from "@fortawesome/free-brands-svg-icons";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useAuthGuard from "../hooks/useAuthGuard";
+import { Commet } from "react-loading-indicators";
 
 export default function LoginPage() {
 
@@ -62,7 +63,7 @@ export default function LoginPage() {
                 localStorage.setItem("refresh_token", data.tokens?.refresh);
                 localStorage.setItem("access_token", data.tokens?.access);
                 localStorage.setItem("UserId", data?.user_id);
-                data.user_status == true ? router.push("/join_community") : router.push("/home");
+                data.user_status == true ? router.push("/join-community") : router.push("/home");
             } else {
                 alert(data.error || "Something went wrong");
             }
@@ -71,7 +72,11 @@ export default function LoginPage() {
             alert("Server error. Please try again.");
         }
     };
-    if(!access) return <h1>Loading</h1>
+    if(access)  return (
+        <div className="flex justify-center items-center h-[80vh]">
+          <Commet />
+        </div>
+      );
     return (
         <div className="mainContainer">
             <div>

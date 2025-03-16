@@ -10,13 +10,14 @@ const dummyData = {
   profileImage_url: "../defaultProfile.png",
   date_joined: "12 December 2012",
 };
-export default function useUserData(id) {
+export default function useUserData() {
   const [userData, setUserData] = useState({});
   const [error, setError] = useState(null);
   const router = useRouter();
 
     useEffect(() => {
-        console.log(localStorage.getItem("UserId"));
+        const id = localStorage.getItem("UserId");
+        console.log(id);
         if (!id) {
             setError("Invalid user ID!");
             router.replace("/not-found");
@@ -50,7 +51,7 @@ export default function useUserData(id) {
         };
 
     fetchUser();
-  }, [id, router]);
+  }, [router]);
 
   return { userData, error };
 }

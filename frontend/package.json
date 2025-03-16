@@ -21,7 +21,8 @@
     "next": "^15.1.7",
     "npm": "^11.1.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-loading-indicators": "^1.0.0"
   },
   "devDependencies": {
     "@types/node": "22.13.5",
