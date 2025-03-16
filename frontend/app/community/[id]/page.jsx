@@ -1,17 +1,34 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart, faBookmark, faTimes, faShareAlt } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHeart,
+  faBookmark,
+  faTimes,
+  faShareAlt,
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function CommunityPage() {
   const userData = {
     id: "1",
     owner: "hari",
-    members: ["kumar", "cooper", "raj", "band", "hari", "sam", "tom", "jack", "mike", "leo"],
+    members: [
+      "kumar",
+      "cooper",
+      "raj",
+      "band",
+      "hari",
+      "sam",
+      "tom",
+      "jack",
+      "mike",
+      "leo",
+    ],
     name: "animeworld",
     description: "animeworld",
     community_based_on: "naruto",
-    rules: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum facilisis, ligula in consectetur interdum, ex nunc fermentum odio, eget pellentesque risus purus non nulla. Fusce vitae scelerisque nisl. Aenean euismod, odio at ultrices fermentum, sapien erat tempus dolor, nec cursus nisi justo id justo. Nulla facilisi. Vestibulum sollicitudin dapibus augue, at fringilla velit. Duis quis nisi erat. Mauris sed lacus non sapien venenatis vehicula non at metus.Suspendisse a elit et lectus hendrerit luctus. Nulla et dui vel odio aliquet interdum nec nec mi. Phasellus dapibus dolor ut nisl lacinia, nec feugiat mauris vehicula. Integer efficitur, erat ac dictum ullamcorper, purus tortor convallis nulla, nec sagittis risus augue eget nunc. Sed ut urna vel arcu tincidunt vestibulum id et dolor. Mauris at metus at sapien tristique luctus vel non nulla. Donec vitae ante tristique, malesuada metus a, tincidunt lacus.Curabitur id purus ut velit imperdiet vulputate. Ut egestas velit eget dui tempor, nec accumsan dolor sollicitudin. Vivamus ultricies sodales dolor, sit amet fermentum nisl faucibus a. Cras consectetur tincidunt lorem, ac dignissim purus interdum id. Pellentesque et mi sit amet ex molestie congue et vel ligula. Etiam vitae nulla nec magna gravida fermentum. Phasellus et magna ac velit venenatis tempor id non purus. Fusce interdum malesuada dolor, et molestie sem dignissim ac.Aliquam euismod, eros ac ultricies interdum, ligula eros facilisis metus, a fermentum erat augue eget risus. Praesent sit amet mi ac risus ullamcorper pellentesque. Ut consequat ligula a metus vulputate tincidunt.",
+    rules:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum facilisis, ligula in consectetur interdum, ex nunc fermentum odio, eget pellentesque risus purus non nulla. Fusce vitae scelerisque nisl. Aenean euismod, odio at ultrices fermentum, sapien erat tempus dolor, nec cursus nisi justo id justo. Nulla facilisi. Vestibulum sollicitudin dapibus augue, at fringilla velit. Duis quis nisi erat. Mauris sed lacus non sapien venenatis vehicula non at metus.Suspendisse a elit et lectus hendrerit luctus. Nulla et dui vel odio aliquet interdum nec nec mi. Phasellus dapibus dolor ut nisl lacinia, nec feugiat mauris vehicula. Integer efficitur, erat ac dictum ullamcorper, purus tortor convallis nulla, nec sagittis risus augue eget nunc. Sed ut urna vel arcu tincidunt vestibulum id et dolor. Mauris at metus at sapien tristique luctus vel non nulla. Donec vitae ante tristique, malesuada metus a, tincidunt lacus.Curabitur id purus ut velit imperdiet vulputate. Ut egestas velit eget dui tempor, nec accumsan dolor sollicitudin. Vivamus ultricies sodales dolor, sit amet fermentum nisl faucibus a. Cras consectetur tincidunt lorem, ac dignissim purus interdum id. Pellentesque et mi sit amet ex molestie congue et vel ligula. Etiam vitae nulla nec magna gravida fermentum. Phasellus et magna ac velit venenatis tempor id non purus. Fusce interdum malesuada dolor, et molestie sem dignissim ac.Aliquam euismod, eros ac ultricies interdum, ligula eros facilisis metus, a fermentum erat augue eget risus. Praesent sit amet mi ac risus ullamcorper pellentesque. Ut consequat ligula a metus vulputate tincidunt.",
     communityImage_url: "",
     bannerImage_url: "",
     created_at: "2025-02-24",
@@ -36,7 +53,7 @@ export default function CommunityPage() {
   const [mobileView, setMobileView] = useState("posts");
   const [isJoined, setIsJoined] = useState(false);
 
-  const popupRef = useRef(null); 
+  const popupRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -91,16 +108,23 @@ export default function CommunityPage() {
       {/* Mobile View */}
       <div className="lg:hidden">
         <div className="bg-gray-700 overflow-hidden">
-
           {/* Banner */}
           <div className="relative w-full h-20 bg-gray-300">
-            <img src={userData.bannerImage_url} alt="Banner" className="w-full h-full object-cover" />
+            <img
+              src={userData.bannerImage_url}
+              alt="Banner"
+              className="w-full h-full object-cover"
+            />
           </div>
 
           {/* Profile Image and Name */}
           <div className="flex items-center p-4">
             <div className="w-16 h-16 rounded-full overflow-hidden bg-black border-4 border-gray-900">
-              <img src={userData.communityImage_url} alt="Profile" className="w-full h-full object-cover" />
+              <img
+                src={userData.communityImage_url}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="ml-4">
               <h1 className="text-xl font-bold text-white">{userData.name}</h1>
@@ -147,7 +171,11 @@ export default function CommunityPage() {
             {[posts].map((post) => (
               <div key={post.id} className="bg-gray-700 p-4 rounded-md">
                 <div className="flex items-center">
-                  <img src={post.profileImage_url} alt="Avatar" className="w-10 h-10 bg-black rounded-full" />
+                  <img
+                    src={post.profileImage_url}
+                    alt="Avatar"
+                    className="w-10 h-10 bg-black rounded-full"
+                  />
                   <div className="ml-2">
                     <h3 className="font-bold text-xl">{post.created_by}</h3>
                     <p className="text-xs text-gray-400">{post.created_at}</p>
@@ -165,15 +193,24 @@ export default function CommunityPage() {
 
                 <div className="flex items-center mt-3 text-gray-400 gap-6">
                   <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faHeart} className="cursor-pointer" />
+                    <FontAwesomeIcon
+                      icon={faHeart}
+                      className="cursor-pointer"
+                    />
                     <span>{post.likes}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faBookmark} className="cursor-pointer" />
+                    <FontAwesomeIcon
+                      icon={faBookmark}
+                      className="cursor-pointer"
+                    />
                     <span>{post.saved}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faShareAlt} className="cursor-pointer" />
+                    <FontAwesomeIcon
+                      icon={faShareAlt}
+                      className="cursor-pointer"
+                    />
                     <span>{post.shared}</span>
                   </div>
                 </div>
@@ -209,12 +246,14 @@ export default function CommunityPage() {
                   <div className="w-6 h-6 rounded-full bg-black"></div>
                   <span className="text-xs">{userData.owner}</span>
                 </li>
-                {userData.members.slice(0, showAllModerators ? userData.members.length : 5).map((member, index) => (
-                  <li key={index} className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-black"></div>
-                    <span className="text-xs">{member}</span>
-                  </li>
-                ))}
+                {userData.members
+                  .slice(0, showAllModerators ? userData.members.length : 5)
+                  .map((member, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-black"></div>
+                      <span className="text-xs">{member}</span>
+                    </li>
+                  ))}
               </div>
               {userData.members.length > 5 && (
                 <button
@@ -237,18 +276,29 @@ export default function CommunityPage() {
             <div className="flex flex-col items-center w-full h-[100px]">
               {/* Banner */}
               <div className="relative w-full h-20 bg-white">
-                <img src={userData.bannerImage_url} alt="Banner" className="w-full h-full object-cover" />
+                <img
+                  src={userData.bannerImage_url}
+                  alt="Banner"
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               {/* Profile */}
               <div className="relative w-full">
                 <div className="absolute -top-10 left-0 ml-10 w-24 h-24 rounded-full overflow-hidden bg-black border-4 border-gray-900">
-                  <img src={userData.communityImage_url} alt="Profile" className="w-full h-full object-cover" />
+                  <img
+                    src={userData.communityImage_url}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
 
                 {/* Icons */}
                 <div className="absolute top-0 right-0 flex items-center gap-3 p-2">
-                  <button className="text-white px-3 py-1 rounded-full text-xm" onClick={handleCreatePostClick}>
+                  <button
+                    className="text-white px-3 py-1 rounded-full text-xm"
+                    onClick={handleCreatePostClick}
+                  >
                     + Create Post
                   </button>
                   <button
@@ -275,7 +325,11 @@ export default function CommunityPage() {
             {[posts].map((post) => (
               <div key={post.id}>
                 <div className="flex items-center">
-                  <img src={post.profileImage_url} alt="Avatar" className="w-10 h-10 bg-black rounded-full" />
+                  <img
+                    src={post.profileImage_url}
+                    alt="Avatar"
+                    className="w-10 h-10 bg-black rounded-full"
+                  />
                   <div className="flex items-center gap-4">
                     <h3 className="font-bold text-xl">{post.created_by}</h3>
                     <p className="text-xs text-gray-400">{post.created_at}</p>
@@ -293,15 +347,24 @@ export default function CommunityPage() {
 
                 <div className="flex items-center mt-3 text-gray-400 gap-6">
                   <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faHeart} className="cursor-pointer" />
+                    <FontAwesomeIcon
+                      icon={faHeart}
+                      className="cursor-pointer"
+                    />
                     <span>{post.likes}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faBookmark} className="cursor-pointer" />
+                    <FontAwesomeIcon
+                      icon={faBookmark}
+                      className="cursor-pointer"
+                    />
                     <span>{post.saved}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faShareAlt} className="cursor-pointer" />
+                    <FontAwesomeIcon
+                      icon={faShareAlt}
+                      className="cursor-pointer"
+                    />
                     <span>{post.shared}</span>
                   </div>
                 </div>
@@ -328,12 +391,14 @@ export default function CommunityPage() {
                 <div className="w-8 h-8 rounded-full bg-black"></div>
                 <span className="text-xs">{userData.owner}</span>
               </li>
-              {userData.members.slice(0, showAllModerators ? userData.members.length : 5).map((member, index) => (
-                <li key={index} className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-black"></div>
-                  <span className="text-xs">{member}</span>
-                </li>
-              ))}
+              {userData.members
+                .slice(0, showAllModerators ? userData.members.length : 5)
+                .map((member, index) => (
+                  <li key={index} className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-black"></div>
+                    <span className="text-xs">{member}</span>
+                  </li>
+                ))}
             </div>
             {userData.members.length > 5 && (
               <button
@@ -350,7 +415,10 @@ export default function CommunityPage() {
       {/* Post Popup */}
       {showPostPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md">
-          <div className="bg-white p-8 rounded-lg w-full lg:w-1/2 max-w-2xl relative shadow-lg" ref={popupRef}>
+          <div
+            className="bg-white p-8 rounded-lg w-full lg:w-1/2 max-w-2xl relative shadow-lg"
+            ref={popupRef}
+          >
             <h2 className="text-2xl font-bold mb-6">Create a Post</h2>
 
             {/* Post Title */}
@@ -374,7 +442,11 @@ export default function CommunityPage() {
             >
               {selectedImage ? (
                 <div className="relative">
-                  <img src={selectedImage} alt="Preview" className="w-full h-48 object-cover rounded-md" />
+                  <img
+                    src={selectedImage}
+                    alt="Preview"
+                    className="w-full h-48 object-cover rounded-md"
+                  />
                   <button
                     className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
                     onClick={() => setSelectedImage(null)}
@@ -384,7 +456,9 @@ export default function CommunityPage() {
                 </div>
               ) : (
                 <label className="block cursor-pointer">
-                  <p className="text-gray-500 text-lg">Drag and drop or click to upload an image</p>
+                  <p className="text-gray-500 text-lg">
+                    Drag and drop or click to upload an image
+                  </p>
                   <input
                     type="file"
                     accept="image/*"
@@ -398,7 +472,10 @@ export default function CommunityPage() {
               <button className="text-white bg-green-500 px-6 py-3 rounded-md text-lg hover:bg-green-600">
                 Post
               </button>
-              <button className="text-white bg-red-500 px-6 py-3 rounded-md text-lg hover:bg-red-600" onClick={handleClosePopup}>
+              <button
+                className="text-white bg-red-500 px-6 py-3 rounded-md text-lg hover:bg-red-600"
+                onClick={handleClosePopup}
+              >
                 Cancel
               </button>
             </div>
