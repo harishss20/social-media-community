@@ -54,18 +54,24 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class CreateCommunitySerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
+    owner_id=serializers.SerializerMethodField()
     members = serializers.SerializerMethodField()
     
     class Meta:
         model = Community
         fields = '__all__'
-        read_only_fields=['id','created_at','owner','members']
+        read_only_fields=['id','created_at','owner','members','owner_id']
 
     def get_owner(self, obj):
         return obj.owner.name if obj.owner else "Unknown"
        
     def get_members(self, obj):
         return [member.name for member in obj.members.all()] 
+    
+    def get_owner_id(self, obj):
+        return obj.owner_id;
+    
+   
    
 
     

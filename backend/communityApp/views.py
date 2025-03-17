@@ -10,7 +10,7 @@ from .permissions import IsAuthorOrReadOnly,IsOwnerOrReadOnly, IsAuthenticatedFo
 from rest_framework.permissions import IsAuthenticatedOrReadOnly,AllowAny, IsAuthenticated
 from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinCommunitySerializer, PostSerializer
 from .models import Profile ,Community, Post
-
+import random
 from django.shortcuts import get_object_or_404
  
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -177,6 +177,7 @@ class CreateCommunityView(APIView):
             community.delete()
             return Response({"message":"community deleted successfully"},status=status.HTTP_200_OK)
                 
+
 class ProfileBasedCommunityView(APIView):
 
     def get(self, request):
@@ -213,8 +214,20 @@ class userJoinedCommunityView(APIView):
             
 
 class JoinCommunityView(APIView):
+    
+    permission_classes = [IsAuthenticated]
 
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    def get(self,request):
+        
+            items= list(Community.objects.all())
+            random_items=random.sample(items,3);
+            if random_items:
+                serializer = JoinCommunitySerializer(random_items , many=True)
+                return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message": "Community is not exists"}, status=status.HTTP_400_BAD_REQUEST)
+       
+
     def post(self, request):
         user_id= request.data.get("user_id");
         community_name = request.data.get("community_name")    
@@ -232,7 +245,21 @@ class JoinCommunityView(APIView):
         community.save()
 
         return Response({"message": f"{profile.name} has joined {community.name}."}, status=status.HTTP_200_OK)
+    
+    def patch(self, request):
+        user_id= request.data.get("user_id");
+        community_name = request.data.get("community_name")    
 
+        if not user_id or not community_name:
+            return Response({"error": "User ID and Community ID are required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        profile = get_object_or_404(Profile, id=user_id)
+        community = get_object_or_404(Community, name=community_name)
+        community.members.remove(profile)
+        community.save()
+
+        return Response({"message": f"{profile.name} has Leaved {community.name}."}, status=status.HTTP_200_OK)
+        
 
 class PostListCreateView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
