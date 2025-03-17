@@ -80,14 +80,13 @@ class Post(models.Model):
     media_file = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    saves = models.ManyToManyField(Profile, related_name='saved_posts', blank=True)
-    likes = models.ManyToManyField(Profile, related_name='liked_posts', blank=True)
+    likes_count = models.IntegerField(default = 0)
     shares = models.ManyToManyField(Profile, related_name='shared_posts', blank=True)
 
 
     def __str__(self):
         return self.title
     
-    def total_likes(self):
-        return self.likes.count()
+    
+
     

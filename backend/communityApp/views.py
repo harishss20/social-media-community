@@ -6,10 +6,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .permissions import IsAuthorOrReadOnly,IsOwnerOrReadOnly, IsAuthenticatedForCreation
+from rest_framework.permissions import IsAuthenticatedOrReadOnly,AllowAny, IsAuthenticated
 from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinCommunitySerializer, PostSerializer
 from .models import Profile ,Community, Post
-
+import random
 from django.shortcuts import get_object_or_404
  
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -26,6 +27,7 @@ def get_tokens_for_user(user):
         'access': str(refresh.access_token),
     }
 class LoginView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -52,6 +54,7 @@ class LoginView(APIView):
 
 
 class UserRegistrationView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
     
         serializer = UserRegistrationSerializer(data=request.data)
@@ -74,6 +77,7 @@ class UserRegistrationView(APIView):
             
 
 class ProfileView(APIView):
+    permission_classes = [IsOwnerOrReadOnly]
 
     def get(self, request):       
         user_id = request.query_params.get('id', None);
@@ -103,6 +107,8 @@ class ProfileView(APIView):
         
 
 class CreateCommunityView(APIView):
+
+    permission_classes = [IsAuthenticatedForCreation]
 
     def get(self, request):
         community_name = request.query_params.get('name')
@@ -171,6 +177,7 @@ class CreateCommunityView(APIView):
             community.delete()
             return Response({"message":"community deleted successfully"},status=status.HTTP_200_OK)
                 
+
 class ProfileBasedCommunityView(APIView):
 
     def get(self, request):
@@ -207,6 +214,20 @@ class userJoinedCommunityView(APIView):
             
 
 class JoinCommunityView(APIView):
+    
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request):
+        
+            items= list(Community.objects.all())
+            random_items=random.sample(items,3);
+            if random_items:
+                serializer = JoinCommunitySerializer(random_items , many=True)
+                return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message": "Community is not exists"}, status=status.HTTP_400_BAD_REQUEST)
+       
+
     def post(self, request):
         user_id= request.data.get("user_id");
         community_name = request.data.get("community_name")    
@@ -224,7 +245,21 @@ class JoinCommunityView(APIView):
         community.save()
 
         return Response({"message": f"{profile.name} has joined {community.name}."}, status=status.HTTP_200_OK)
+    
+    def patch(self, request):
+        user_id= request.data.get("user_id");
+        community_name = request.data.get("community_name")    
 
+        if not user_id or not community_name:
+            return Response({"error": "User ID and Community ID are required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        profile = get_object_or_404(Profile, id=user_id)
+        community = get_object_or_404(Community, name=community_name)
+        community.members.remove(profile)
+        community.save()
+
+        return Response({"message": f"{profile.name} has Leaved {community.name}."}, status=status.HTTP_200_OK)
+        
 
 class PostListCreateView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
@@ -242,6 +277,27 @@ class PostRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_update(self, serializer):
         serializer.save(author = self.request.user.profile)
+
+class LikePostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            post = Post.objects.get(id=pk)
+            data = request.data
+            action = data.get('action')
+
+            if action == 'like':
+                post.likes_count+=1
+            elif action == 'unlike':
+                if post.likes_count > 0:
+                    post.likes_count -= 1
+            
+            post.save()
+            return Response({'likes_count':post.likes_count},status=status.HTTP_200_OK)
+        
+        except Post.DoesNotExist:
+            return Response({'error':'Post not found'},status = status.HTTP_404_NOT_FOUND)
     
 
 
