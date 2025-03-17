@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import LoginView, UserRegistrationView
-from .views import ProfileView ,CreateCommunityView,JoinCommunityView, PostListCreateView, LikePostView
+from .views import ProfileView ,CreateCommunityView,JoinCommunityView, PostListCreateView, LikePostView,ToggleSavePostView,SavedPostsView
 from .views import PostRetrieveUpdateDestroyView,ProfileBasedCommunityView
 from .views import userJoinedCommunityView
 
@@ -18,5 +18,7 @@ urlpatterns = [
     path('posts/', PostListCreateView.as_view(), name='post-list-create'),
     path('posts/<uuid:pk>/', PostRetrieveUpdateDestroyView.as_view(), name='post-detail'),
     path('posts/<uuid:pk>/like/', LikePostView.as_view(), name='like-post'),
+    path('posts/<uuid:pk>/toggle-save/', ToggleSavePostView.as_view(), name='toggle-save-post'),
+    path('profile/<uuid:pk>/saved-posts/', SavedPostsView.as_view(), name='saved-posts'),
 
 ]

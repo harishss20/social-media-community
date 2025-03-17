@@ -298,6 +298,33 @@ class LikePostView(APIView):
         
         except Post.DoesNotExist:
             return Response({'error':'Post not found'},status = status.HTTP_404_NOT_FOUND)
+        
+class ToggleSavePostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, id = pk)
+        profile = request.user.profile
+
+        if post.saved_by.filter(id=profile.id).exists():
+            post.unsave_post(profile)
+            action = 'unsaved'
+
+        else:
+            post.save_post(profile)
+            action = 'saved'
+
+        return JsonResponse({'status':action})
+    
+class SavedPostsView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, pk):
+        profile = get_object_or_404(Profile, id=pk)
+        saved_posts = profile.get_saved_posts()
+        serializer = PostSerializer(saved_posts, many=True, context={'request':request})
+        return JsonResponse(serializer.data, safe=False)
+
+
     
 
 
