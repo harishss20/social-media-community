@@ -1,44 +1,21 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faHeart,
-  faBookmark,
-  faTimes,
-  faShareAlt,
-} from "@fortawesome/free-solid-svg-icons";
-import { useParams } from "next/navigation";
-import useCommunityDetails from "../../hooks/useCommunityDetails";
-import { Commet } from "react-loading-indicators";
+import { faHeart, faBookmark, faTimes, faShareAlt } from "@fortawesome/free-solid-svg-icons";
 
 export default function CommunityPage() {
-  const {name} = useParams();
-  const {loading, error, community_data} = useCommunityDetails(name);
-  
-  // const community_data = {
-  //   id: "1",
-  //   owner: "hari",
-  //   members: [
-  //     "kumar",
-  //     "cooper",
-  //     "raj",
-  //     "band",
-  //     "hari",
-  //     "sam",
-  //     "tom",
-  //     "jack",
-  //     "mike",
-  //     "leo",
-  //   ],
-  //   name: "animeworld",
-  //   description: "animeworld",
-  //   community_based_on: "naruto",
-  //   rules:
-  //     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum facilisis, ligula in consectetur interdum, ex nunc fermentum odio, eget pellentesque risus purus non nulla. Fusce vitae scelerisque nisl. Aenean euismod, odio at ultrices fermentum, sapien erat tempus dolor, nec cursus nisi justo id justo. Nulla facilisi. Vestibulum sollicitudin dapibus augue, at fringilla velit. Duis quis nisi erat. Mauris sed lacus non sapien venenatis vehicula non at metus.Suspendisse a elit et lectus hendrerit luctus. Nulla et dui vel odio aliquet interdum nec nec mi. Phasellus dapibus dolor ut nisl lacinia, nec feugiat mauris vehicula. Integer efficitur, erat ac dictum ullamcorper, purus tortor convallis nulla, nec sagittis risus augue eget nunc. Sed ut urna vel arcu tincidunt vestibulum id et dolor. Mauris at metus at sapien tristique luctus vel non nulla. Donec vitae ante tristique, malesuada metus a, tincidunt lacus.Curabitur id purus ut velit imperdiet vulputate. Ut egestas velit eget dui tempor, nec accumsan dolor sollicitudin. Vivamus ultricies sodales dolor, sit amet fermentum nisl faucibus a. Cras consectetur tincidunt lorem, ac dignissim purus interdum id. Pellentesque et mi sit amet ex molestie congue et vel ligula. Etiam vitae nulla nec magna gravida fermentum. Phasellus et magna ac velit venenatis tempor id non purus. Fusce interdum malesuada dolor, et molestie sem dignissim ac.Aliquam euismod, eros ac ultricies interdum, ligula eros facilisis metus, a fermentum erat augue eget risus. Praesent sit amet mi ac risus ullamcorper pellentesque. Ut consequat ligula a metus vulputate tincidunt.",
-  //   communityImage_url: "/defaultProfile.png",
-  //   bannerImage_url: "/defaultBanner.png",
-  //   created_at: "2025-02-24",
-  // };
+  const userData = {
+    id: "1",
+    owner: "hari",
+    members: ["kumar", "cooper", "raj", "band", "hari", "sam", "tom", "jack", "mike", "leo"],
+    name: "animeworld",
+    description: "animeworld",
+    community_based_on: "naruto",
+    rules: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum facilisis, ligula in consectetur interdum, ex nunc fermentum odio, eget pellentesque risus purus non nulla. Fusce vitae scelerisque nisl. Aenean euismod, odio at ultrices fermentum, sapien erat tempus dolor, nec cursus nisi justo id justo. Nulla facilisi. Vestibulum sollicitudin dapibus augue, at fringilla velit. Duis quis nisi erat. Mauris sed lacus non sapien venenatis vehicula non at metus. Suspendisse a elit et lectus hendrerit luctus. Nulla et dui vel odio aliquet interdum nec nec mi. Phasellus dapibus dolor ut nisl lacinia, nec feugiat mauris vehicula. Integer efficitur, erat ac dictum ullamcorper, purus tortor convallis nulla, nec sagittis risus augue eget nunc. Sed ut urna vel arcu tincidunt vestibulum id et dolor. Mauris at metus at sapien tristique luctus vel non nulla. Donec vitae ante tristique, malesuada metus a, tincidunt lacus. Curabitur id purus ut velit imperdiet vulputate. Ut egestas velit eget dui tempor, nec accumsan dolor sollicitudin. Vivamus ultricies sodales dolor, sit amet fermentum nisl faucibus a. Cras consectetur tincidunt lorem, ac dignissim purus interdum id. Pellentesque et mi sit amet ex molestie congue et vel ligula. Etiam vitae nulla nec magna gravida fermentum. Phasellus et magna ac velit venenatis tempor id non purus. Fusce interdum malesuada dolor, et molestie sem dignissim ac. Aliquam euismod, eros ac ultricies interdum, ligula eros facilisis metus, a fermentum erat augue eget risus. Praesent sit amet mi ac risus ullamcorper pellentesque. Ut consequat ligula a metus vulputate tincidunt.",
+    bannerImage_url: "/defaultBanner.png",
+    profileImage_url: "/defaultProfile.png",
+    created_at: "2025-02-24",
+  };
 
   const posts = [
     {
@@ -180,12 +157,6 @@ export default function CommunityPage() {
               onClick={() => setPicOpen(true)}
             >
               <img src={profileImage_url || "/defaultProfile.png"} alt="Profile" className="w-full h-full object-cover" />
-            <div className="w-16 h-16 rounded-full overflow-hidden bg-black border-4 border-gray-900">
-              <img
-                src={community_data.communityImage_url}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
             </div>
             <div className="ml-4">
               <h1 className="text-xl font-bold text-white">{community_data.name}</h1>
