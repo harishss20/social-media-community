@@ -85,6 +85,10 @@ export default function SignupPage() {
       confirm_password: confirmPassword,
     };
 
+    if(username.length < 3 || email.length < 3 || password.length < 3 || confirmPassword.length < 3){
+      alert("Please fill all the fields");
+      return;
+    } 
     try {
       const response = await fetch("http://localhost:8000/api/register/", {
         method: "POST",
@@ -97,7 +101,7 @@ export default function SignupPage() {
       const data = await response.json();
       if (data.message === true) {
         alert("Signup successful!");
-        router.push("/preferences");
+        router.push("/login");
       } else {
         alert(data.error || "Something went wrong");
       }
