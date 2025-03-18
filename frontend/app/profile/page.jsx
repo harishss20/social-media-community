@@ -164,7 +164,7 @@ export default function ProfilePage() {
 
         <div
           onClick={() => setBannerOpen(true)}
-          className="max-h-40 w-full bg-white overflow-hidden cursor-pointer"
+          className="h-40 w-full bg-white overflow-hidden cursor-pointer"
         >
           <img
             src={bannerImage_url || "defaultBanner.png"}

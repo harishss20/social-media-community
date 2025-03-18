@@ -7,32 +7,38 @@ import {
   faTimes,
   faShareAlt,
 } from "@fortawesome/free-solid-svg-icons";
+import { useParams } from "next/navigation";
+import useCommunityDetails from "../../hooks/useCommunityDetails";
+import { Commet } from "react-loading-indicators";
 
 export default function CommunityPage() {
-  const userData = {
-    id: "1",
-    owner: "hari",
-    members: [
-      "kumar",
-      "cooper",
-      "raj",
-      "band",
-      "hari",
-      "sam",
-      "tom",
-      "jack",
-      "mike",
-      "leo",
-    ],
-    name: "animeworld",
-    description: "animeworld",
-    community_based_on: "naruto",
-    rules:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum facilisis, ligula in consectetur interdum, ex nunc fermentum odio, eget pellentesque risus purus non nulla. Fusce vitae scelerisque nisl. Aenean euismod, odio at ultrices fermentum, sapien erat tempus dolor, nec cursus nisi justo id justo. Nulla facilisi. Vestibulum sollicitudin dapibus augue, at fringilla velit. Duis quis nisi erat. Mauris sed lacus non sapien venenatis vehicula non at metus.Suspendisse a elit et lectus hendrerit luctus. Nulla et dui vel odio aliquet interdum nec nec mi. Phasellus dapibus dolor ut nisl lacinia, nec feugiat mauris vehicula. Integer efficitur, erat ac dictum ullamcorper, purus tortor convallis nulla, nec sagittis risus augue eget nunc. Sed ut urna vel arcu tincidunt vestibulum id et dolor. Mauris at metus at sapien tristique luctus vel non nulla. Donec vitae ante tristique, malesuada metus a, tincidunt lacus.Curabitur id purus ut velit imperdiet vulputate. Ut egestas velit eget dui tempor, nec accumsan dolor sollicitudin. Vivamus ultricies sodales dolor, sit amet fermentum nisl faucibus a. Cras consectetur tincidunt lorem, ac dignissim purus interdum id. Pellentesque et mi sit amet ex molestie congue et vel ligula. Etiam vitae nulla nec magna gravida fermentum. Phasellus et magna ac velit venenatis tempor id non purus. Fusce interdum malesuada dolor, et molestie sem dignissim ac.Aliquam euismod, eros ac ultricies interdum, ligula eros facilisis metus, a fermentum erat augue eget risus. Praesent sit amet mi ac risus ullamcorper pellentesque. Ut consequat ligula a metus vulputate tincidunt.",
-    communityImage_url: "",
-    bannerImage_url: "",
-    created_at: "2025-02-24",
-  };
+  const {name} = useParams();
+  const {loading, error, community_data} = useCommunityDetails(name);
+  
+  // const community_data = {
+  //   id: "1",
+  //   owner: "hari",
+  //   members: [
+  //     "kumar",
+  //     "cooper",
+  //     "raj",
+  //     "band",
+  //     "hari",
+  //     "sam",
+  //     "tom",
+  //     "jack",
+  //     "mike",
+  //     "leo",
+  //   ],
+  //   name: "animeworld",
+  //   description: "animeworld",
+  //   community_based_on: "naruto",
+  //   rules:
+  //     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum facilisis, ligula in consectetur interdum, ex nunc fermentum odio, eget pellentesque risus purus non nulla. Fusce vitae scelerisque nisl. Aenean euismod, odio at ultrices fermentum, sapien erat tempus dolor, nec cursus nisi justo id justo. Nulla facilisi. Vestibulum sollicitudin dapibus augue, at fringilla velit. Duis quis nisi erat. Mauris sed lacus non sapien venenatis vehicula non at metus.Suspendisse a elit et lectus hendrerit luctus. Nulla et dui vel odio aliquet interdum nec nec mi. Phasellus dapibus dolor ut nisl lacinia, nec feugiat mauris vehicula. Integer efficitur, erat ac dictum ullamcorper, purus tortor convallis nulla, nec sagittis risus augue eget nunc. Sed ut urna vel arcu tincidunt vestibulum id et dolor. Mauris at metus at sapien tristique luctus vel non nulla. Donec vitae ante tristique, malesuada metus a, tincidunt lacus.Curabitur id purus ut velit imperdiet vulputate. Ut egestas velit eget dui tempor, nec accumsan dolor sollicitudin. Vivamus ultricies sodales dolor, sit amet fermentum nisl faucibus a. Cras consectetur tincidunt lorem, ac dignissim purus interdum id. Pellentesque et mi sit amet ex molestie congue et vel ligula. Etiam vitae nulla nec magna gravida fermentum. Phasellus et magna ac velit venenatis tempor id non purus. Fusce interdum malesuada dolor, et molestie sem dignissim ac.Aliquam euismod, eros ac ultricies interdum, ligula eros facilisis metus, a fermentum erat augue eget risus. Praesent sit amet mi ac risus ullamcorper pellentesque. Ut consequat ligula a metus vulputate tincidunt.",
+  //   communityImage_url: "/defaultProfile.png",
+  //   bannerImage_url: "/defaultBanner.png",
+  //   created_at: "2025-02-24",
+  // };
 
   const posts = {
     id: 1,
@@ -40,7 +46,7 @@ export default function CommunityPage() {
     text_field: "This is the first post in the community!",
     media_file: "https://via.placeholder.com/100",
     created_by: "Krishketcum",
-    profileImage_url: "",
+    profileImage_url: "/dummy.png",
     created_at: "2025-03-10",
     likes: 0,
     saved: 0,
@@ -103,6 +109,12 @@ export default function CommunityPage() {
     setIsJoined(!isJoined);
   };
 
+  if(loading) return (
+    <div className="flex justify-center items-center h-[80vh]">
+      <Commet size="small" color="#cac8ff"/>
+    </div>
+);
+
   return (
     <div className="flex flex-col lg:flex-row w-full lg:w-3/4 mx-auto p-2 gap-4">
       {/* Mobile View */}
@@ -111,7 +123,7 @@ export default function CommunityPage() {
           {/* Banner */}
           <div className="relative w-full h-20 bg-gray-300">
             <img
-              src={userData.bannerImage_url}
+              src={community_data.bannerImage_url}
               alt="Banner"
               className="w-full h-full object-cover"
             />
@@ -121,14 +133,14 @@ export default function CommunityPage() {
           <div className="flex items-center p-4">
             <div className="w-16 h-16 rounded-full overflow-hidden bg-black border-4 border-gray-900">
               <img
-                src={userData.communityImage_url}
+                src={community_data.communityImage_url}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="ml-4">
-              <h1 className="text-xl font-bold text-white">{userData.name}</h1>
-              <p className="text-sm text-gray-400">r/{userData.name}</p>
+              <h1 className="text-xl font-bold text-white">{community_data.name}</h1>
+              <p className="text-sm text-gray-400">r/{community_data.name}</p>
             </div>
           </div>
 
@@ -225,16 +237,16 @@ export default function CommunityPage() {
             {/* About Community */}
             <div className="bg-gray-500 p-4 rounded-md">
               <h2 className="text-xl font-bold text-white">About Community</h2>
-              <p className="text-gray-400">{userData.community_based_on}</p>
-              <p className="text-gray-400">{userData.description}</p>
-              <p className="text-gray-400">Created {userData.created_at}</p>
+              <p className="text-gray-400">{community_data.community_based_on}</p>
+              <p className="text-gray-400">{community_data.description}</p>
+              <p className="text-gray-400">Created {community_data.created_at}</p>
             </div>
 
             {/* Rules */}
             <div className="h-auto p-5 bg-gray-500">
               <h2 className="text-xl text-white font-bold">Rules</h2>
               <div className="max-h-[250px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-800">
-                <p className="text-white mt-2">{userData.rules}</p>
+                <p className="text-white mt-2">{community_data.rules}</p>
               </div>
             </div>
 
@@ -244,10 +256,10 @@ export default function CommunityPage() {
               <div className="max-h-[220px] overflow-y-auto scrollbar-thin text-gray-400 space-y-2">
                 <li className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full bg-black"></div>
-                  <span className="text-xs">{userData.owner}</span>
+                  <span className="text-xs">{community_data.owner}</span>
                 </li>
-                {userData.members
-                  .slice(0, showAllModerators ? userData.members.length : 5)
+                {community_data.members
+                  .slice(0, showAllModerators ? community_data.members.length : 5)
                   .map((member, index) => (
                     <li key={index} className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-black"></div>
@@ -255,7 +267,7 @@ export default function CommunityPage() {
                     </li>
                   ))}
               </div>
-              {userData.members.length > 5 && (
+              {community_data.members.length > 5 && (
                 <button
                   onClick={() => setShowAllModerators(!showAllModerators)}
                   className="w-full mt-2 p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all"
@@ -273,11 +285,11 @@ export default function CommunityPage() {
         {/* Left Side */}
         <div className="w-full lg:w-3/4 flex flex-col gap-4">
           <div className="bg-gray-700 h-auto">
-            <div className="flex flex-col items-center w-full h-[100px]">
+            <div className="flex flex-col items-center w-full h-[200px]">
               {/* Banner */}
-              <div className="relative w-full h-20 bg-white">
+              <div className="relative w-full h-40 bg-white">
                 <img
-                  src={userData.bannerImage_url}
+                  src={community_data.bannerImage_url}
                   alt="Banner"
                   className="w-full h-full object-cover"
                 />
@@ -287,7 +299,7 @@ export default function CommunityPage() {
               <div className="relative w-full">
                 <div className="absolute -top-10 left-0 ml-10 w-24 h-24 rounded-full overflow-hidden bg-black border-4 border-gray-900">
                   <img
-                    src={userData.communityImage_url}
+                    src={community_data.communityImage_url}
                     alt="Profile"
                     className="w-full h-full object-cover"
                   />
@@ -313,10 +325,10 @@ export default function CommunityPage() {
 
             {/* Community Details */}
             <div className="mt-6 mb-2 ml-6 p-4 text-white">
-              <b>{userData.name || "Community Name"}</b>
-              <h4>{userData.community_based_on || "Community Based On"}</h4>
-              <h4>{userData.description || "No Description"}</h4>
-              <h4>{userData.created_at || "Created At"}</h4>
+              <b>{community_data.name || "Community Name"}</b>
+              <h4>{community_data.community_based_on || "Community Based On"}</h4>
+              <h4>{community_data.description || "No Description"}</h4>
+              <h4>{community_data.created_at || "Created At"}</h4>
             </div>
           </div>
 
@@ -379,7 +391,7 @@ export default function CommunityPage() {
           <div className="h-auto p-5 bg-gray-500">
             <h2 className="text-xl text-white font-bold">Rules</h2>
             <div className="max-h-[250px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-800">
-              <p className="text-white mt-2">{userData.rules}</p>
+              <p className="text-white mt-2">{community_data.rules}</p>
             </div>
           </div>
 
@@ -389,10 +401,10 @@ export default function CommunityPage() {
             <div className="max-h-[235px] overflow-y-auto scrollbar-thin text-white space-y-2">
               <li className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-black"></div>
-                <span className="text-xs">{userData.owner}</span>
+                <span className="text-xs">{community_data.owner}</span>
               </li>
-              {userData.members
-                .slice(0, showAllModerators ? userData.members.length : 5)
+              {community_data.members
+                .slice(0, showAllModerators ? community_data.members.length : 5)
                 .map((member, index) => (
                   <li key={index} className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-black"></div>
@@ -400,7 +412,7 @@ export default function CommunityPage() {
                   </li>
                 ))}
             </div>
-            {userData.members.length > 5 && (
+            {community_data.members.length > 5 && (
               <button
                 onClick={() => setShowAllModerators(!showAllModerators)}
                 className="w-full mt-2 p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all"

@@ -1,19 +1,4 @@
-export const fetchCommunityPage = async (community_name) => {
-    return fetch(`http://localhost:8000/api/community?name=${community_name}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem("access_token")}`
-        }
-    })
-        .then((res) => res.json())
-        .then((data) => {
-            return data;
-        })
-        .catch(e => {
-            return e.error;
-        });
-}
+
 
 export const EditCommunityPage = async (id, name) => {
     return fetch(`http://localhost:8000/api/community?id=${id}`, {

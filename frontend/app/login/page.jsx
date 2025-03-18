@@ -72,11 +72,11 @@ export default function LoginPage() {
             alert("Server error. Please try again.");
         }
     };
-    if(access)  return (
+    if (access) return (
         <div className="flex justify-center items-center h-[80vh]">
-          <Commet />
+          <Commet size="small" color="#cac8ff"/>
         </div>
-      );
+    );
     return (
         <div className="mainContainer">
             <div>
