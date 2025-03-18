@@ -50,9 +50,15 @@ class Profile(models.Model):
     bannerImage_url = models.URLField(default="https://res.cloudinary.com/dttdxreiq/image/upload/v1740691299/vlcgkfx6ul17fvokugpv.png")
     date_joined = models.DateField(auto_now_add=True, null=True)
     user_status = models.BooleanField(default=False)
+    saved_posts = models.ManyToManyField('Post',related_name='saved_by',blank=True)
+
+
     
     def __str__(self):
         return f"{self.user.username}'s Profile"
+    
+    def get_saved_posts(self):
+        return self.saved_posts.all()
 
 class Community(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -86,6 +92,14 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def save_post(self, profile):
+        self.saved_by.add(profile)
+
+    def unsave_post(self, profile):
+        self.saved_by.remove(profile)
+    
+
     
     
 
