@@ -134,6 +134,12 @@ export default function CommunityPage() {
     }
   };
 
+  if(loading) return (
+    <div className="flex justify-center items-center h-[80vh]">
+      <Commet size="small" color="#cac8ff"/>
+    </div>
+);
+
   return (
     <div className="flex flex-col lg:flex-row w-full lg:w-3/4 mx-auto p-2 gap-4">
       {/* Mobile View */}
@@ -153,8 +159,8 @@ export default function CommunityPage() {
               <img src={profileImage_url || "/defaultProfile.png"} alt="Profile" className="w-full h-full object-cover" />
             </div>
             <div className="ml-4">
-              <h1 className="text-xl font-bold text-white">{userData.name}</h1>
-              <p className="text-sm text-gray-400">r/{userData.name}</p>
+              <h1 className="text-xl font-bold text-white">{community_data.name}</h1>
+              <p className="text-sm text-gray-400">r/{community_data.name}</p>
             </div>
           </div>
 
@@ -222,9 +228,9 @@ export default function CommunityPage() {
             {/* About Community */}
             <div className="bg-gray-500 p-4 rounded-md">
               <h2 className="text-xl font-bold text-white">About Community</h2>
-              <p className="text-gray-400">{userData.community_based_on}</p>
-              <p className="text-gray-400">{userData.description}</p>
-              <p className="text-gray-400">Created {userData.created_at}</p>
+              <p className="text-gray-400">{community_data.community_based_on}</p>
+              <p className="text-gray-400">{community_data.description}</p>
+              <p className="text-gray-400">Created {community_data.created_at}</p>
             </div>
 
             {/* Rules */}
@@ -241,7 +247,7 @@ export default function CommunityPage() {
               <div className="max-h-[220px] overflow-y-auto scrollbar-thin text-gray-400 space-y-2">
                 <li className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full bg-black"></div>
-                  <span className="text-xs">{userData.owner}</span>
+                  <span className="text-xs">{community_data.owner}</span>
                 </li>
                 {userData.members.slice(0, showAllModerators ? userData.members.length : 5).map((member, index) => (
                   <li key={index} className="flex items-center gap-2">
@@ -250,7 +256,7 @@ export default function CommunityPage() {
                   </li>
                 ))}
               </div>
-              {userData.members.length > 5 && (
+              {community_data.members.length > 5 && (
                 <button
                   onClick={() => setShowAllModerators(!showAllModerators)}
                   className="w-full mt-2 p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all"
@@ -355,7 +361,7 @@ export default function CommunityPage() {
           <div className="h-auto p-5 bg-gray-500">
             <h2 className="text-xl text-white font-bold">Rules</h2>
             <div className="max-h-[250px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-800">
-              <p className="text-white mt-2">{userData.rules}</p>
+              <p className="text-white mt-2">{community_data.rules}</p>
             </div>
           </div>
 
@@ -365,7 +371,7 @@ export default function CommunityPage() {
             <div className="max-h-[235px] overflow-y-auto scrollbar-thin text-white space-y-2">
               <li className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-black"></div>
-                <span className="text-xs">{userData.owner}</span>
+                <span className="text-xs">{community_data.owner}</span>
               </li>
               {userData.members.slice(0, showAllModerators ? userData.members.length : 5).map((member, index) => (
                 <li key={index} className="flex items-center gap-2">
@@ -374,7 +380,7 @@ export default function CommunityPage() {
                 </li>
               ))}
             </div>
-            {userData.members.length > 5 && (
+            {community_data.members.length > 5 && (
               <button
                 onClick={() => setShowAllModerators(!showAllModerators)}
                 className="w-full mt-2 p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all"
