@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
+from rest_framework import serializers
 from .permissions import IsAuthorOrReadOnly,IsOwnerOrReadOnly, IsAuthenticatedForCreation
 from rest_framework.permissions import IsAuthenticatedOrReadOnly,AllowAny, IsAuthenticated
 from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinCommunitySerializer, PostSerializer
@@ -209,10 +210,6 @@ class userJoinedCommunityView(APIView):
             return Response({"error": "User Id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-        
-
-            
-
 class JoinCommunityView(APIView):
     
     permission_classes = [IsAuthenticated]
@@ -268,7 +265,12 @@ class PostListCreateView(generics.ListCreateAPIView):
 
 
     def perform_create(self, serializer):
-        serializer.save(author = self.request.user.profile)
+        user_profile = self.request.user.profile
+        community = serializer.validated_data.get("community")
+
+        if not community.members.filter(id=user_profile.id).exists():
+            raise serializers.ValidationError( {"error": "You must join the community before posting."})
+        serializer.save(author=user_profile)
 
 class PostRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
@@ -323,6 +325,21 @@ class SavedPostsView(APIView):
         saved_posts = profile.get_saved_posts()
         serializer = PostSerializer(saved_posts, many=True, context={'request':request})
         return JsonResponse(serializer.data, safe=False)
+    
+
+class HomePagePostView(APIView):
+
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        profile = request.user.profile
+        joined_communities = profile.communities_joined.all()
+        posts = Post.objects.filter(community__in = joined_communities).order_by('-created_at')
+        serializer = PostSerializer(posts, many=True)
+
+
+        return Response({
+            "posts":serializer.data
+        }, status = status.HTTP_200_OK)
 
 
     
