@@ -263,7 +263,13 @@ class PostListCreateView(generics.ListCreateAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-
+    def get_queryset(self):
+        queryset = Post.objects.all()
+        community_name = self.request.query_params.get('community', None)
+        if community_name is not None:
+            queryset = queryset.filter(community__name=community_name)
+        return queryset
+    
     def perform_create(self, serializer):
         user_profile = self.request.user.profile
         community = serializer.validated_data.get("community")
