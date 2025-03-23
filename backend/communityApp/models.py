@@ -87,7 +87,11 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     likes_count = models.IntegerField(default = 0)
+    dislikes_count = models.IntegerField(default = 0)
+    likes = models.ManyToManyField(Profile, related_name='liked_posts', blank=True)
+    dislikes = models.ManyToManyField(Profile, related_name='disliked_posts', blank=True)
     shares = models.ManyToManyField(Profile, related_name='shared_posts', blank=True)
+
 
 
     def __str__(self):
