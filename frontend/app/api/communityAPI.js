@@ -1,16 +1,93 @@
+import { useParams } from "next/navigation";
+const id = localStorage.getItem("UserId");
+const token = `Bearer ${localStorage.getItem("access_token")}`;
 
+export const joinSingleCommunity = async (name) => {
+    console.log("Join");
+        const res = await fetch("http://localhost:8000/api/join-community/", {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token
+            },
+            body: JSON.stringify({ user_id: id, community_name: name }),
+        })
 
-export const EditCommunityPage = async (id, name) => {
-    return fetch(`http://localhost:8000/api/community?id=${id}`, {
+        if(res.ok) return true
+        return false;
+}
+
+export const leaveCommunity = async(name) => {
+    // const id = localStorage.getItem("UserId");
+    console.log("Join");
+        const res = await fetch("http://localhost:8000/api/join-community/", {
+            method: 'PATCH',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token
+            },
+            body: JSON.stringify({ user_id: id, community_name: name }),
+        })
+
+        const data = await res.json();
+        console.log(data);
+
+        if(res.ok) return true
+        return false;
+}
+
+export const createPost = async({title, text_field, media_file, name}) => {
+    console.log(title, text_field, media_file, name);
+        const res = await fetch("http://localhost:8000/api/posts/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token
+            },
+            body: JSON.stringify({
+                title: title, text_field: text_field, media_file: media_file, community: name
+            })
+        })
+        if(res.ok) return true;
+        return false
+        
+}
+
+export const updateLike = async(postId, action) => {
+    const res = await fetch(`http://localhost:8000/api/posts/${postId}/like/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token
+        },
+        body: JSON.stringify({action})
+    });
+}
+
+export const updateSave = async(postId) => {
+    const res = await fetch(`http://localhost:8000/api/posts/${postId}/toggle-save/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token
+        }
+    });
+    const data = await res.json();
+    console.log(data);
+}
+
+export const editCommunityPage = async (id, fields) => {
+    return fetch(`http://localhost:8000/api/community/?id=${id}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem("access_token")}`
+            'Authorization': token
         },
-        body: JSON.stringify({ name: name })
+        body: JSON.stringify(fields)
     })
         .then((res) => res.json())
         .then((data) => {
+            console.log(data);
             return data;
         })
         .catch(e => {
@@ -19,13 +96,13 @@ export const EditCommunityPage = async (id, name) => {
 }
 
 export const DeleteCommunityPage = async (id, name) => {
-    return fetch(`http://localhost:8000/api/community?id=${id}`, {
+    return fetch(`http://localhost:8000/api/community/`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem("access_token")}`
+            'Authorization': token
         },
-        body: JSON.stringify({ name: name })
+        body: JSON.stringify({ user_id: id, name: name })
     })
         .then((res) => res.json())
         .then((data) => {

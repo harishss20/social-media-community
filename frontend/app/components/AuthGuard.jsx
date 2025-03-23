@@ -1,54 +1,52 @@
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+"use client";
 
-export default function AuthGuard(props) {
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Commet } from "react-loading-indicators";
+
+const tokenExpiry = (token) => {
+    if (!token) return true;
+    try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        const expiry = payload.exp * 1000;
+        return Date.now() >= expiry;
+    } catch (err) {
+        console.error("Invalid token! ", err);
+        return true;
+    }
+}
+
+export default function AuthGuard({ children }) {
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
+    const path = usePathname();
+    const [access, setAccess] = useState(null);
 
     useEffect(() => {
+        if (typeof window === "undefined") return;
 
-        const authCheck = async () => {
+        const token = localStorage.getItem("access_token");
 
-            const accessToken = localStorage.getItem("access_token");
-            if (!accessToken) {
-                router.push("/login");
-            }
-            else {
-                const response = fetch("http://localhost:8000/api/token/", {
-                    method: "POST",
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                });
+        const expired = tokenExpiry(token);
 
-                if (response.status === 401) {
-                    console.log("Token expired, trying to refresh...");
-                    await refreshAccessToken();
-                }
-            }
-            setLoading(false);
+        console.log(expired);
+
+        if (expired) {
+            setAccess(false);
+            if (path !== "/login" && path !== "/signup") router.replace("/login");
         }
-
-        authCheck();
-    }, []);
-
-    const refreshAccessToken = async () => {
-        const refreshToken = localStorage.getItem("refresh_token");
-        const response = await fetch("http://localhost:8000/api/token/refresh/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ refresh: refreshToken }),
-        });
-
-        if (response.status === 401) {
-            console.log("Refresh token expired, logging out...");
-            localStorage.removeItem("refresh_token");
-            localStorage.removeItem("access_token");
-            router.push("/login");
+        else {
+            setAccess(true);
+            if (path === "/login" || path === "/signup") router.replace("/home");
         }
+    }, [path, router]);
 
-        const data = await response.json();
-        localStorage.setItem("access_token", data.access);
-    }
+    if (access == null || (!access && path !== "/login" && path !== "/signup")) return (
+        <div className="flex justify-center items-center h-[80vh]">
+          <Commet size="small" color="#cac8ff"/>
+        </div>
+    );
 
-    if (loading) return <p>Loading...</p>;
-    return <>{props.children}</>;
+    return <div>
+        {children}
+    </div>
 }

@@ -1,5 +1,6 @@
 import "./globals.css";
 import FontAwesomeConfig from "./fontawesome";
+import AuthGuard from "./components/AuthGuard";
 
 
 
@@ -11,11 +12,13 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-    <head>
-      <FontAwesomeConfig />
-    </head>
+      <head>
+        <FontAwesomeConfig />
+      </head>
       <body>
-        {children}
+        <AuthGuard>
+          {children}
+        </AuthGuard>
       </body>
     </html>
   );

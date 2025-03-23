@@ -4,12 +4,9 @@ import { faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
 import { faGoogle, faFacebook } from "@fortawesome/free-brands-svg-icons";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import useAuthGuard from "../hooks/useAuthGuard";
-import { Commet } from "react-loading-indicators";
 
 export default function LoginPage() {
 
-    const access = useAuthGuard();
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -72,11 +69,7 @@ export default function LoginPage() {
             alert("Server error. Please try again.");
         }
     };
-    if (access) return (
-        <div className="flex justify-center items-center h-[80vh]">
-          <Commet size="small" color="#cac8ff"/>
-        </div>
-    );
+
     return (
         <div className="mainContainer">
             <div>
