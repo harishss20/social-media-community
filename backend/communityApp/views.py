@@ -6,6 +6,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
+from django.urls import reverse
+from rest_framework import serializers
 from .permissions import IsAuthorOrReadOnly,IsOwnerOrReadOnly, IsAuthenticatedForCreation
 from rest_framework.permissions import IsAuthenticatedOrReadOnly,AllowAny, IsAuthenticated
 from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinCommunitySerializer, PostSerializer
@@ -209,10 +211,6 @@ class userJoinedCommunityView(APIView):
             return Response({"error": "User Id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-        
-
-            
-
 class JoinCommunityView(APIView):
     
     permission_classes = [IsAuthenticated]
@@ -266,9 +264,20 @@ class PostListCreateView(generics.ListCreateAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-
+    def get_queryset(self):
+        queryset = Post.objects.all()
+        community_name = self.request.query_params.get('community', None)
+        if community_name is not None:
+            queryset = queryset.filter(community__name=community_name)
+        return queryset
+    
     def perform_create(self, serializer):
-        serializer.save(author = self.request.user.profile)
+        user_profile = self.request.user.profile
+        community = serializer.validated_data.get("community")
+
+        if not community.members.filter(id=user_profile.id).exists():
+            raise serializers.ValidationError( {"error": "You must join the community before posting."})
+        serializer.save(author=user_profile)
 
 class PostRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
@@ -284,20 +293,90 @@ class LikePostView(APIView):
     def post(self, request, pk):
         try:
             post = Post.objects.get(id=pk)
+            user_profile = request.user.profile
             data = request.data
             action = data.get('action')
 
             if action == 'like':
-                post.likes_count+=1
-            elif action == 'unlike':
-                if post.likes_count > 0:
-                    post.likes_count -= 1
-            
+                if user_profile in post.dislikes.all():  
+                    post.dislikes.remove(user_profile)
+                    post.dislikes_count = max(0, post.dislikes_count - 1)
+                if user_profile in post.likes.all():
+                    post.likes.remove(user_profile)
+                    post.likes_count = max(0, post.likes_count - 1)
+                else:
+                    post.likes.add(user_profile)
+                    post.likes_count += 1
+            elif action == 'dislike':
+                if user_profile in post.likes.all():
+                    post.likes.remove(user_profile)
+                    post.likes_count = max(0, post.likes_count - 1)
+                if user_profile in post.dislikes.all():
+                    post.dislikes.remove(user_profile)
+                    post.dislikes_count = max(0, post.dislikes_count - 1)
+                else:
+                    post.dislikes.add(user_profile)
+                    post.dislikes_count += 1
+
             post.save()
-            return Response({'likes_count':post.likes_count},status=status.HTTP_200_OK)
-        
+
+            return Response({
+                'likes_count':post.likes_count,
+                'dislikes_count':post.dislikes_count
+            }, status=status.HTTP_200_OK)
         except Post.DoesNotExist:
-            return Response({'error':'Post not found'},status = status.HTTP_404_NOT_FOUND)
+            return Response({'error':'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+class ToggleSavePostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, id = pk)
+        profile = request.user.profile
+
+        if post.saved_by.filter(id=profile.id).exists():
+            post.unsave_post(profile)
+            action = 'unsaved'
+
+        else:
+            post.save_post(profile)
+            action = 'saved'
+
+        return JsonResponse({'status':action})
+    
+class SavedPostsView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, pk):
+        profile = get_object_or_404(Profile, id=pk)
+        saved_posts = profile.get_saved_posts()
+        serializer = PostSerializer(saved_posts, many=True, context={'request':request})
+        return JsonResponse(serializer.data, safe=False)
+    
+
+class HomePagePostView(APIView):
+
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        profile = request.user.profile
+        joined_communities = profile.communities_joined.all()
+        posts = Post.objects.filter(community__in = joined_communities).order_by('-created_at')
+        serializer = PostSerializer(posts, many=True)
+
+
+        return Response({
+            "posts":serializer.data
+        }, status = status.HTTP_200_OK)
+
+class GenerateShareLinkAPIView(APIView):
+    def get(self, request, pk):
+        try:
+            post = Post.objects.get(id=pk)
+        except Post.DoesNotExist:
+            return Response({"error":"Post not found"})
+        
+        link = request.build_absolute_uri(reverse('post-detail', args=[post.id]))
+        return Response({"generated_link":link}, status=status.HTTP_200_OK)
+
     
 
 
