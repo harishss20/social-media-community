@@ -93,11 +93,13 @@ class PostSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'author', 'community', 'created_at', 'updated_at'] 
 
 class CommentsSerializer(serializers.ModelSerializer):
-
-    
+    user= serializers.SerializerMethodField();
     class Meta:
         model = Comments
         fields = ['id', 'comments', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'post','created_at', 'updated_at','user']  
+        read_only_fields = ['id', 'post','created_at', 'updated_at','user'] 
+
+    def get_user(self,obj):
+        return {obj}
 
     

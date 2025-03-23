@@ -373,6 +373,16 @@ class HomePagePostView(APIView):
             return Response({"posts":serializer.data}, status = status.HTTP_200_OK)
         return Response({"message":"error"},status=status.HTTP_400_BAD_REQUEST)
 
+
+class GenerateShareLinkAPIView(APIView):
+    def get(self, request, pk):
+        try:
+            post = Post.objects.get(id=pk)
+        except Post.DoesNotExist:
+            return Response({"error":"Post not found"})
+        
+        link = request.build_absolute_uri(reverse('post-detail', args=[post.id]))
+        return Response({"generated_link":link}, status=status.HTTP_200_OK)
     
 class CommentsView(APIView):
     
