@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
+from django.urls import reverse
 from rest_framework import serializers
 from .permissions import IsAuthorOrReadOnly,IsOwnerOrReadOnly, IsAuthenticatedForCreation
 from rest_framework.permissions import IsAuthenticatedOrReadOnly,AllowAny, IsAuthenticated
@@ -292,20 +293,39 @@ class LikePostView(APIView):
     def post(self, request, pk):
         try:
             post = Post.objects.get(id=pk)
+            user_profile = request.user.profile
             data = request.data
             action = data.get('action')
 
             if action == 'like':
-                post.likes_count+=1
-            elif action == 'unlike':
-                if post.likes_count > 0:
-                    post.likes_count -= 1
-            
+                if user_profile in post.dislikes.all():  
+                    post.dislikes.remove(user_profile)
+                    post.dislikes_count = max(0, post.dislikes_count - 1)
+                if user_profile in post.likes.all():
+                    post.likes.remove(user_profile)
+                    post.likes_count = max(0, post.likes_count - 1)
+                else:
+                    post.likes.add(user_profile)
+                    post.likes_count += 1
+            elif action == 'dislike':
+                if user_profile in post.likes.all():
+                    post.likes.remove(user_profile)
+                    post.likes_count = max(0, post.likes_count - 1)
+                if user_profile in post.dislikes.all():
+                    post.dislikes.remove(user_profile)
+                    post.dislikes_count = max(0, post.dislikes_count - 1)
+                else:
+                    post.dislikes.add(user_profile)
+                    post.dislikes_count += 1
+
             post.save()
-            return Response({'likes_count':post.likes_count},status=status.HTTP_200_OK)
-        
+
+            return Response({
+                'likes_count':post.likes_count,
+                'dislikes_count':post.dislikes_count
+            }, status=status.HTTP_200_OK)
         except Post.DoesNotExist:
-            return Response({'error':'Post not found'},status = status.HTTP_404_NOT_FOUND)
+            return Response({'error':'Post not found'}, status=status.HTTP_404_NOT_FOUND)
         
 class ToggleSavePostView(APIView):
     permission_classes = [IsAuthenticated]
@@ -347,6 +367,15 @@ class HomePagePostView(APIView):
             "posts":serializer.data
         }, status = status.HTTP_200_OK)
 
+class GenerateShareLinkAPIView(APIView):
+    def get(self, request, pk):
+        try:
+            post = Post.objects.get(id=pk)
+        except Post.DoesNotExist:
+            return Response({"error":"Post not found"})
+        
+        link = request.build_absolute_uri(reverse('post-detail', args=[post.id]))
+        return Response({"generated_link":link}, status=status.HTTP_200_OK)
 
     
 
