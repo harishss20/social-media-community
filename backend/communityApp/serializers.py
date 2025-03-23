@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import CustomUser ,Profile
-from .models import  Community, Post
+from .models import  Community, Post ,Comments
 
 
 class LoginSerializer(serializers.Serializer):
@@ -54,27 +54,24 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class CreateCommunitySerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
-    owner_id=serializers.SerializerMethodField()
     members = serializers.SerializerMethodField()
+    
     
     class Meta:
         model = Community
         fields = '__all__'
-        read_only_fields=['id','created_at','owner','members','owner_id']
+        read_only_fields=['id','created_at','owner','members']
 
     def get_owner(self, obj):
-        return obj.owner.name if obj.owner else "Unknown"
+        return {"id": obj.owner.id ,"profileImage_url":obj.owner.profileImage_url,"name":obj.owner.name} if obj.owner else "Unknown"
        
     def get_members(self, obj):
-        return [member.name for member in obj.members.all()] 
+        return [{"id":member.id ,"profileImage_url":member.profileImage_url,"name": member.name } for member in obj.members.all()] 
+     
+   
     
-    def get_owner_id(self, obj):
-        return obj.owner_id;
     
    
-   
-
-    
 class JoinCommunitySerializer(serializers.ModelSerializer):
    
     class Meta:
@@ -93,4 +90,14 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta():
         model = Post
         fields ='__all__'
-        read_only_fields = ['id', 'author', 'community', 'created_at', 'updated_at']  
+        read_only_fields = ['id', 'author', 'community', 'created_at', 'updated_at'] 
+
+class CommentsSerializer(serializers.ModelSerializer):
+
+    
+    class Meta:
+        model = Comments
+        fields = ['id', 'comments', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'post','created_at', 'updated_at','user']  
+
+    

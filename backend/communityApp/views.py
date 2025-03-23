@@ -10,8 +10,8 @@ from django.urls import reverse
 from rest_framework import serializers
 from .permissions import IsAuthorOrReadOnly,IsOwnerOrReadOnly, IsAuthenticatedForCreation
 from rest_framework.permissions import IsAuthenticatedOrReadOnly,AllowAny, IsAuthenticated
-from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinCommunitySerializer, PostSerializer
-from .models import Profile ,Community, Post
+from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinCommunitySerializer, PostSerializer,CommentsSerializer
+from .models import Profile ,Community, Post,Comments
 import random
 from django.shortcuts import get_object_or_404
  
@@ -114,6 +114,8 @@ class CreateCommunityView(APIView):
 
     def get(self, request):
         community_name = request.query_params.get('name')
+        
+        community_name= community_name.replace(" ","%20")
         if community_name:
             community = Community.objects.filter(name=community_name).first()
             if community:
@@ -267,8 +269,12 @@ class PostListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         queryset = Post.objects.all()
         community_name = self.request.query_params.get('community', None)
+        community_name = community_name.replace(" ", "%20")
+        print(community_name)
+        
         if community_name is not None:
             queryset = queryset.filter(community__name=community_name)
+            # print(queryset)
         return queryset
     
     def perform_create(self, serializer):
@@ -357,27 +363,37 @@ class HomePagePostView(APIView):
 
     permission_classes = [IsAuthenticated]
     def get(self, request):
-        profile = request.user.profile
-        joined_communities = profile.communities_joined.all()
-        posts = Post.objects.filter(community__in = joined_communities).order_by('-created_at')
-        serializer = PostSerializer(posts, many=True)
-
-
-        return Response({
-            "posts":serializer.data
-        }, status = status.HTTP_200_OK)
-
-class GenerateShareLinkAPIView(APIView):
-    def get(self, request, pk):
-        try:
-            post = Post.objects.get(id=pk)
-        except Post.DoesNotExist:
-            return Response({"error":"Post not found"})
-        
-        link = request.build_absolute_uri(reverse('post-detail', args=[post.id]))
-        return Response({"generated_link":link}, status=status.HTTP_200_OK)
+        user_id = request.query_params.get('id')
+        if user_id:
+            profile = get_object_or_404(Profile, id=user_id)
+            community = profile.communities_joined.all()
+            print(community)
+            posts = Post.objects.filter(community__in = community).order_by('-created_at')
+            serializer = PostSerializer(posts, many=True)
+            return Response({"posts":serializer.data}, status = status.HTTP_200_OK)
+        return Response({"message":"error"},status=status.HTTP_400_BAD_REQUEST)
 
     
+class CommentsView(APIView):
+    
+    def get(self, request, post_id):
+       
+        post = get_object_or_404(Post, id=post_id)
+        print(post)
+        comments = Comments.objects.filter(post=post).order_by('-created_at')
+        print(comments) 
+        if comments is None:
+            return Response({"message":"No comments is available"}) 
+        serializer = CommentsSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-
+    def post(self, request,post_id):
+     
+        user_id=request.data.get('user_id')
+        user = get_object_or_404(Profile, id=user_id)
+        post = get_object_or_404(Post, id=post_id)
+        serializer = CommentsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=user, post=post)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
