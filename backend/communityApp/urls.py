@@ -20,10 +20,10 @@ urlpatterns = [
     path('posts/<uuid:pk>/like/', LikePostView.as_view(), name='like-post'),
     path('posts/<uuid:pk>/toggle-save/', ToggleSavePostView.as_view(), name='toggle-save-post'),
     path('profile/<uuid:pk>/saved-posts/', SavedPostsView.as_view(), name='saved-posts'),
-    path('post/<uuid:pk>/share/', GenerateShareLinkAPIView.as_view(), name='generate-share-link'),
     path('feed/', HomePagePostView.as_view(), name='feed-page'),
     path('posts/comments/', CommentsView.as_view(), name='comments-list'),
-    path('posts/<str:post_id>/comments/', CommentsView.as_view(), name='get-comments'),
+    path('posts/<str:post_id>/comments/', CommentsView.as_view(), name='get-comments'),    path('post/<uuid:pk>/share/', GenerateShareLinkAPIView.as_view(), name='generate-share-link'),
+
 
 
 ]
