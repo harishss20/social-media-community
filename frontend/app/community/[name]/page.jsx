@@ -2,65 +2,51 @@
 import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faBookmark, faTimes, faShareAlt } from "@fortawesome/free-solid-svg-icons";
+import useCommunityDetails from "../../hooks/useCommunityDetails";
+import { useParams, useRouter } from "next/navigation";
+import { createPost, DeleteCommunityPage, editCommunityPage, joinSingleCommunity, leaveCommunity, updateLike, updateSave } from "../../api/communityAPI";
+import { Commet } from "react-loading-indicators";
 
 export default function CommunityPage() {
-  const userData = {
-    id: "1",
-    owner: "hari",
-    members: ["kumar", "cooper", "raj", "band", "hari", "sam", "tom", "jack", "mike", "leo"],
-    name: "animeworld",
-    description: "animeworld",
-    community_based_on: "naruto",
-    rules: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum facilisis, ligula in consectetur interdum, ex nunc fermentum odio, eget pellentesque risus purus non nulla. Fusce vitae scelerisque nisl. Aenean euismod, odio at ultrices fermentum, sapien erat tempus dolor, nec cursus nisi justo id justo. Nulla facilisi. Vestibulum sollicitudin dapibus augue, at fringilla velit. Duis quis nisi erat. Mauris sed lacus non sapien venenatis vehicula non at metus. Suspendisse a elit et lectus hendrerit luctus. Nulla et dui vel odio aliquet interdum nec nec mi. Phasellus dapibus dolor ut nisl lacinia, nec feugiat mauris vehicula. Integer efficitur, erat ac dictum ullamcorper, purus tortor convallis nulla, nec sagittis risus augue eget nunc. Sed ut urna vel arcu tincidunt vestibulum id et dolor. Mauris at metus at sapien tristique luctus vel non nulla. Donec vitae ante tristique, malesuada metus a, tincidunt lacus. Curabitur id purus ut velit imperdiet vulputate. Ut egestas velit eget dui tempor, nec accumsan dolor sollicitudin. Vivamus ultricies sodales dolor, sit amet fermentum nisl faucibus a. Cras consectetur tincidunt lorem, ac dignissim purus interdum id. Pellentesque et mi sit amet ex molestie congue et vel ligula. Etiam vitae nulla nec magna gravida fermentum. Phasellus et magna ac velit venenatis tempor id non purus. Fusce interdum malesuada dolor, et molestie sem dignissim ac. Aliquam euismod, eros ac ultricies interdum, ligula eros facilisis metus, a fermentum erat augue eget risus. Praesent sit amet mi ac risus ullamcorper pellentesque. Ut consequat ligula a metus vulputate tincidunt.",
-    bannerImage_url: "/defaultBanner.png",
-    profileImage_url: "/defaultProfile.png",
-    created_at: "2025-02-24",
-  };
-
-  const posts = [
-    {
-      id: 1,
-      title: "First Post",
-      text_field: "This is the first post in the community!",
-      media_file: "https://via.placeholder.com/100",
-      created_by: "Krishketcum",
-      profileImage_url: "https://picsum.photos/id/1",
-      created_at: "2025-03-10",
-      likes: 0,
-      saved: 0,
-      shared: 0,
-    },
-    {
-      id: 2,
-      title: "First Post",
-      text_field: "This is the first post in the community!",
-      media_file: "https://via.placeholder.com/100",
-      created_by: "Krishketcum",
-      profileImage_url: "https://picsum.photos/id/1",
-      created_at: "2025-03-10",
-      likes: 0,
-      saved: 0,
-      shared: 0,
-    },
-  ];
+  const { name } = useParams();
+  const router = useRouter();
+  const [refresh, setRefresh] = useState(0);
+  const { loading, error, community_data, community_posts } = useCommunityDetails(name, refresh);
+  const owner = community_data?.owner?.id;
 
   const [showAllModerators, setShowAllModerators] = useState(false);
   const [showPostPopup, setShowPostPopup] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [mobileView, setMobileView] = useState("posts");
   const [isJoined, setIsJoined] = useState(false);
-  const [bannerImage_url, setBannerImage_url] = useState(userData.bannerImage_url);
-  const [profileImage_url, setProfileImage_url] = useState(userData.profileImage_url);
+  const [bannerImage_url, setBannerImage_url] = useState(community_data?.bannerImage_url);
+  const [profileImage_url, setProfileImage_url] = useState(community_data?.profileImage_url);
   const [isProfileZoomed, setIsProfileZoomed] = useState(false);
   const [isBannerZoomed, setIsBannerZoomed] = useState(false);
   const [bannerOpen, setBannerOpen] = useState(false);
   const [picOpen, setPicOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [text_field, setText_field] = useState("");
+  const [media_file, setMedia_file] = useState(null);
+  const [posts, setPosts] = useState(community_posts);
+  // const [members, setMembers] = useState([]);
 
   const bannerFile = useRef(null);
   const profileFile = useRef(null);
   const popupRef = useRef(null);
 
   useEffect(() => {
+    if (community_data?.members) {
+      community_data?.members?.forEach(item => {
+        if (item?.id == localStorage.getItem("UserId")) setIsJoined(true);
+      })
+    }
+    if (community_data?.bannerImage_url) setBannerImage_url(community_data.bannerImage_url);
+    if (community_data?.communityImage_url) setProfileImage_url(community_data.communityImage_url);
+
+  }, [community_data])
+  useEffect(() => {
+    console.log(community_data);
+    setPosts(community_posts);
     const handleClickOutside = (event) => {
       if (popupRef.current && !popupRef.current.contains(event.target)) {
         handleClosePopup();
@@ -74,7 +60,7 @@ export default function CommunityPage() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showPostPopup]);
+  }, [showPostPopup, community_posts, isJoined, refresh]);
 
   const handleCreatePostClick = () => setShowPostPopup(true);
   const handleClosePopup = () => {
@@ -83,7 +69,11 @@ export default function CommunityPage() {
   };
   const handleImageChange = (event) => {
     const file = event.target.files[0];
-    if (file) setSelectedImage(URL.createObjectURL(file));
+    if (file) {
+      setMedia_file(file);
+      console.log(media_file)
+      setSelectedImage(URL.createObjectURL(file));
+    }
   };
   const handleDragOver = (event) => event.preventDefault();
   const handleDrop = (event) => {
@@ -91,29 +81,68 @@ export default function CommunityPage() {
     const file = event.dataTransfer.files[0];
     if (file) setSelectedImage(URL.createObjectURL(file));
   };
-  const toggleJoin = () => setIsJoined(!isJoined);
+  const toggleJoin = async () => {
+    if (!isJoined) {
+      const success = await joinSingleCommunity(name);
+      if (success) {
+        setIsJoined(true);
+        setRefresh(prev => prev + 1);
+      }
+    }
+    else {
+      const success = await leaveCommunity(name);
+      console.log(success);
+      if (success) {
+        setIsJoined(false);
+        setRefresh(prev => prev + 1);
+      }
+    }
+    console.log(community_data);
+    console.log(isJoined);
+  }
 
   const bannerHandle = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    console.log(community_data?.bannerImage_url)
 
     const imageUrl = await uploadToCloudinary(file);
     if (imageUrl) {
-      setBannerImage_url(imageUrl);
-      setBannerOpen(false);
+      const res = await editCommunityPage(localStorage.getItem("UserId"), { name: community_data?.name, bannerImage_url: imageUrl });
+      if (res) {
+        console.log(imageUrl);
+        setBannerImage_url(imageUrl);
+        setBannerOpen(false);
+        setRefresh(0);
+      }
     }
   };
 
   const profileHandle = async (e) => {
+    console.log("hello");
+    console.log(community_data?.communityImage_url);
     const file = e.target.files[0];
     if (!file) return;
 
     const imageUrl = await uploadToCloudinary(file);
+    console.log(imageUrl);
     if (imageUrl) {
-      setProfileImage_url(imageUrl);
-      setPicOpen(false);
+      const res = await editCommunityPage(localStorage.getItem("UserId"), { name: community_data?.name, communityImage_url: imageUrl });
+      if (res) {
+        setProfileImage_url(imageUrl);
+        setPicOpen(false);
+        setRefresh(0);
+      }
     }
   };
+
+  const handleDeleteCommunity = async () => {
+    const res = await DeleteCommunityPage(localStorage.getItem("UserId"), community_data?.name);
+    if (res) {
+      console.log(res);
+      router.replace  ("/home");
+    }
+  }
 
   const uploadToCloudinary = async (file) => {
     const formData = new FormData();
@@ -134,156 +163,87 @@ export default function CommunityPage() {
     }
   };
 
-  if(loading) return (
+  const handlePostSubmission = async () => {
+    const media_url = await uploadToCloudinary(media_file);
+    console.log(title, media_url);
+    const success = createPost({ title, text_field, media_file: media_url, name });
+    if (success) {
+      setRefresh(prev => prev + 1);
+      handleClosePopup();
+      setTitle("");
+      setText_field("");
+      setMedia_file(null);
+    }
+  }
+
+  const timeAgo = (created) => {
+    const currentTime = Date.now();
+    const createdTime = new Date(created).getTime();
+
+    let duration = (currentTime - createdTime) / (1000 * 60 * 60 * 24 * 365);
+    if (duration >= 1) return Math.floor(duration) + " years ago";
+
+    duration = (currentTime - createdTime) / (1000 * 60 * 60 * 24 * 30);
+    if (duration >= 1) return Math.floor(duration) + " months ago";
+
+    duration = (currentTime - createdTime) / (1000 * 60 * 60 * 24 * 7);
+    if (duration >= 1) return Math.floor(duration) + " weeks ago";
+
+    duration = (currentTime - createdTime) / (1000 * 60 * 60 * 24);
+    if (duration >= 1) return Math.floor(duration) + " days ago";
+
+    duration = (currentTime - createdTime) / (1000 * 60 * 60);
+    if (duration >= 1) return Math.floor(duration) + " hours ago";
+
+    return "Just now";
+  }
+
+  const getFormattedTime = () => {
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    if (community_data?.created_at) {
+
+      let t = new Date(community_data?.created_at).toLocaleDateString().split("/");
+      const formattedTime = months[t[0] - 1].slice(0, 3) + " " + t[1] + ", " + t[2];
+      return "Created at " + formattedTime
+    }
+    return ""
+  }
+
+  const toggleLike = (id) => {
+    if (id) updateLike(id, { action: "like" });
+    updateLike(id, { action: "unlike" });
+  }
+
+  const toggleSave = async(id) => {
+    updateSave(id);
+  }
+
+  if (!community_data) return (
     <div className="flex justify-center items-center h-[80vh]">
-      <Commet size="small" color="#cac8ff"/>
+      <Commet size="small" color="#cac8ff" />
     </div>
-);
+  );
+
 
   return (
     <div className="flex flex-col lg:flex-row w-full lg:w-3/4 mx-auto p-2 gap-4">
-      {/* Mobile View */}
-      <div className="lg:hidden">
-        <div className="bg-gray-700 overflow-hidden">
-          {/* Banner */}
-          <div className="relative w-full h-[100] bg-gray-300" onClick={() => setBannerOpen(true)}>
-            <img src={bannerImage_url || "/defaultBanner.png"} alt="Banner" className="w-full h-full object-cover" />
-          </div>
 
-          {/* Profile Image and Name */}
-          <div className="flex items-center p-4">
-            <div
-              className="w-16 h-16 rounded-full overflow-hidden bg-black border-4 border-gray-900"
-              onClick={() => setPicOpen(true)}
-            >
-              <img src={profileImage_url || "/defaultProfile.png"} alt="Profile" className="w-full h-full object-cover" />
-            </div>
-            <div className="ml-4">
-              <h1 className="text-xl font-bold text-white">{community_data.name}</h1>
-              <p className="text-sm text-gray-400">r/{community_data.name}</p>
-            </div>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-start p-2 bg-gray-700 gap-2">
-            <button className="text-white bg-blue-600 px-4 py-2 rounded-md" onClick={handleCreatePostClick}>
-              + Create Post
-            </button>
-            <button className={`text-white px-4 py-2 rounded-md`} onClick={toggleJoin}>
-              {isJoined ? "Joined" : "Join"}
-            </button>
-          </div>
-        </div>
-
-        {/* Post and About */}
-        <div className="flex justify-around p-2 mt-1 rounded-md">
-          <button onClick={() => setMobileView("posts")} className={"px-4 py-2 rounded-md text-white"}>
-            Posts
-          </button>
-          <button onClick={() => setMobileView("about")} className={`px-4 py-2 rounded-md text-white`}>
-            About
-          </button>
-        </div>
-
-        {/* Posts */}
-        {mobileView === "posts" && (
-          <div className="mt-1 space-y-4">
-            {posts.map((post) => (
-              <div key={post.id} className="bg-gray-700 p-4 rounded-md">
-                <div className="flex items-center">
-                  <img src={post.profileImage_url} alt="Avatar" className="w-10 h-10 bg-black rounded-full" />
-                  <div className="ml-2">
-                    <h3 className="font-bold text-xl">{post.created_by}</h3>
-                    <p className="text-xs text-gray-400">{post.created_at}</p>
-                  </div>
-                </div>
-
-                <p className="mt-2">{post.text_field}</p>
-                {post.media_file && (
-                  <img src={post.media_file} alt="Post" className="mt-2 w-full h-48 bg-white object-cover rounded-md" />
-                )}
-
-                <div className="flex items-center mt-3 text-gray-400 gap-6">
-                  <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faHeart} className="cursor-pointer" />
-                    <span>{post.likes}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faBookmark} className="cursor-pointer" />
-                    <span>{post.saved}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faShareAlt} className="cursor-pointer" />
-                    <span>{post.shared}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* About */}
-        {mobileView === "about" && (
-          <div className="mt-4 space-y-4">
-            {/* About Community */}
-            <div className="bg-gray-500 p-4 rounded-md">
-              <h2 className="text-xl font-bold text-white">About Community</h2>
-              <p className="text-gray-400">{community_data.community_based_on}</p>
-              <p className="text-gray-400">{community_data.description}</p>
-              <p className="text-gray-400">Created {community_data.created_at}</p>
-            </div>
-
-            {/* Rules */}
-            <div className="h-auto p-5 bg-gray-500">
-              <h2 className="text-xl text-white font-bold">Rules</h2>
-              <div className="max-h-[250px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-800">
-                <p className="text-white mt-3">{userData.rules}</p>
-              </div>
-            </div>
-
-            {/* Moderators */}
-            <div className="bg-gray-500 p-4 rounded-md">
-              <h2 className="text-ls font-bold text-white">Moderators</h2>
-              <div className="max-h-[220px] overflow-y-auto scrollbar-thin text-gray-400 space-y-2">
-                <li className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-black"></div>
-                  <span className="text-xs">{community_data.owner}</span>
-                </li>
-                {userData.members.slice(0, showAllModerators ? userData.members.length : 5).map((member, index) => (
-                  <li key={index} className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-black"></div>
-                    <span className="text-xs">{member}</span>
-                  </li>
-                ))}
-              </div>
-              {community_data.members.length > 5 && (
-                <button
-                  onClick={() => setShowAllModerators(!showAllModerators)}
-                  className="w-full mt-2 p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all"
-                >
-                  {showAllModerators ? "View Less" : "View All Moderators"}
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* Desktop View */}
       <div className="hidden lg:flex flex-col lg:flex-row w-full gap-4">
         {/* Left Side */}
-        <div className="w-full lg:w-3/4 flex flex-col gap-4">
+        <div className="w-full lg:w-3/4 flex flex-col gap-10">
           <div className="bg-gray-700 h-auto">
             <div className="flex flex-col items-center w-full h-[230px]">
               {/* Banner */}
-              <div onClick={() => setBannerOpen(true)} className="relative w-full h-[170]">
-                <img src={bannerImage_url || "/defaultBanner.png"} alt="Banner" className="w-full h-full object-cover" />
+              <div onClick={() => setBannerOpen(true)} className="relative w-full h-[170] hover:brightness-50 cursor-pointer duration-500 ease-in-out">
+                <img src={bannerImage_url} alt="Banner" className="w-full h-full object-cover" />
               </div>
 
               {/* Profile */}
-              <div onClick={() => setPicOpen(true)} className="relative w-full">
-                <div className="absolute -top-10 left-0 ml-10 w-[120] h-[120] rounded-full overflow-hidden bg-black border-4 border-gray-900">
-                  <img src={profileImage_url || "/defaultProfile.png"} alt="Profile" className="w-full h-full object-cover" />
+              <div className="relative w-full">
+                <div onClick={() => setPicOpen(true)} className="absolute -top-10 left-0 ml-10 w-[120] h-[120] rounded-full overflow-hidden bg-black border-4 border-gray-900 hover:brightness-50 cursor-pointer duration-500 ease-in-out">
+                  <img src={profileImage_url} alt="Profile" className="w-full h-full object-cover" />
                 </div>
 
                 {/* Icons */}
@@ -295,54 +255,68 @@ export default function CommunityPage() {
                       handleCreatePostClick();
                     }}
                   >
-                    + Create Post
+                    {isJoined && "+ Create Post"}
                   </button>
-                  <button
-                    className="text-white px-3 py-1 rounded-full text-xm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleJoin();
-                    }}
-                  >
-                    {isJoined ? "Joined" : "Join"}
-                  </button>
+                  {community_data?.owner?.id == localStorage.getItem("UserId")
+                    ?
+                    <button
+                      className="text-white px-3 py-1 rounded-full text-xm"
+                      onClick={handleDeleteCommunity}>
+                      Delete
+                    </button>
+                    :
+                    <button
+                      className="text-white px-3 py-1 rounded-full text-xm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleJoin();
+                      }}
+                    >
+                      {isJoined ? "Leave" : "Join"}
+                    </button>
+                  }
                 </div>
               </div>
             </div>
 
             {/* Community Details */}
             <div className="mt-4 mb-2 ml-6 p-4 text-white">
-              <b>{userData.name || "Community Name"}</b>
-              <h4>{userData.community_based_on || "Community Based On"}</h4>
-              <h4>{userData.description || "No Description"}</h4>
-              <h4>{userData.created_at || "Created At"}</h4>
+              <div className="flex flex-row items-center gap-5">
+
+                <b className="text-3xl">{community_data?.name.replace(/%20/g, " ") || "Community Name"}</b>
+                <p className="text-xs">{getFormattedTime() || "Created At"}</p>
+              </div>
+              {/* <h4>{community_data?.community_based_on || "Community Based On"}</h4> */}
+              <h4 className="pt-5">{community_data?.description || "No Description"}</h4>
             </div>
           </div>
 
           {/* Posts Container */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-10">
             {posts.map((post) => (
-              <div key={post.id} className="bg-gray-700 p-4 rounded-md">
+              <div key={post.id} className="bg-gray-700 p-7 pt-8 rounded-md">
                 <div className="flex items-center">
-                  <img src={post.profileImage_url} alt="Avatar" className="w-10 h-10 bg-black rounded-full" />
+                  <img src={post.author.profileImage_url} alt="Avatar" className="w-10 h-10 object-cover bg-black rounded-full" />
                   <div className="ml-2">
-                    <h3 className="font-bold text-xl">{post.created_by}</h3>
-                    <p className="text-xs text-gray-400">{post.created_at}</p>
+                    <h3 className="font-bold text-xl">{post.author.name}</h3>
+                    <p className="text-xs text-gray-400">{timeAgo(post.created_at)}</p>
                   </div>
                 </div>
+                <h1 className="text-xl pt-5">{post.title}</h1>
+                {/* <hr/> */}
 
-                <p className="mt-2">{post.text_field}</p>
                 {post.media_file && (
-                  <img src={post.media_file} alt="Post" className="mt-2 w-full h-[500px] bg-white object-cover rounded-md" />
+                  <img src={post.media_file} alt="Post" className="mt-2 w-full h-[500px] bg-black object-contain rounded-md" />
                 )}
+                <p className="mt-2 text-sm pt-5">{post.text_field}</p>
 
-                <div className="flex items-center mt-3 text-gray-400 gap-6">
+                <div className="flex items-center mt-5 text-gray-400 gap-6">
                   <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faHeart} className="cursor-pointer" />
-                    <span>{post.likes}</span>
+                    <FontAwesomeIcon onClick={() => toggleLike(post.id)} icon={faHeart} className="cursor-pointer" />
+                    <span>{post.likes_count}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faBookmark} className="cursor-pointer" />
+                    <FontAwesomeIcon onClick={() => toggleSave(post.id)} icon={faBookmark} className="cursor-pointer" />
                     <span>{post.saved}</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -361,7 +335,7 @@ export default function CommunityPage() {
           <div className="h-auto p-5 bg-gray-500">
             <h2 className="text-xl text-white font-bold">Rules</h2>
             <div className="max-h-[250px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-800">
-              <p className="text-white mt-2">{community_data.rules}</p>
+              <p className="text-white mt-2">{community_data?.rules}</p>
             </div>
           </div>
 
@@ -370,17 +344,21 @@ export default function CommunityPage() {
             <h2 className="text-ls text-white font-bold mb-4">Moderators</h2>
             <div className="max-h-[235px] overflow-y-auto scrollbar-thin text-white space-y-2">
               <li className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-black"></div>
-                <span className="text-xs">{community_data.owner}</span>
+                {/* <div className="w-8 h-8 rounded-full bg-black overflow-hidden flex items-center justify-center"> */}
+                <img src={community_data?.owner?.profileImage_url} alt="Pr" className="w-8 h-8 rounded-full bg-black object-cover" />
+                {/* </div> */}
+                <span className="text-xs">{community_data?.owner?.name}</span>
               </li>
-              {userData.members.slice(0, showAllModerators ? userData.members.length : 5).map((member, index) => (
+              {community_data?.members.slice(0, showAllModerators ? community_data?.members.length : 5).map((member, index) => (
                 <li key={index} className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-black"></div>
-                  <span className="text-xs">{member}</span>
+                  {/* <div className="w-8 h-8 rounded-full bg-black overflow-hidden flex items-center justify-center"> */}
+                  <img src={member?.profileImage_url} alt="Pr" className="w-8 h-8 object-cover bg-black rounded-full" />
+                  {/* </div> */}
+                  <span className="text-xs">{member.name}</span>
                 </li>
               ))}
             </div>
-            {community_data.members.length > 5 && (
+            {community_data?.members.length > 5 && (
               <button
                 onClick={() => setShowAllModerators(!showAllModerators)}
                 className="w-full mt-2 p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all"
@@ -399,12 +377,14 @@ export default function CommunityPage() {
             <h2 className="text-2xl font-bold mb-6">Create a Post</h2>
 
             {/* Post Title */}
-            <input type="text" className="w-full p-3 border rounded-md mb-4 text-lg" placeholder="Enter post title" />
+            <input type="text" className="w-full p-3 border rounded-md mb-4 text-lg" placeholder="Enter post title" value={title} onChange={e => setTitle(e.target.value)} />
 
             {/* Post Text */}
             <textarea
               className="w-full h-32 p-3 border rounded-md mb-4 text-lg resize-none"
               placeholder="What's on your mind?"
+              value={text_field}
+              onChange={e => setText_field(e.target.value)}
             ></textarea>
 
             {/* Image Upload */}
@@ -421,10 +401,10 @@ export default function CommunityPage() {
                     className="w-full h-full object-cover rounded-md"
                   />
                   <button
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
+                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full pl-2 pr-2"
                     onClick={() => setSelectedImage(null)}
                   >
-                    <FontAwesomeIcon icon={faTimes} />
+                    <FontAwesomeIcon size="2xs" icon={faTimes} />
                   </button>
                 </div>
               ) : (
@@ -437,7 +417,7 @@ export default function CommunityPage() {
 
             {/* Buttons */}
             <div className="flex justify-end gap-4 mt-4">
-              <button className="text-white bg-green-500 px-6 py-3 rounded-md text-lg hover:bg-green-600">Post</button>
+              <button className="text-white bg-green-500 px-6 py-3 rounded-md text-lg hover:bg-green-600" onClick={handlePostSubmission}>Post</button>
               <button className="text-white bg-red-500 px-6 py-3 rounded-md text-lg hover:bg-red-600" onClick={handleClosePopup}>
                 Cancel
               </button>
@@ -459,11 +439,15 @@ export default function CommunityPage() {
             <p className="cursor-pointer" onClick={() => setIsBannerZoomed(!isBannerZoomed)}>
               View Banner
             </p>
-            <hr className="w-full" />
-            <input type="file" accept="image/*" ref={bannerFile} className="hidden" onChange={bannerHandle}></input>
-            <p className="cursor-pointer" onClick={() => bannerFile.current.click()}>
-              Change Banner
-            </p>
+            {community_data?.owner?.id == localStorage.getItem("UserId") &&
+              <>
+                <hr className="w-full" />
+                <input type="file" accept="image/*" ref={bannerFile} className="hidden" onChange={bannerHandle}></input>
+                <p className="cursor-pointer" onClick={() => bannerFile.current.click()}>
+                  Change Banner
+                </p>
+              </>
+            }
           </div>
         </div>
       )}
@@ -480,11 +464,15 @@ export default function CommunityPage() {
             <p onClick={() => setIsProfileZoomed(!isProfileZoomed)} className="cursor-pointer">
               View Profile
             </p>
-            <hr className="w-full" />
-            <input type="file" accept="image/*" ref={profileFile} className="hidden" onChange={profileHandle}></input>
-            <p className="cursor-pointer" onClick={() => profileFile.current.click()}>
-              Change Profile
-            </p>
+            {community_data?.owner?.id == localStorage.getItem("UserId") &&
+              <>
+                <hr className="w-full" />
+                <input type="file" accept="image/*" ref={profileFile} className="hidden" onChange={profileHandle}></input>
+                <p className="cursor-pointer" onClick={() => profileFile.current.click()}>
+                  Change Profile
+                </p>
+              </>
+            }
           </div>
         </div>
       )}
