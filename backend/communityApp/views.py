@@ -8,7 +8,8 @@ from django.urls import reverse
 from .permissions import IsOwnerOrReadOnly, IsAuthenticatedForCreation
 from rest_framework.permissions import IsAuthenticatedOrReadOnly,AllowAny, IsAuthenticated
 from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinCommunitySerializer, PostSerializer,CommentsSerializer
-from .models import Profile ,Community, Post,Comments
+from .serializers import ReplySerializer
+from .models import Profile ,Community, Post,Comments,Reply
 import random
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -361,7 +362,7 @@ class CommentsView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class CommentsEditOrDeleteView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def patch(self, request,comments_id):
         comment = get_object_or_404(Comments, id=comments_id)
@@ -387,10 +388,40 @@ class CommentsEditOrDeleteView(APIView):
             return Response({"Comment is deleted successfully"},status=status.HTTP_200_OK)  
         return Response({"Comment doesn't exits"},status=status.HTTP_400_BAD_REQUEST)
 
-            
 
-
-
-
-
+class ReplyView(APIView):
+    
+    def get(self, request, comments_id):
+        comment= get_object_or_404(Comments, id=comments_id)
+        print(comment)
+        replies = Reply.objects.filter(comment=comment).order_by('-created_at')
+        if replies is None:
+            return Response({"message":"No reply is available"}) 
+        serializer = ReplySerializer(replies, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request,comments_id):
+        user_id=request.data.get('user_id')
+        user = get_object_or_404(Profile, id=user_id)
+        comments = get_object_or_404(Comments, id=comments_id)
+        serializer = ReplySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=user, comment=comments)
+            return Response({"message:":"Reply is created successfully"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class ReplyEditOrDeleteView(APIView):
+    
+    def patch(self, request, reply_id):
+        replies= get_object_or_404(Reply,id=reply_id)
+        user_id=request.data.get('user_id')
+        user_uuid=UUID(user_id)
+        if replies:
+            if not user_id or str(replies.user.id) != str(user_uuid):
+                return Response({"error":"you don't has access to Edit"},status=status.HTTP_401_UNAUTHORIZED)
+            serializer=ReplySerializer(replies,data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message":"Reply is updated successfully"},status=status.HTTP_200_OK)
+        return Response({"Reply doesn't exits"},status=status.HTTP_400_BAD_REQUEST)
 

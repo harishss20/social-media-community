@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import CustomUser ,Profile
-from .models import  Community, Post ,Comments
+from .models import  Community, Post ,Comments,Reply
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -93,5 +93,14 @@ class CommentsSerializer(serializers.ModelSerializer):
         fields = ['id', 'comments', 'created_at', 'updated_at','user']
         read_only_fields = ['id', 'post','created_at', 'updated_at','user'] 
 
+    def get_user(self,obj):
+        return {"id":obj.user.id,"name":obj.user.name,"profileImage_url":obj.user.profileImage_url}
+
+class ReplySerializer(serializers.ModelSerializer):
+    user= serializers.SerializerMethodField()
+    class Meta:
+        model=Reply
+        fields = ['id','replies','created_at','updated_at','user']
+        read_only_fields = ['id', 'comment','created_at', 'updated_at','user'] 
     def get_user(self,obj):
         return {"id":obj.user.id,"name":obj.user.name,"profileImage_url":obj.user.profileImage_url}
