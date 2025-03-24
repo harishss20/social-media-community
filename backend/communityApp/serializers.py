@@ -81,12 +81,12 @@ class JoinCommunitySerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     author  = serializers.SerializerMethodField()
-    # author = ProfileSerializer(read_only= True)
     community = serializers.SlugRelatedField(
         queryset=Community.objects.all(), 
         slug_field='name'  
     )
     total_likes = serializers.ReadOnlyField()
+    saved_by = serializers.SerializerMethodField()
 
     class Meta():
         model = Post
@@ -95,11 +95,14 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_author(self, obj):
         return {"id":obj.author.id , "name":obj.author.name, "profileImage_url":obj.author.profileImage_url}
+    
+    def get_saved_by(self, obj):
+        return [profile.id for profile in obj.saved_by.all()]
      
 
 
 class CommentsSerializer(serializers.ModelSerializer):
-    user= serializers.SerializerMethodField();
+    user= serializers.SerializerMethodField()
     class Meta:
         model = Comments
         fields = ['id', 'comments', 'created_at', 'updated_at','user']
