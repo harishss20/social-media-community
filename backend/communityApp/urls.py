@@ -22,7 +22,7 @@ urlpatterns = [
     path('profile/<uuid:pk>/saved-posts/', SavedPostsView.as_view(), name='saved-posts'),
     path('feed/', HomePagePostView.as_view(), name='feed-page'),
     path('posts/comments/', CommentsView.as_view(), name='comments-list'),
-    path('posts/<str:post_id>/comments/', CommentsView.as_view(), name='get-comments'),    path('post/<uuid:pk>/share/', GenerateShareLinkAPIView.as_view(), name='generate-share-link'),
+    path('posts/<uuid:id>/comments/', CommentsView.as_view(), name='get-comments'),    path('post/<uuid:pk>/share/', GenerateShareLinkAPIView.as_view(), name='generate-share-link'),
 
 
 

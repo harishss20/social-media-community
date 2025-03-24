@@ -63,10 +63,10 @@ class CreateCommunitySerializer(serializers.ModelSerializer):
         read_only_fields=['id','created_at','owner','members']
 
     def get_owner(self, obj):
-        return {"id": obj.owner.id ,"profileImage_url":obj.owner.profileImage_url,"name":obj.owner.name} if obj.owner else "Unknown"
+        return {"id": obj.owner.id ,"name":obj.owner.name,"profileImage_url":obj.owner.profileImage_url} if obj.owner else "Unknown"
        
     def get_members(self, obj):
-        return [{"id":member.id ,"profileImage_url":member.profileImage_url,"name": member.name } for member in obj.members.all()] 
+        return [{"id":member.id ,"name": member.name ,"profileImage_url":member.profileImage_url} for member in obj.members.all()] 
      
    
     
@@ -80,7 +80,8 @@ class JoinCommunitySerializer(serializers.ModelSerializer):
     
 
 class PostSerializer(serializers.ModelSerializer):
-    author = ProfileSerializer(read_only= True)
+    author  = serializers.SerializerMethodField()
+    # author = ProfileSerializer(read_only= True)
     community = serializers.SlugRelatedField(
         queryset=Community.objects.all(), 
         slug_field='name'  
@@ -90,16 +91,21 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta():
         model = Post
         fields ='__all__'
-        read_only_fields = ['id', 'author', 'community', 'created_at', 'updated_at'] 
+        read_only_fields = ['id', 'author', 'community', 'created_at', 'updated_at']
+
+    def get_author(self, obj):
+        return {"id":obj.author.id , "name":obj.author.name, "profileImage_url":obj.author.profileImage_url}
+     
+
 
 class CommentsSerializer(serializers.ModelSerializer):
     user= serializers.SerializerMethodField();
     class Meta:
         model = Comments
-        fields = ['id', 'comments', 'created_at', 'updated_at']
+        fields = ['id', 'comments', 'created_at', 'updated_at','user']
         read_only_fields = ['id', 'post','created_at', 'updated_at','user'] 
 
     def get_user(self,obj):
-        return {obj}
+        return {"id":obj.user.id,"name":obj.user.name,"profileImage_url":obj.user.profileImage_url}
 
     

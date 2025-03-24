@@ -76,7 +76,6 @@ class Community(models.Model):
         return self.name
 
 
-
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='posts')
@@ -87,7 +86,11 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     likes_count = models.IntegerField(default = 0)
+    dislikes_count = models.IntegerField(default = 0)
+    likes = models.ManyToManyField(Profile, related_name='liked_posts', blank=True)
+    dislikes = models.ManyToManyField(Profile, related_name='disliked_posts', blank=True)
     shares = models.ManyToManyField(Profile, related_name='shared_posts', blank=True)
+
 
 
     def __str__(self):
@@ -98,6 +101,7 @@ class Post(models.Model):
 
     def unsave_post(self, profile):
         self.saved_by.remove(profile)
+    
     
 
 class Comments(models.Model):

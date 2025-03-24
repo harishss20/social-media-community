@@ -386,9 +386,9 @@ class GenerateShareLinkAPIView(APIView):
     
 class CommentsView(APIView):
     
-    def get(self, request, post_id):
+    def get(self, request, id):
        
-        post = get_object_or_404(Post, id=post_id)
+        post = get_object_or_404(Post, id=id)
         print(post)
         comments = Comments.objects.filter(post=post).order_by('-created_at')
         print(comments) 
@@ -397,13 +397,16 @@ class CommentsView(APIView):
         serializer = CommentsSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request,post_id):
+    def post(self, request,id):
      
         user_id=request.data.get('user_id')
         user = get_object_or_404(Profile, id=user_id)
-        post = get_object_or_404(Post, id=post_id)
+        post = get_object_or_404(Post, id=id)
         serializer = CommentsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=user, post=post)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    # def patch(self, request, id):
+
