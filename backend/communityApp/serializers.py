@@ -2,11 +2,9 @@ from rest_framework import serializers
 from .models import CustomUser ,Profile
 from .models import  Community, Post ,Comments
 
-
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
-
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     username = serializers.CharField(write_only=True)
@@ -29,13 +27,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user = CustomUser.objects.create_user(username=username, email=email, password=password)
         return user
 
-
 class ProfileSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(format='hex_verbose')
     community_created=serializers.SerializerMethodField()
     community_joined= serializers.SerializerMethodField()
  
-   
     class Meta:
         model = Profile
         fields = '__all__'
@@ -49,14 +45,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         profile= Profile.objects.get(id=obj.id)
         return profile.communities_joined.all().count() 
     
-
- 
-
 class CreateCommunitySerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
     members = serializers.SerializerMethodField()
-    
-    
+      
     class Meta:
         model = Community
         fields = '__all__'
@@ -68,17 +60,12 @@ class CreateCommunitySerializer(serializers.ModelSerializer):
     def get_members(self, obj):
         return [{"id":member.id ,"name": member.name ,"profileImage_url":member.profileImage_url} for member in obj.members.all()] 
      
-   
-    
-    
-   
 class JoinCommunitySerializer(serializers.ModelSerializer):
    
     class Meta:
         model = Community
         fields ='__all__'
     
-
 class PostSerializer(serializers.ModelSerializer):
     author  = serializers.SerializerMethodField()
     community = serializers.SlugRelatedField(
@@ -99,8 +86,6 @@ class PostSerializer(serializers.ModelSerializer):
     def get_saved_by(self, obj):
         return [profile.id for profile in obj.saved_by.all()]
      
-
-
 class CommentsSerializer(serializers.ModelSerializer):
     user= serializers.SerializerMethodField()
     class Meta:
@@ -110,14 +95,3 @@ class CommentsSerializer(serializers.ModelSerializer):
 
     def get_user(self,obj):
         return {"id":obj.user.id,"name":obj.user.name,"profileImage_url":obj.user.profileImage_url}
-
-
-
-class CommentsEditOrDeleteSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Comments
-        fields = "__all__"
-        
-
-    

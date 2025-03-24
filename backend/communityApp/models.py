@@ -91,8 +91,6 @@ class Post(models.Model):
     dislikes = models.ManyToManyField(Profile, related_name='disliked_posts', blank=True)
     shares = models.ManyToManyField(Profile, related_name='shared_posts', blank=True)
 
-
-
     def __str__(self):
         return self.title
     

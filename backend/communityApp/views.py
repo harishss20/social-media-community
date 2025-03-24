@@ -8,7 +8,6 @@ from django.urls import reverse
 from .permissions import IsOwnerOrReadOnly, IsAuthenticatedForCreation
 from rest_framework.permissions import IsAuthenticatedOrReadOnly,AllowAny, IsAuthenticated
 from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinCommunitySerializer, PostSerializer,CommentsSerializer
-from .serializers import CommentsEditOrDeleteSerializer
 from .models import Profile ,Community, Post,Comments
 import random
 from django.shortcuts import get_object_or_404
@@ -82,7 +81,6 @@ class ProfileView(APIView):
             return Response({"error": "User ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         profile = get_object_or_404(Profile, id=user_id)
         profile_serializer = ProfileSerializer(profile)
-       
         return Response({
             "profile": profile_serializer.data,
         }, status=status.HTTP_200_OK)
@@ -94,7 +92,6 @@ class ProfileView(APIView):
                 profile = Profile.objects.get(id=id)
             except Profile.DoesNotExist:
                 return Response({"error": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
-            
             serializer = ProfileSerializer(profile, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -121,7 +118,6 @@ class CreateCommunityView(APIView):
     def post(self, request):
         #gets all the community based on category
         community_based_on=request.data.get('category')
-        print(community_based_on)
         if community_based_on:
             communities=Community.objects.filter(community_based_on__startswith=community_based_on)
             if communities:
@@ -129,9 +125,15 @@ class CreateCommunityView(APIView):
                 return Response({'data':serializer.data},status=status.HTTP_200_OK)
             
         #To create community
+        user_id=request.data.get('owner')
+        community_name=request.data.get('name')
         serializer = JoinCommunitySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            profile = get_object_or_404(Profile, id=user_id)
+            community=get_object_or_404(Community, name=community_name)
+            community.members.add(profile)
+            community.save()
             return Response({"message": "community is created successfully"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -173,7 +175,6 @@ class ProfileBasedCommunityView(APIView):
         user_id = request.query_params.get('id')
         if user_id:
             community = Community.objects.filter(owner_id=user_id)
-            print(community)
             if community:
                 serializer = JoinCommunitySerializer(community, many=True)
                 return Response({'data': serializer.data}, status=status.HTTP_200_OK)
@@ -241,7 +242,6 @@ class PostListCreateView(generics.ListCreateAPIView):
         community_name = community_name.replace(" ", "%20")
         if community_name is not None:
             queryset = queryset.filter(community__name=community_name)
-            # print(queryset)
         return queryset
     
     def perform_create(self, serializer):
@@ -325,7 +325,6 @@ class HomePagePostView(APIView):
         if user_id:
             profile = get_object_or_404(Profile, id=user_id)
             community = profile.communities_joined.all()
-            print(community)
             posts = Post.objects.filter(community__in = community).order_by('-created_at')
             serializer = PostSerializer(posts, many=True)
             return Response({"posts":serializer.data}, status = status.HTTP_200_OK)
@@ -345,9 +344,7 @@ class CommentsView(APIView):
 
     def get(self, request, post_id):
         post = get_object_or_404(Post, id=post_id)
-        print(post)
         comments = Comments.objects.filter(post=post).order_by('-created_at')
-        print(comments) 
         if comments is None:
             return Response({"message":"No comments is available"}) 
         serializer = CommentsSerializer(comments, many=True)
@@ -368,13 +365,12 @@ class CommentsEditOrDeleteView(APIView):
 
     def patch(self, request,comments_id):
         comment = get_object_or_404(Comments, id=comments_id)
-        print(comment)
         user_id = request.data.get('user_id')
         user_uuid= UUID(user_id)
         if comment:
             if not user_id or str(comment.user.id) != str(user_uuid):
                 return Response({"error":"you can't Edit the comment"},status=status.HTTP_401_UNAUTHORIZED)  
-            serializer = CommentsEditOrDeleteSerializer(comment, data=request.data, partial=True)
+            serializer = CommentsSerializer(comment, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response({"message": "comments is updated successfully"}, status=status.HTTP_200_OK)
