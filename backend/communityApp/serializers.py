@@ -111,4 +111,13 @@ class CommentsSerializer(serializers.ModelSerializer):
     def get_user(self,obj):
         return {"id":obj.user.id,"name":obj.user.name,"profileImage_url":obj.user.profileImage_url}
 
+
+
+class CommentsEditOrDeleteSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Comments
+        fields = "__all__"
+        
+
     

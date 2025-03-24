@@ -1,20 +1,17 @@
 from uuid import UUID
 from django.http import JsonResponse
-from django.contrib.auth import get_user_model
-from django.contrib.auth import authenticate
+from django.contrib.auth import get_user_model,authenticate
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import generics
+from rest_framework import generics,serializers,status
 from django.urls import reverse
-from rest_framework import serializers
-from .permissions import IsAuthorOrReadOnly,IsOwnerOrReadOnly, IsAuthenticatedForCreation
+from .permissions import IsOwnerOrReadOnly, IsAuthenticatedForCreation
 from rest_framework.permissions import IsAuthenticatedOrReadOnly,AllowAny, IsAuthenticated
 from .serializers import LoginSerializer, UserRegistrationSerializer ,ProfileSerializer ,CreateCommunitySerializer, JoinCommunitySerializer, PostSerializer,CommentsSerializer
+from .serializers import CommentsEditOrDeleteSerializer
 from .models import Profile ,Community, Post,Comments
 import random
 from django.shortcuts import get_object_or_404
- 
 from rest_framework_simplejwt.tokens import RefreshToken
 
 User = get_user_model()
@@ -30,6 +27,7 @@ def get_tokens_for_user(user):
     }
 class LoginView(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -54,11 +52,10 @@ class LoginView(APIView):
                 return Response({"error": "Password is wrong "}, status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class UserRegistrationView(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
-    
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -75,8 +72,6 @@ class UserRegistrationView(APIView):
                 return Response({"message":True}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Username field is empty"}, status=status.HTTP_400_BAD_REQUEST)
-
-            
 
 class ProfileView(APIView):
     permission_classes = [IsOwnerOrReadOnly]
@@ -107,14 +102,11 @@ class ProfileView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({"error": "Profile ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         
-
 class CreateCommunityView(APIView):
-
     permission_classes = [IsAuthenticatedForCreation]
 
     def get(self, request):
         community_name = request.query_params.get('name')
-        
         community_name= community_name.replace(" ","%20")
         if community_name:
             community = Community.objects.filter(name=community_name).first()
@@ -135,7 +127,7 @@ class CreateCommunityView(APIView):
             if communities:
                 serializer=JoinCommunitySerializer(communities, many=True)
                 return Response({'data':serializer.data},status=status.HTTP_200_OK)
-        
+            
         #To create community
         serializer = JoinCommunitySerializer(data=request.data)
         if serializer.is_valid():
@@ -146,18 +138,14 @@ class CreateCommunityView(APIView):
     def patch(self, request):
         user_id = request.query_params.get('id',None)
         community_name = request.data.get('name', None)
-
         if community_name:
             try:
                 community = Community.objects.get(name=community_name)
             except Community.DoesNotExist:
                 return Response({"error": "Community not found"}, status=status.HTTP_404_NOT_FOUND)
-            
             user_uuid= UUID(user_id)
-            
             if not user_id or str(community.owner.id) != str(user_uuid):
                     return Response({"error":"Owner has the access to Edit"},status=status.HTTP_401_UNAUTHORIZED)   
-            
             serializer = CreateCommunitySerializer(community, data=request.data, partial=True)  
             if serializer.is_valid():
                 serializer.save()
@@ -173,15 +161,12 @@ class CreateCommunityView(APIView):
                 community = Community.objects.get(name=community_name)
             except Community.DoesNotExist:
                 return Response({"error": "Community not found"}, status=status.HTTP_404_NOT_FOUND)
-         
             user_uuid = UUID(user_id)
             if str(community.owner.id) != str(user_uuid):
                 return Response({"error": "Owner has the access to Delete Community"}, status=status.HTTP_401_UNAUTHORIZED)
-            
             community.delete()
             return Response({"message":"community deleted successfully"},status=status.HTTP_200_OK)
                 
-
 class ProfileBasedCommunityView(APIView):
 
     def get(self, request):
@@ -200,25 +185,19 @@ class ProfileBasedCommunityView(APIView):
 class userJoinedCommunityView(APIView):
     def get(self, request):
         user_id= request.query_params.get('id')
-                   
         if user_id:
             profile = get_object_or_404(Profile, id=user_id)
             community = profile.communities_joined.all()
-
             if community:
                 serializer= CreateCommunitySerializer(community, many=True)
                 return Response({"joined_community":serializer.data},status=status.HTTP_200_OK)
-
         else:
             return Response({"error": "User Id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-
 class JoinCommunityView(APIView):
-    
     permission_classes = [IsAuthenticated]
 
     def get(self,request):
-        
             items= list(Community.objects.all())
             random_items=random.sample(items,3);
             if random_items:
@@ -227,40 +206,30 @@ class JoinCommunityView(APIView):
             else:
                 return Response({"message": "Community is not exists"}, status=status.HTTP_400_BAD_REQUEST)
        
-
     def post(self, request):
         user_id= request.data.get("user_id");
         community_name = request.data.get("community_name")    
-
         if not user_id or not community_name:
             return Response({"error": "User ID and Community ID are required."}, status=status.HTTP_400_BAD_REQUEST)
-        
         profile = get_object_or_404(Profile, id=user_id)
         community = get_object_or_404(Community, name=community_name)
-
         if profile in community.members.all():
             return Response({"message": "User is already a member of this community."}, status=status.HTTP_200_OK)
-        
         community.members.add(profile)
         community.save()
-
         return Response({"message": f"{profile.name} has joined {community.name}."}, status=status.HTTP_200_OK)
     
     def patch(self, request):
         user_id= request.data.get("user_id");
         community_name = request.data.get("community_name")    
-
         if not user_id or not community_name:
             return Response({"error": "User ID and Community ID are required."}, status=status.HTTP_400_BAD_REQUEST)
-        
         profile = get_object_or_404(Profile, id=user_id)
         community = get_object_or_404(Community, name=community_name)
         community.members.remove(profile)
         community.save()
-
         return Response({"message": f"{profile.name} has Leaved {community.name}."}, status=status.HTTP_200_OK)
-        
-
+    
 class PostListCreateView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -270,8 +239,6 @@ class PostListCreateView(generics.ListCreateAPIView):
         queryset = Post.objects.all()
         community_name = self.request.query_params.get('community', None)
         community_name = community_name.replace(" ", "%20")
-        print(community_name)
-        
         if community_name is not None:
             queryset = queryset.filter(community__name=community_name)
             # print(queryset)
@@ -280,7 +247,6 @@ class PostListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         user_profile = self.request.user.profile
         community = serializer.validated_data.get("community")
-
         if not community.members.filter(id=user_profile.id).exists():
             raise serializers.ValidationError( {"error": "You must join the community before posting."})
         serializer.save(author=user_profile)
@@ -289,7 +255,6 @@ class PostRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
-
     def perform_update(self, serializer):
         serializer.save(author = self.request.user.profile)
 
@@ -302,7 +267,6 @@ class LikePostView(APIView):
             user_profile = request.user.profile
             data = request.data
             action = data.get('action')
-
             if action == 'like':
                 if user_profile in post.dislikes.all():  
                     post.dislikes.remove(user_profile)
@@ -323,9 +287,7 @@ class LikePostView(APIView):
                 else:
                     post.dislikes.add(user_profile)
                     post.dislikes_count += 1
-
             post.save()
-
             return Response({
                 'likes_count':post.likes_count,
                 'dislikes_count':post.dislikes_count
@@ -339,15 +301,12 @@ class ToggleSavePostView(APIView):
     def post(self, request, pk):
         post = get_object_or_404(Post, id = pk)
         profile = request.user.profile
-
         if post.saved_by.filter(id=profile.id).exists():
             post.unsave_post(profile)
             action = 'unsaved'
-
         else:
             post.save_post(profile)
             action = 'saved'
-
         return JsonResponse({'status':action})
     
 class SavedPostsView(APIView):
@@ -358,7 +317,6 @@ class SavedPostsView(APIView):
         serializer = PostSerializer(saved_posts, many=True, context={'request':request})
         return JsonResponse(serializer.data, safe=False)
     
-
 class HomePagePostView(APIView):
 
     permission_classes = [IsAuthenticated]
@@ -373,22 +331,20 @@ class HomePagePostView(APIView):
             return Response({"posts":serializer.data}, status = status.HTTP_200_OK)
         return Response({"message":"error"},status=status.HTTP_400_BAD_REQUEST)
 
-
 class GenerateShareLinkAPIView(APIView):
     def get(self, request, pk):
         try:
             post = Post.objects.get(id=pk)
         except Post.DoesNotExist:
             return Response({"error":"Post not found"})
-        
         link = request.build_absolute_uri(reverse('post-detail', args=[post.id]))
         return Response({"generated_link":link}, status=status.HTTP_200_OK)
     
 class CommentsView(APIView):
-    
-    def get(self, request, id):
-       
-        post = get_object_or_404(Post, id=id)
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id)
         print(post)
         comments = Comments.objects.filter(post=post).order_by('-created_at')
         print(comments) 
@@ -397,16 +353,48 @@ class CommentsView(APIView):
         serializer = CommentsSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request,id):
-     
+    def post(self, request,post_id):
         user_id=request.data.get('user_id')
         user = get_object_or_404(Profile, id=user_id)
-        post = get_object_or_404(Post, id=id)
+        post = get_object_or_404(Post, id=post_id)
         serializer = CommentsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=user, post=post)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"message:":"Comment is created successfully"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    # def patch(self, request, id):
+class CommentsEditOrDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request,comments_id):
+        comment = get_object_or_404(Comments, id=comments_id)
+        print(comment)
+        user_id = request.data.get('user_id')
+        user_uuid= UUID(user_id)
+        if comment:
+            if not user_id or str(comment.user.id) != str(user_uuid):
+                return Response({"error":"you can't Edit the comment"},status=status.HTTP_401_UNAUTHORIZED)  
+            serializer = CommentsEditOrDeleteSerializer(comment, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "comments is updated successfully"}, status=status.HTTP_200_OK)
+        return Response({"Comment doesn't exits"},status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, comments_id):
+        comment=get_object_or_404(Comments, id=comments_id)
+        user_id = request.data.get('user_id')
+        user_uuid= UUID(user_id)
+        if comment:
+            if not user_id or str(comment.user.id) != str(user_uuid):
+                return Response({"error":"you can't delete the comment"},status=status.HTTP_401_UNAUTHORIZED)  
+            comment.delete();
+            return Response({"Comment is deleted successfully"},status=status.HTTP_200_OK)  
+        return Response({"Comment doesn't exits"},status=status.HTTP_400_BAD_REQUEST)
+
+            
+
+
+
+
+
 

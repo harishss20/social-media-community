@@ -3,7 +3,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import LoginView, UserRegistrationView
 from .views import ProfileView ,CreateCommunityView,JoinCommunityView, PostListCreateView, LikePostView,ToggleSavePostView,SavedPostsView, HomePagePostView, GenerateShareLinkAPIView
 from .views import PostRetrieveUpdateDestroyView,ProfileBasedCommunityView
-from .views import userJoinedCommunityView,CommentsView
+from .views import userJoinedCommunityView,CommentsView,CommentsEditOrDeleteView
 
 urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
@@ -22,7 +22,9 @@ urlpatterns = [
     path('profile/<uuid:pk>/saved-posts/', SavedPostsView.as_view(), name='saved-posts'),
     path('feed/', HomePagePostView.as_view(), name='feed-page'),
     path('posts/comments/', CommentsView.as_view(), name='comments-list'),
-    path('posts/<uuid:id>/comments/', CommentsView.as_view(), name='get-comments'),    path('post/<uuid:pk>/share/', GenerateShareLinkAPIView.as_view(), name='generate-share-link'),
+    path('posts/<uuid:post_id>/comments/', CommentsView.as_view(), name='get-comments'),
+    path('posts/comments/<uuid:comments_id>/',CommentsEditOrDeleteView.as_view(),name='edit-comments') ,
+    path('post/<uuid:pk>/share/', GenerateShareLinkAPIView.as_view(), name='generate-share-link'),
 
 
 
