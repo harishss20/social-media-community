@@ -76,7 +76,6 @@ class Community(models.Model):
         return self.name
 
 
-
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='posts')
@@ -92,8 +91,6 @@ class Post(models.Model):
     dislikes = models.ManyToManyField(Profile, related_name='disliked_posts', blank=True)
     shares = models.ManyToManyField(Profile, related_name='shared_posts', blank=True)
 
-
-
     def __str__(self):
         return self.title
     
@@ -103,8 +100,30 @@ class Post(models.Model):
     def unsave_post(self, profile):
         self.saved_by.remove(profile)
     
-
-    
     
 
+class Comments(models.Model):
+    id =models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    post=models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    user=models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='comments')
+    comments=models.TextField(max_length=200 ,blank=True)
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.name}'s Comments"
     
+class Reply(models.Model):
+    id=models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
+    comment= models.ForeignKey(Comments, on_delete=models.CASCADE, related_name='replies')
+    user= models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='replies')
+    replies=models.TextField(max_length=200)
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.name}'s Replies"
+
+
+    
+
