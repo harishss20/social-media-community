@@ -10,6 +10,10 @@ import {
   faBookmark,
   faShare,
   faSignOut,
+  faArrowUp,
+  faArrowDown19,
+  faArrowDownLong,
+  faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function Home() {
@@ -103,7 +107,7 @@ export default function Home() {
       {/* Left Content */}
       <div className="text-white min-h-screen flex p-6 justify-center gap-16 mt-5">
         <div className="flex flex-col items-center gap-4 w-60 sticky top-[120px] h-full overflow-y-auto">
-      
+
           <div className="bg-[#30313b] w-60 h-[370px] rounded-lg shadow-md">
             <div className="relative">
               <img src={userData.bannerImage_url} alt="User Banner" className="w-full h-24 rounded-t-lg" />
@@ -147,10 +151,12 @@ export default function Home() {
                   <img src={post.profileImage_url} alt="Post Author" className="h-12 w-12 rounded-full bg-black" />
                   <div>
                     <h3 className="text-lg font-bold text-gray-300">{post.name}</h3>
-                    <p className="text-sm text-gray-400">
-                      {post.username} <span className="mx-5">|</span>
-                      <span className="text-sm text-gray-400">{post.created_at}</span>
-                    </p>
+                    <div className="flex flex-row justify-between gap-4">
+                      <p className="text-sm text-gray-400">
+                        {post.username} <span className="ml-1 mr-3 text-xl"> |</span>
+                        <span className="text-sm text-gray-400">{post.created_at}</span>
+                      </p>
+                    </div>
                   </div>
                 </div>
                 <button aria-label="Save post" className="ml-auto flex items-center gap-1 px-2 py-1 bg-gray-700 text-purple-400 rounded-full border border-gray-500 text-sm">
@@ -162,11 +168,16 @@ export default function Home() {
               <p className="mt-5 ml-2 mb-4 text-gray-300">{post.desc}</p>
               <img src={post.post_img} alt="Post" className="w-full h-[300px] bg-white mt-2 object-cover rounded-lg" />
               <div className="flex gap-2 mt-3">
-             
-                <button className="flex items-center gap-1 px-2 py-1 bg-gray-700 text-purple-400 rounded-full border border-gray-500 text-sm">
-                  <FontAwesomeIcon icon={faThumbsUp} className="text-xs" />
-                  <span className="font-medium">Vote</span>
-                </button>
+
+                <div className="flex items-center gap-1 px-2 py-0 bg-gray-700 text-purple-400 rounded-full border border-gray-500 text-sm">
+                  <button className="pl-[4px] pr-[4px]">
+                    <FontAwesomeIcon icon={faArrowUp} className="text-xs" />
+                  </button>
+                  <span className="font-medium border-l-2 pl-2 border-r-2 pr-2 border-gray-500">Vote</span>
+                  <button className="pl-[4px] pr-[4px]">
+                    <FontAwesomeIcon icon={faArrowDown} className="text-xs" />
+                  </button>
+                </div>
 
                 <button className="flex items-center gap-1 px-2 py-1 bg-gray-700 text-purple-400 rounded-full border border-gray-500 text-sm">
                   <FontAwesomeIcon icon={faComment} className="text-xs" />
