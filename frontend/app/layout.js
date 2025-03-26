@@ -14,9 +14,7 @@ export default function RootLayout({ children }) {
         <FontAwesomeConfig />
       </head>
       <body>
-        <AuthGuard>
-          {children}
-        </AuthGuard>
+        <AuthGuard>{children}</AuthGuard>
       </body>
     </html>
   );
