@@ -243,7 +243,7 @@ export default function CommunityPage() {
 
 
       {/* Desktop View */}
-      <div className="hidden lg:flex flex-col lg:flex-row w-full gap-4">
+      <div className="hidden lg:flex flex-col lg:flex-row w-full gap-4 mt-2">
         {/* Left Side */}
         <div className="w-full lg:w-3/4 flex flex-col gap-5">
           <div className="bg-gray-800 h-auto rounded-md overflow-hidden">
@@ -316,7 +316,7 @@ export default function CommunityPage() {
                     <p className="font-extrabold text-xs text-gray-400">{timeAgo(post.created_at)}</p>
                   </div>
                 </div>
-                <hr className="border-2 mt-2 rounded-md border-[#cac8ff]"/>
+                <hr className="border-[1px] mt-2 rounded-md border-[#cac8ff]"/>
                 <h1 className="text-xl pt-5 break-words">{post.title}</h1>
 
                 {post.media_file && (
@@ -345,7 +345,7 @@ export default function CommunityPage() {
         </div>
 
         {/* Right Side */}
-        <div className="w-full lg:w-1/3 flex flex-col space-y-4 sticky top-2 h-fit">
+        <div className="w-full lg:w-1/3 flex flex-col space-y-4 sticky top-[88px] h-fit">
           {/* Rules */}
           <div className="h-auto p-5 bg-gray-800 rounded-sm">
             <h2 className="text-xl text-white font-bold">Rules</h2>
