@@ -18,7 +18,6 @@ export const joinSingleCommunity = async (name) => {
 }
 
 export const leaveCommunity = async(name) => {
-    // const id = localStorage.getItem("UserId");
     console.log("Join");
         const res = await fetch("http://localhost:8000/api/join-community/", {
             method: 'PATCH',
@@ -48,6 +47,7 @@ export const createPost = async({title, text_field, media_file, name}) => {
                 title: title, text_field: text_field, media_file: media_file, community: name
             })
         })
+        console.log(await res.json());
         if(res.ok) return true;
         return false
         
@@ -60,8 +60,11 @@ export const updateLike = async(postId, action) => {
             "Content-Type": "application/json",
             "Authorization": token
         },
-        body: JSON.stringify({action})
+        body: JSON.stringify(action)
     });
+
+    if(res.ok) return true;
+    return false;
 }
 
 export const updateSave = async(postId) => {
@@ -74,6 +77,19 @@ export const updateSave = async(postId) => {
     });
     const data = await res.json();
     console.log(data);
+}
+
+export const postShare = async(postId) => {
+    const res = await fetch(`http://localhost:8000/api/post/${postId}/share/`, {
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token
+        }
+    })
+
+    const data = await res.json();
+    console.log(data);
+    return data.generated_link;
 }
 
 export const editCommunityPage = async (id, fields) => {

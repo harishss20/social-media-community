@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faBookmark, faTimes, faShareAlt } from "@fortawesome/free-solid-svg-icons";
 import useCommunityDetails from "../../hooks/useCommunityDetails";
 import { useParams, useRouter } from "next/navigation";
-import { createPost, DeleteCommunityPage, editCommunityPage, joinSingleCommunity, leaveCommunity, updateLike, updateSave } from "../../api/communityAPI";
+import { createPost, DeleteCommunityPage, editCommunityPage, joinSingleCommunity, leaveCommunity, postShare, updateLike, updateSave } from "../../api/communityAPI";
 import { Commet } from "react-loading-indicators";
 
 export default function CommunityPage() {
@@ -16,6 +16,7 @@ export default function CommunityPage() {
 
   const [showAllModerators, setShowAllModerators] = useState(false);
   const [showPostPopup, setShowPostPopup] = useState(false);
+  const [showSharePopup, setShowSharePopup] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isJoined, setIsJoined] = useState(false);
   const [bannerImage_url, setBannerImage_url] = useState(community_data?.bannerImage_url);
@@ -28,7 +29,6 @@ export default function CommunityPage() {
   const [text_field, setText_field] = useState("");
   const [media_file, setMedia_file] = useState(null);
   const [posts, setPosts] = useState(community_posts);
-  // const [members, setMembers] = useState([]);
 
   const bannerFile = useRef(null);
   const profileFile = useRef(null);
@@ -36,6 +36,7 @@ export default function CommunityPage() {
 
   useEffect(() => {
     if (community_data?.members) {
+      if(community_data?.owner?.id == localStorage.getItem("UserId")) setIsJoined(true); 
       community_data?.members?.forEach(item => {
         if (item?.id == localStorage.getItem("UserId")) setIsJoined(true);
       })
@@ -164,9 +165,9 @@ export default function CommunityPage() {
   };
 
   const handlePostSubmission = async () => {
-    const media_url = await uploadToCloudinary(media_file);
+    const media_url = media_file ? await uploadToCloudinary(media_file) : null;
     console.log(title, media_url);
-    const success = createPost({ title, text_field, media_file: media_url, name });
+    const success = await createPost({ title, text_field, media_file: media_url, name });
     if (success) {
       setRefresh(prev => prev + 1);
       handleClosePopup();
@@ -209,13 +210,25 @@ export default function CommunityPage() {
     return ""
   }
 
-  const toggleLike = (id) => {
-    if (id) updateLike(id, { action: "like" });
-    updateLike(id, { action: "unlike" });
+  const toggleLike = async(id) => {
+    const success = await updateLike(id, { action: "like" });
+    console.log(success);
+    if(success) setRefresh(prev => prev+1);
   }
-
+  
   const toggleSave = async(id) => {
     updateSave(id);
+    setRefresh(prev => prev+1);
+  }
+
+  const handleShare = async(id) => {
+    let link = await postShare(id);
+    link = link.replace("8000", "3000");
+    link = link.replace("/posts", "/post");
+    link = link.replace("/api", "");
+    console.log(link);
+    setShowSharePopup(true);
+    // router.push(link);
   }
 
   if (!community_data) return (
@@ -232,8 +245,8 @@ export default function CommunityPage() {
       {/* Desktop View */}
       <div className="hidden lg:flex flex-col lg:flex-row w-full gap-4">
         {/* Left Side */}
-        <div className="w-full lg:w-3/4 flex flex-col gap-10">
-          <div className="bg-gray-700 h-auto">
+        <div className="w-full lg:w-3/4 flex flex-col gap-5">
+          <div className="bg-gray-800 h-auto rounded-md overflow-hidden">
             <div className="flex flex-col items-center w-full h-[230px]">
               {/* Banner */}
               <div onClick={() => setBannerOpen(true)} className="relative w-full h-[170] hover:brightness-50 cursor-pointer duration-500 ease-in-out">
@@ -260,8 +273,8 @@ export default function CommunityPage() {
                   {community_data?.owner?.id == localStorage.getItem("UserId")
                     ?
                     <button
-                      className="text-white px-3 py-1 rounded-full text-xm"
-                      onClick={handleDeleteCommunity}>
+                    className="text-white px-3 py-1 rounded-full text-xm"
+                    onClick={handleDeleteCommunity}>
                       Delete
                     </button>
                     :
@@ -271,7 +284,7 @@ export default function CommunityPage() {
                         e.stopPropagation();
                         toggleJoin();
                       }}
-                    >
+                      >
                       {isJoined ? "Leave" : "Join"}
                     </button>
                   }
@@ -280,48 +293,50 @@ export default function CommunityPage() {
             </div>
 
             {/* Community Details */}
-            <div className="mt-4 mb-2 ml-6 p-4 text-white">
+            <div className="mt-4 mb-2 ml-6 mr-6 p-4 text-white">
               <div className="flex flex-row items-center gap-5">
 
-                <b className="text-3xl">{community_data?.name.replace(/%20/g, " ") || "Community Name"}</b>
+                <b className="text-3xl tracking-[5px]">{community_data?.name.replace(/%20/g, " ") || "Community Name"}</b>
                 <p className="text-xs">{getFormattedTime() || "Created At"}</p>
               </div>
               {/* <h4>{community_data?.community_based_on || "Community Based On"}</h4> */}
+                      <hr className="border-2 mt-2 rounded-md border-[#cac8ff]"/>
               <h4 className="pt-5">{community_data?.description || "No Description"}</h4>
             </div>
           </div>
 
           {/* Posts Container */}
-          <div className="flex flex-col gap-10">
+          <div className="flex flex-col gap-5">
             {posts.map((post) => (
-              <div key={post.id} className="bg-gray-700 p-7 pt-8 rounded-md">
+              <div key={post.id} className="bg-gray-800 p-10 pt-8 rounded-md">
                 <div className="flex items-center">
                   <img src={post.author.profileImage_url} alt="Avatar" className="w-10 h-10 object-cover bg-black rounded-full" />
                   <div className="ml-2">
                     <h3 className="font-bold text-xl">{post.author.name}</h3>
-                    <p className="text-xs text-gray-400">{timeAgo(post.created_at)}</p>
+                    <p className="font-extrabold text-xs text-gray-400">{timeAgo(post.created_at)}</p>
                   </div>
                 </div>
-                <h1 className="text-xl pt-5">{post.title}</h1>
-                {/* <hr/> */}
+                <hr className="border-2 mt-2 rounded-md border-[#cac8ff]"/>
+                <h1 className="text-xl pt-5 break-words">{post.title}</h1>
 
                 {post.media_file && (
                   <img src={post.media_file} alt="Post" className="mt-2 w-full h-[500px] bg-black object-contain rounded-md" />
                 )}
-                <p className="mt-2 text-sm pt-5">{post.text_field}</p>
+                <p className="mt-2 text-sm pt-5 break-words break">{post.text_field}</p>
 
                 <div className="flex items-center mt-5 text-gray-400 gap-6">
                   <div className="flex items-center gap-2">
-                    <FontAwesomeIcon onClick={() => toggleLike(post.id)} icon={faHeart} className="cursor-pointer" />
+                    <FontAwesomeIcon onClick={() => toggleLike(post.id)} icon={faHeart} className="cursor-pointer" color={post.likes.includes(localStorage.getItem("UserId")) ? "red" : ""} />
                     <span>{post.likes_count}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <FontAwesomeIcon onClick={() => toggleSave(post.id)} icon={faBookmark} className="cursor-pointer" />
+                    <FontAwesomeIcon onClick={() => toggleSave(post.id)} icon={faBookmark} className={`cursor-pointer ${post.saved_by.includes(localStorage.getItem("UserId")) ? "text-[#cac8ff]" : ""}`} />
                     <span>{post.saved}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faShareAlt} className="cursor-pointer" />
+                  <div className="flex items-center gap-2 relative">
+                    <FontAwesomeIcon onClick={() => handleShare(post.id)} icon={faShareAlt} className="cursor-pointer" />
                     <span>{post.shared}</span>
+                    {showSharePopup && <div></div>}
                   </div>
                 </div>
               </div>
@@ -332,7 +347,7 @@ export default function CommunityPage() {
         {/* Right Side */}
         <div className="w-full lg:w-1/3 flex flex-col space-y-4 sticky top-2 h-fit">
           {/* Rules */}
-          <div className="h-auto p-5 bg-gray-500">
+          <div className="h-auto p-5 bg-gray-800 rounded-sm">
             <h2 className="text-xl text-white font-bold">Rules</h2>
             <div className="max-h-[250px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-800">
               <p className="text-white mt-2">{community_data?.rules}</p>
@@ -340,7 +355,7 @@ export default function CommunityPage() {
           </div>
 
           {/* Moderators */}
-          <div className="h-auto p-4 bg-gray-500">
+          <div className="h-auto p-4 bg-gray-800 rounded-sm">
             <h2 className="text-ls text-white font-bold mb-4">Moderators</h2>
             <div className="max-h-[235px] overflow-y-auto scrollbar-thin text-white space-y-2">
               <li className="flex items-center gap-2">
