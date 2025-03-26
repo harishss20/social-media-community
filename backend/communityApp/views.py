@@ -424,4 +424,14 @@ class ReplyEditOrDeleteView(APIView):
                 serializer.save()
                 return Response({"message":"Reply is updated successfully"},status=status.HTTP_200_OK)
         return Response({"Reply doesn't exits"},status=status.HTTP_400_BAD_REQUEST)
-
+    
+    def delete(self, request, reply_id):
+        reply=get_object_or_404(Reply, id=reply_id)
+        user_id = request.data.get('user_id')
+        user_uuid= UUID(user_id)
+        if reply:
+            if not user_id or str(reply.user.id) != str(user_uuid):
+                return Response({"error":"you can't delete the reply"},status=status.HTTP_401_UNAUTHORIZED)  
+            reply.delete();
+            return Response({"message":"reply is deleted successfully"},status=status.HTTP_200_OK)  
+        return Response({"error":"reply doesn't exits"},status=status.HTTP_400_BAD_REQUEST)
