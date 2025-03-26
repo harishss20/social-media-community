@@ -246,7 +246,7 @@ export default function CommunityPage() {
       <div className="hidden lg:flex flex-col lg:flex-row w-full gap-4 mt-2">
         {/* Left Side */}
         <div className="w-full lg:w-3/4 flex flex-col gap-5">
-          <div className="bg-gray-800 h-auto rounded-md overflow-hidden">
+          <div className="bg-[#30313b] h-auto rounded-md overflow-hidden">
             <div className="flex flex-col items-center w-full h-[230px]">
               {/* Banner */}
               <div onClick={() => setBannerOpen(true)} className="relative w-full h-[170] hover:brightness-50 cursor-pointer duration-500 ease-in-out">
@@ -262,13 +262,13 @@ export default function CommunityPage() {
                 {/* Icons */}
                 <div className="absolute top-0 right-0 flex items-center gap-3 p-2">
                   <button
-                    className="text-white px-3 py-1 rounded-full text-xm"
+                    className="text-[#cac8ff] px-3 py-1 rounded-full text-xm border-2 border-primary"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleCreatePostClick();
                     }}
                   >
-                    {isJoined && "+ Create Post"}
+                    {isJoined && <><span className="text-primary">+</span> Post</>}
                   </button>
                   {community_data?.owner?.id == localStorage.getItem("UserId")
                     ?
@@ -279,7 +279,7 @@ export default function CommunityPage() {
                     </button>
                     :
                     <button
-                      className="text-white px-3 py-1 rounded-full text-xm"
+                      className="text-[#cac8ff] px-3 py-1 rounded-full text-xm border-2 border-primary "
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleJoin();
@@ -294,13 +294,10 @@ export default function CommunityPage() {
 
             {/* Community Details */}
             <div className="mt-4 mb-2 ml-6 mr-6 p-4 text-white">
-              <div className="flex flex-row items-center gap-5">
 
-                <b className="text-3xl tracking-[5px]">{community_data?.name.replace(/%20/g, " ") || "Community Name"}</b>
-                <p className="text-xs">{getFormattedTime() || "Created At"}</p>
-              </div>
-              {/* <h4>{community_data?.community_based_on || "Community Based On"}</h4> */}
-                      <hr className="border-2 mt-2 rounded-md border-[#cac8ff]"/>
+                <b className="text-2xl text-accent">{community_data?.name.replace(/%20/g, " ") || "Community Name"}</b>
+                <p className="text-xs text-gray-400">{getFormattedTime() || "Created At"}</p>
+                      <hr className="border-[1px] mt-2 rounded-md border-[#cac8ff]"/>
               <h4 className="pt-5">{community_data?.description || "No Description"}</h4>
             </div>
           </div>

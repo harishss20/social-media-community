@@ -74,8 +74,6 @@ export default function Home() {
 
   return (
     <div>
-      {/* Navbar */}
-      {/* <Navbar /> */}
       {/* Left Content */}
       <div className="text-white min-h-screen flex p-6 justify-center gap-16 mt-5">
         <div className="flex flex-col items-center gap-4 w-60 sticky top-[120px] h-full overflow-y-auto">

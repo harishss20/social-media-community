@@ -7,6 +7,7 @@ const Navbar = () => {
 
     const handleLogout = () => {
         localStorage.clear();
+        window.location.reload();
     }
     return (
         <nav className="bg-[#30313b] text-white flex items-center justify-around px-6 py-4 sticky top-0 z-50">
