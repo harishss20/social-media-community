@@ -160,7 +160,7 @@ export default function ProfilePage() {
 
 
       <div
-        className="w-[800px] pb-10 flex flex-col items-center space-y-28 bg-[#343538] rounded-xl relative">
+        className="w-[800px] pb-10 flex flex-col items-center space-y-28 bg-[#30313b] rounded-xl relative">
 
         <div
           onClick={() => setBannerOpen(true)}

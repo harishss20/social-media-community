@@ -70,14 +70,14 @@ export default function Home() {
   return (
     <div>
       {/* Navbar */}
-      <nav className="bg-gray-500 text-white flex items-center justify-around px-6 py-4 sticky top-0 z-50">
+      <nav className="bg-[#30313b] text-white flex items-center justify-around px-6 py-4 sticky top-0 z-50">
         <div className="text-3xl font-bold text-purple-300">LADSPA</div>
         <div className="relative ml-24">
           <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-3 text-purple-300" />
           <input
             type="text"
             placeholder="Search"
-            className="bg-gray-800 text-gray-300 pl-10 pr-4 py-2 focus:outline-none rounded-3xl w-96"
+            className="bg-[#1e1f26] text-gray-300 pl-10 pr-4 py-2 focus:outline-none rounded-3xl w-96"
           />
         </div>
         <div className="flex space-x-8">
@@ -104,7 +104,7 @@ export default function Home() {
       <div className="text-white min-h-screen flex p-6 justify-center gap-16 mt-5">
         <div className="flex flex-col items-center gap-4 w-60 sticky top-[120px] h-full overflow-y-auto">
       
-          <div className="bg-gray-800 w-60 h-[370px] rounded-lg shadow-md">
+          <div className="bg-[#30313b] w-60 h-[370px] rounded-lg shadow-md">
             <div className="relative">
               <img src={userData.bannerImage_url} alt="User Banner" className="w-full h-24 rounded-t-lg" />
               <img
@@ -114,7 +114,7 @@ export default function Home() {
               />
             </div>
             <div className="px-6 pt-20">
-              <h3 className="text-red-500 text-lg font-bold">{userData.name}</h3>
+              <h3 className="text-accent text-lg font-bold">{userData.name}</h3>
               <p className="text-sm mt-2">{userData.description}</p>
             </div>
 
@@ -122,17 +122,17 @@ export default function Home() {
               <hr className="my-4 border-gray-600" />
               <div className="flex justify-between">
                 <span>Clubs Created:</span>
-                <span className="text-red-500">{userData.clubsCreated}</span>
+                <span className="text-accent">{userData.clubsCreated}</span>
               </div>
               <div className="flex justify-between mt-2">
                 <span>Clubs Joined:</span>
-                <span className="text-red-500">{userData.clubsJoined}</span>
+                <span className="text-accent">{userData.clubsJoined}</span>
               </div>
             </div>
           </div>
 
           {/* Saved Items */}
-          <div className="bg-gray-800 text-white w-60 h-14 p-4 rounded-lg flex items-center gap-3 shadow-md">
+          <div className="bg-[#30313b] text-white w-60 h-14 p-4 rounded-lg flex items-center gap-3 shadow-md">
             <FontAwesomeIcon icon={faBookmark} className="text-purple-300 text-xl" />
             <span className="font-semibold text-md">Saved Items</span>
           </div>
@@ -141,7 +141,7 @@ export default function Home() {
         {/* Post Content */}
         <div className="w-[400px]">
           {posts.map((post) => (
-            <div key={post.id} className="bg-gray-800 px-8 py-4 mb-6 rounded-lg shadow-md">
+            <div key={post.id} className="bg-[#30313b] px-8 py-4 mb-6 rounded-lg shadow-md">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
                   <img src={post.profileImage_url} alt="Post Author" className="h-12 w-12 rounded-full bg-black" />
@@ -184,8 +184,9 @@ export default function Home() {
 
         {/* Communities Section */}
         <div className="flex flex-col gap-4 w-64 sticky top-[120px] h-full overflow-y-auto">
-          <div className="bg-gray-800 p-4 w-64 max-h-[500px] rounded-lg shadow-md">
-            <h3 className="text-red-500 text-lg font-bold">Communities</h3>
+          <button className="p-2 font-bold text-white bg-accent rounded-md">Create a community</button>
+          <div className="bg-[#30313b] p-4 w-64 max-h-[500px] rounded-lg shadow-md">
+            <h3 className="text-accent text-lg font-bold">Communities</h3>
             <ul className="mt-4 space-y-5 h-[400px] overflow-y-auto">
               {communities.name.map((club, index) => (
                 <li key={`${club}-${index}`} className="flex items-center gap-3">
