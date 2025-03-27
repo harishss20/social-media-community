@@ -117,18 +117,36 @@ class CreateCommunityView(APIView):
             return Response({"error": "community names is required"}, status=status.HTTP_400_BAD_REQUEST)
       
     def post(self, request):
-        #gets all the community based on category
-        community_based_on=request.data.get('category')
-        if community_based_on:
-            communities=Community.objects.filter(community_based_on__startswith=community_based_on)
+        print(request.data)
+        #gets all the community based on name
+        name=request.data.get('community_name')
+        if name:
+            communities=Community.objects.all()
+            arr =[]
+            for community in communities:
+                if( (name in str(community) or str(community) in name)):
+                    arr.append(community)  
             if communities:
-                serializer=JoinCommunitySerializer(communities, many=True)
+                serializer=JoinCommunitySerializer(arr, many=True)
                 return Response({'data':serializer.data},status=status.HTTP_200_OK)
             
         #To create community
         user_id=request.data.get('owner')
         community_name=request.data.get('name')
-        serializer = JoinCommunitySerializer(data=request.data)
+        community_name=community_name.replace(" ","%20")
+        communityImage_url=request.data.get('communityImage_url')
+        bannerImage_url=request.data.get('bannerImage_url')
+        description=request.data.get('description')
+        rules= request.data.get('rules')
+
+        if(communityImage_url==""):
+            communityImage_url="https://res.cloudinary.com/dttdxreiq/image/upload/v1740721608/x4nd59qhqts2l670xzwx.png"
+        if(bannerImage_url==""):
+             bannerImage_url="https://res.cloudinary.com/dttdxreiq/image/upload/v1740691299/vlcgkfx6ul17fvokugpv.png"
+
+        temp = {'name':community_name,'owner':user_id, 'communityImage_url':communityImage_url,'bannerImage_url':bannerImage_url,'description':description,'rules':rules}
+        print(temp)
+        serializer = JoinCommunitySerializer(data=temp)
         if serializer.is_valid():
             serializer.save()
             profile = get_object_or_404(Profile, id=user_id)
@@ -244,13 +262,18 @@ class PostListCreateView(generics.ListCreateAPIView):
         if community_name is not None:
             queryset = queryset.filter(community__name=community_name)
         return queryset
-    
     def perform_create(self, serializer):
         user_profile = self.request.user.profile
-        community = serializer.validated_data.get("community")
+        community_name = self.request.data.get("community")  
+        if not community_name:
+            raise serializers.ValidationError({"error": "Community name is required."})
+        try:
+            community = Community.objects.get(name=community_name)  # Fetch by nam
+        except Community.DoesNotExist:
+            raise serializers.ValidationError({"error": "Invalid community name."})
         if not community.members.filter(id=user_profile.id).exists():
-            raise serializers.ValidationError( {"error": "You must join the community before posting."})
-        serializer.save(author=user_profile)
+            raise serializers.ValidationError({"error": "You must join the community before posting."})
+        serializer.save(author=user_profile, community=community)
 
 class PostRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()

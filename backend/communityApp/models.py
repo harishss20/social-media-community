@@ -64,7 +64,7 @@ class Community(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100,unique=True)
     description = models.TextField(blank=True, null=True)
-    community_based_on = models.CharField(max_length=50)
+    community_based_on = models.CharField(max_length=50,blank=True, null=True)
     rules = models.TextField(max_length=500, blank=True, null=True)
     members = models.ManyToManyField(Profile, related_name="communities_joined", blank=True)  
     communityImage_url = models.URLField(default="https://res.cloudinary.com/dttdxreiq/image/upload/v1740721608/x4nd59qhqts2l670xzwx.png")
