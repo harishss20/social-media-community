@@ -68,8 +68,34 @@ export default function Home() {
 
   const communities = {
     profileImage_url: "/defaultProfile.png",
-    name: ["kumar", "cooper", "raj", "band", "hari", "sam", "vikram", "arjun", "naveen", "rohith", "tarun", "manoj"],
-    members: ["12,890", "10,500", "8,700", "15,300", "9,200", "11,400", "12,890", "10,500", "8,700", "15,300", "9,200", "11,400"],
+    name: [
+      "kumar",
+      "cooper",
+      "raj",
+      "band",
+      "hari",
+      "sam",
+      "vikram",
+      "arjun",
+      "naveen",
+      "rohith",
+      "tarun",
+      "manoj",
+    ],
+    members: [
+      "12,890",
+      "10,500",
+      "8,700",
+      "15,300",
+      "9,200",
+      "11,400",
+      "12,890",
+      "10,500",
+      "8,700",
+      "15,300",
+      "9,200",
+      "11,400",
+    ],
   };
 
   return (
@@ -77,10 +103,13 @@ export default function Home() {
       {/* Left Content */}
       <div className="text-white min-h-screen flex p-6 justify-center gap-16 mt-5">
         <div className="flex flex-col items-center gap-4 w-60 sticky top-[120px] h-full overflow-y-auto">
-
           <div className="bg-[#30313b] w-60 h-[370px] rounded-lg shadow-md">
             <div className="relative">
-              <img src={userData.bannerImage_url} alt="User Banner" className="w-full h-24 rounded-t-lg" />
+              <img
+                src={userData.bannerImage_url}
+                alt="User Banner"
+                className="w-full h-24 rounded-t-lg"
+              />
               <img
                 src={userData.profileImage_url}
                 alt="User Profile"
@@ -107,7 +136,10 @@ export default function Home() {
 
           {/* Saved Items */}
           <div className="bg-[#30313b] text-white w-60 h-14 p-4 rounded-lg flex items-center gap-3 shadow-md">
-            <FontAwesomeIcon icon={faBookmark} className="text-purple-300 text-xl" />
+            <FontAwesomeIcon
+              icon={faBookmark}
+              className="text-purple-300 text-xl"
+            />
             <span className="font-semibold text-md">Saved Items</span>
           </div>
         </div>
@@ -115,35 +147,55 @@ export default function Home() {
         {/* Post Content */}
         <div className="w-[400px]">
           {posts.map((post) => (
-            <div key={post.id} className="bg-[#30313b] px-8 py-4 mb-6 rounded-lg shadow-md">
+            <div
+              key={post.id}
+              className="bg-[#30313b] px-8 py-4 mb-6 rounded-lg shadow-md"
+            >
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <img src={post.profileImage_url} alt="Post Author" className="h-12 w-12 rounded-full bg-black" />
+                  <img
+                    src={post.profileImage_url}
+                    alt="Post Author"
+                    className="h-12 w-12 rounded-full bg-black"
+                  />
                   <div>
-                    <h3 className="text-lg font-bold text-gray-300">{post.name}</h3>
+                    <h3 className="text-lg font-bold text-gray-300">
+                      {post.name}
+                    </h3>
                     <div className="flex flex-row justify-between gap-4">
                       <p className="text-sm text-gray-400">
-                        {post.username} <span className="ml-1 mr-3 text-xl"> |</span>
-                        <span className="text-sm text-gray-400">{post.created_at}</span>
+                        {post.username}{" "}
+                        <span className="ml-1 mr-3 text-xl"> |</span>
+                        <span className="text-sm text-gray-400">
+                          {post.created_at}
+                        </span>
                       </p>
                     </div>
                   </div>
                 </div>
-                <button aria-label="Save post" className="ml-auto flex items-center gap-1 px-2 py-1 bg-gray-700 text-purple-400 rounded-full border border-gray-500 text-sm">
+                <button
+                  aria-label="Save post"
+                  className="ml-auto flex items-center gap-1 px-2 py-1 bg-gray-700 text-purple-400 rounded-full border border-gray-500 text-sm"
+                >
                   <FontAwesomeIcon icon={faBookmark} className="text-xs" />
                   <span className="font-medium">Save</span>
                 </button>
               </div>
 
               <p className="mt-5 ml-2 mb-4 text-gray-300">{post.desc}</p>
-              <img src={post.post_img} alt="Post" className="w-full h-[300px] bg-white mt-2 object-cover rounded-lg" />
+              <img
+                src={post.post_img}
+                alt="Post"
+                className="w-full h-[300px] bg-white mt-2 object-cover rounded-lg"
+              />
               <div className="flex gap-2 mt-3">
-
                 <div className="flex items-center gap-1 px-2 py-0 bg-gray-700 text-purple-400 rounded-full border border-gray-500 text-sm">
                   <button className="pl-[4px] pr-[4px]">
                     <FontAwesomeIcon icon={faArrowUp} className="text-xs" />
                   </button>
-                  <span className="font-medium border-l-2 pl-2 border-r-2 pr-2 border-gray-500">Vote</span>
+                  <span className="font-medium border-l-2 pl-2 border-r-2 pr-2 border-gray-500">
+                    Vote
+                  </span>
                   <button className="pl-[4px] pr-[4px]">
                     <FontAwesomeIcon icon={faArrowDown} className="text-xs" />
                   </button>
@@ -165,35 +217,33 @@ export default function Home() {
 
         {/* Communities Section */}
         <div className="flex flex-col gap-4 w-64 sticky top-[120px] h-full overflow-y-auto">
-          <button className="p-2 font-bold text-white bg-accent rounded-md">Create a community</button>
+          <button className="p-2 font-bold text-white bg-accent rounded-md">
+            Create a community
+          </button>
           <div className="bg-[#30313b] p-4 w-64 max-h-[500px] rounded-lg shadow-md">
             <h3 className="text-accent text-lg font-bold">Communities</h3>
             <ul className="mt-4 space-y-5 h-[400px] overflow-y-auto">
               {communities.name.map((club, index) => (
-                <li key={`${club}-${index}`} className="flex items-center gap-3">
-                  <img src={communities.profileImage_url} alt="Community" className="w-10 h-10 rounded-full" />
+                <li
+                  key={`${club}-${index}`}
+                  className="flex items-center gap-3"
+                >
+                  <img
+                    src={communities.profileImage_url}
+                    alt="Community"
+                    className="w-10 h-10 rounded-full"
+                  />
                   <div>
-                    <span className="block font-bold text-purple-400 leading-tight">{club}</span>
-                    <p className="text-gray-400 text-sm">{communities.members[index]} members</p>
+                    <span className="block font-bold text-purple-400 leading-tight">
+                      {club}
+                    </span>
+                    <p className="text-gray-400 text-sm">
+                      {communities.members[index]} members
+                    </p>
                   </div>
                 </li>
               ))}
             </ul>
-          </div>
-
-          {/* Footer */}
-          <div className="text-gray-300 text-center py-4">
-            <div className="flex justify-center space-x-6 text-white mb-4">
-              <a href="/about" className="flex items-center">
-                <span className="w-2 h-2 bg-white rounded-full inline-block mr-2"></span> About
-              </a>
-              <a href="/privacy" className="flex items-center">
-                <span className="w-2 h-2 bg-white rounded-full inline-block mr-2"></span> Privacy & Terms
-              </a>
-            </div>
-            <div className="text-lg font-bold">
-              <span className="text-purple-400">LADSPA</span> <span className="text-gray-400">Corporation © 2025</span>
-            </div>
           </div>
         </div>
       </div>
