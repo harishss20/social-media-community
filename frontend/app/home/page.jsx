@@ -89,10 +89,13 @@ export default function Home() {
       {/* Left Content */}
       <div className="text-white min-h-screen flex p-6 justify-center gap-16 mt-5">
         <div className="flex flex-col items-center gap-4 w-60 sticky top-[120px] h-full overflow-y-auto">
-
           <div className="bg-[#30313b] w-60 h-[370px] rounded-lg shadow-md">
             <div className="relative">
-              <img src={userData.bannerImage_url} alt="User Banner" className="w-full h-24 rounded-t-lg" />
+              <img
+                src={userData.bannerImage_url}
+                alt="User Banner"
+                className="w-full h-24 rounded-t-lg"
+              />
               <img
                 src={userData.profileImage_url}
                 alt="User Profile"
@@ -119,7 +122,10 @@ export default function Home() {
 
           {/* Saved Items */}
           <div className="bg-[#30313b] text-white w-60 h-14 p-4 rounded-lg flex items-center gap-3 shadow-md">
-            <FontAwesomeIcon icon={faBookmark} className="text-purple-300 text-xl" />
+            <FontAwesomeIcon
+              icon={faBookmark}
+              className="text-purple-300 text-xl"
+            />
             <span className="font-semibold text-md">Saved Items</span>
           </div>
         </div>
@@ -142,7 +148,10 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-                <button aria-label="Save post" className="ml-auto flex items-center gap-1 px-2 py-1 bg-gray-700 text-purple-400 rounded-full border border-gray-500 text-sm">
+                <button
+                  aria-label="Save post"
+                  className="ml-auto flex items-center gap-1 px-2 py-1 bg-gray-700 text-purple-400 rounded-full border border-gray-500 text-sm"
+                >
                   <FontAwesomeIcon icon={faBookmark} className="text-xs" />
                   <span className="font-medium">Save</span>
                 </button>
@@ -157,7 +166,9 @@ export default function Home() {
                   <button className="pl-[4px] pr-[4px]">
                     <FontAwesomeIcon icon={faArrowUp} className="text-xs" />
                   </button>
-                  <span className="font-medium border-l-2 pl-2 border-r-2 pr-2 border-gray-500">Vote</span>
+                  <span className="font-medium border-l-2 pl-2 border-r-2 pr-2 border-gray-500">
+                    Vote
+                  </span>
                   <button className="pl-[4px] pr-[4px]">
                     <FontAwesomeIcon icon={faArrowDown} className="text-xs" />
                   </button>
@@ -200,14 +211,17 @@ export default function Home() {
           <div className="text-gray-300 text-center py-4">
             <div className="flex justify-center space-x-6 text-white mb-4">
               <a href="/about" className="flex items-center">
-                <span className="w-2 h-2 bg-white rounded-full inline-block mr-2"></span> About
+                <span className="w-2 h-2 bg-white rounded-full inline-block mr-2"></span>{" "}
+                About
               </a>
               <a href="/privacy" className="flex items-center">
-                <span className="w-2 h-2 bg-white rounded-full inline-block mr-2"></span> Privacy & Terms
+                <span className="w-2 h-2 bg-white rounded-full inline-block mr-2"></span>{" "}
+                Privacy & Terms
               </a>
             </div>
             <div className="text-lg font-bold">
-              <span className="text-purple-400">LADSPA</span> <span className="text-gray-400">Corporation © 2025</span>
+              <span className="text-purple-400">LADSPA</span>{" "}
+              <span className="text-gray-400">Corporation © 2025</span>
             </div>
           </div>
         </div>

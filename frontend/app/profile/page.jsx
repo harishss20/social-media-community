@@ -11,8 +11,12 @@ export default function ProfilePage() {
 
   const [bio, setBio] = useState(userData.bio);
   const [tempBio, setTempBio] = useState("");
-  const [bannerImage_url, setBannerImage_url] = useState(userData.bannerImage_url);
-  const [profileImage_url, setProfileImage_url] = useState(userData.profileImage_url);
+  const [bannerImage_url, setBannerImage_url] = useState(
+    userData.bannerImage_url
+  );
+  const [profileImage_url, setProfileImage_url] = useState(
+    userData.profileImage_url
+  );
 
   const [bannerOpen, setBannerOpen] = useState(false);
   const [picOpen, setPicOpen] = useState(false);
@@ -26,20 +30,24 @@ export default function ProfilePage() {
   useEffect(() => {
     if (userData.bio) setBio(userData.bio);
     if (userData.bannerImage_url) setBannerImage_url(userData.bannerImage_url);
-    if (userData.profileImage_url) setProfileImage_url(userData.profileImage_url);
+    if (userData.profileImage_url)
+      setProfileImage_url(userData.profileImage_url);
   }, [userData.bio, userData.bannerImage_url, userData.profileImage_url]);
 
   const updateBannerImage = async (imageUrl) => {
     console.log(userData.id, imageUrl);
     try {
-      const response = await fetch(`http://localhost:8000/api/profile/?id=${userData.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
-        },
-        body: JSON.stringify({ bannerImage_url: imageUrl }),
-      });
+      const response = await fetch(
+        `http://localhost:8000/api/profile/?id=${userData.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+          body: JSON.stringify({ bannerImage_url: imageUrl }),
+        }
+      );
 
       if (response.ok) {
         alert("Banner updated!");
@@ -57,14 +65,17 @@ export default function ProfilePage() {
   const updateProfileImage = async (imageUrl) => {
     console.log(userData.id, imageUrl);
     try {
-      const response = await fetch(`http://localhost:8000/api/profile/?id=${userData.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
-        },
-        body: JSON.stringify({ profileImage_url: imageUrl }),
-      });
+      const response = await fetch(
+        `http://localhost:8000/api/profile/?id=${userData.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+          body: JSON.stringify({ profileImage_url: imageUrl }),
+        }
+      );
 
       if (response.ok) {
         alert("Profile picture updated!");
@@ -81,14 +92,17 @@ export default function ProfilePage() {
 
   const updateBio = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/profile/?id=${userData.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
-        },
-        body: JSON.stringify({ bio: tempBio }),
-      });
+      const response = await fetch(
+        `http://localhost:8000/api/profile/?id=${userData.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+          body: JSON.stringify({ bio: tempBio }),
+        }
+      );
 
       if (response.ok) {
         alert("Bio updated!");
@@ -104,7 +118,6 @@ export default function ProfilePage() {
     }
   };
 
-
   const uploadToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -112,10 +125,13 @@ export default function ProfilePage() {
     formData.append("cloud_name", "dttdxreiq");
 
     try {
-      const response = await fetch("https://api.cloudinary.com/v1_1/dttdxreiq/image/upload", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/dttdxreiq/image/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const data = await response.json();
       return data.secure_url;
@@ -146,11 +162,12 @@ export default function ProfilePage() {
     }
   };
 
-  if (!bannerImage_url || !profileImage_url) return (
-    <div className="flex justify-center items-center h-[80vh]">
-      <Commet size="small" color="#cac8ff"/>
-    </div>
-  );
+  if (!bannerImage_url || !profileImage_url)
+    return (
+      <div className="flex justify-center items-center h-[80vh]">
+        <Commet size="small" color="#cac8ff" />
+      </div>
+    );
   if (error) return null;
   return (
     <div className="pt-4 flex justify-center min-h-full pb-0 rounded-lg overflow-hidden">
@@ -183,7 +200,9 @@ export default function ProfilePage() {
 
         <div className="w-full pl-14 pr-14 flex flex-col justify-start">
           <div className="h-14 flex justify-between items-center">
-            <h1 className="text-3xl text-accent"><b>{userData.name}</b></h1>
+            <h1 className="text-3xl text-accent">
+              <b>{userData.name}</b>
+            </h1>
           </div>
           <hr className="border-secondary border-[1px]" />
 
@@ -191,38 +210,57 @@ export default function ProfilePage() {
             <section className="">
               <div className="flex flex-row items-center space-x-3">
                 <h1 className="text-xl text-secondary ">Bio</h1>
-                {!editbio && <FontAwesomeIcon icon={faEdit} onClick={() => setEditbio(true)} className="cursor-pointer text-secondary" />}
+                {!editbio && (
+                  <FontAwesomeIcon
+                    icon={faEdit}
+                    onClick={() => setEditbio(true)}
+                    className="cursor-pointer text-secondary"
+                  />
+                )}
               </div>
-              {editbio ?
+              {editbio ? (
                 <div className="w-full h-36 ">
-                  <textarea maxLength={400} onChange={(e) => setTempBio(e.target.value)} className="w-full p-2 text-sm h-[80%] resize-none bg-transparent border-2 border-[#CAC8FF] rounded-sm outline-none text-white placeholder-white ">
-                  </textarea>
+                  <textarea
+                    maxLength={400}
+                    onChange={(e) => setTempBio(e.target.value)}
+                    className="w-full p-2 text-sm h-[80%] resize-none bg-transparent border-2 border-[#CAC8FF] rounded-sm outline-none text-white placeholder-white "
+                  ></textarea>
                   <div className="w-full flex flex-row items-center justify-end space-x-5">
-                    <button className="text-white px-4 py-2 rounded-2xl font-bold hover:bg-accent transition duration-300 mt-2"
+                    <button
+                      className="text-white px-4 py-2 rounded-2xl font-bold hover:bg-accent transition duration-300 mt-2"
                       onClick={() => {
                         setBio(userData.bio);
                         setEditbio(false);
                       }}
-                    >Cancel
+                    >
+                      Cancel
                     </button>
-                    <button className="text-white px-4 py-2 rounded-2xl font-bold hover:bg-[#1E1F26] transition duration-300 mt-2" type="submit" onClick={updateBio}>Save</button>
-
+                    <button
+                      className="text-white px-4 py-2 rounded-2xl font-bold hover:bg-[#1E1F26] transition duration-300 mt-2"
+                      type="submit"
+                      onClick={updateBio}
+                    >
+                      Save
+                    </button>
                   </div>
                 </div>
-                :
+              ) : (
                 <p className="text-lg px-4 text-white">{bio}</p>
-              }
+              )}
             </section>
             <div className="flex flex-row justify-between">
-
               <section className="">
                 <h1 className="text-xl text-secondary">Communities joined</h1>
-                <p className="text-lg px-4 text-white">{userData.community_joined}</p>
+                <p className="text-lg px-4 text-white">
+                  {userData.community_joined}
+                </p>
               </section>
 
               <section className="">
                 <h1 className="text-xl text-secondary">Communities created</h1>
-                <p className="text-lg px-4 text-white">{userData.community_created}</p>
+                <p className="text-lg px-4 text-white">
+                  {userData.community_created}
+                </p>
               </section>
             </div>
             <section className="">

@@ -8,7 +8,6 @@ class Migration(migrations.Migration):
     dependencies = [
         ('communityApp', '0001_initial'),
     ]
-
     operations = [
         migrations.AddField(
             model_name='post',
