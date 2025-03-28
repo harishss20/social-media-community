@@ -43,12 +43,14 @@ export default function AuthGuard({ children }) {
 
     if (access == null || (!access && path !== "/login" && path !== "/signup")) return (
         <div className="flex justify-center items-center h-[80vh]">
-          <Commet size="small" color="#cac8ff"/>
+            <Commet size="small" color="#cac8ff" />
         </div>
     );
 
-    return <div>
-        <Navbar />
-        {children}
-    </div>
+    return (
+        <div><div className="hidden lg:block">
+            {access && <Navbar />}
+            {children}
+        </div>
+        </div>)
 }

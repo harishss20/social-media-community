@@ -24,13 +24,11 @@ const useCommunityDetails = (community_name, refresh) => {
                 })
                 const data = await res1.json();
                 if (!res1.ok) {
-                    // throw new Error("Problem with fetching!");
-                    if(data?.message == "Community is not exists") {
+                    if(data?.message == "Community does not exist") {
                         router.push("/not-found-2");
                     }
                 }
                 setCommunity_data(data?.data);
-                console.log("Yo again");
                 
                 const res2 = await fetch(`http://localhost:8000/api/posts/?community=${community_name}`, {
                     method: 'GET',

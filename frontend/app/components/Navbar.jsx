@@ -10,7 +10,7 @@ const Navbar = () => {
         window.location.reload();
     }
     return (
-        <nav className="bg-[#30313b] text-white flex items-center justify-around px-6 py-4 sticky top-0 z-50">
+        <nav className="bg-[#30313b] shadow-2xl text-white flex items-center justify-around px-6 py-4 sticky top-0 z-50">
         <div className="text-3xl font-bold text-purple-300">LADSPA</div>
         <div className="relative ml-24">
           <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-3 text-purple-300" />

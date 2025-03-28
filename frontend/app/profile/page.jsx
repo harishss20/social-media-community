@@ -7,7 +7,6 @@ import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import { Commet } from "react-loading-indicators";
 
 export default function ProfilePage() {
-  // const [id, setId] = useState();
   const { userData, error } = useUserData();
 
   const [bio, setBio] = useState(userData.bio);
@@ -132,7 +131,6 @@ export default function ProfilePage() {
 
     const imageUrl = await uploadToCloudinary(file);
     if (imageUrl) {
-      // setBannerImage_url(imageUrl);
       updateBannerImage(imageUrl);
     }
   };
@@ -144,7 +142,6 @@ export default function ProfilePage() {
     const imageUrl = await uploadToCloudinary(file);
     console.log(imageUrl);
     if (imageUrl) {
-      // setProfileImage_url(imageUrl);
       updateProfileImage(imageUrl);
     }
   };
@@ -156,11 +153,11 @@ export default function ProfilePage() {
   );
   if (error) return null;
   return (
-    <div className="flex justify-center min-h-full pb-10 rounded-lg">
+    <div className="pt-4 flex justify-center min-h-full pb-0 rounded-lg overflow-hidden">
 
 
       <div
-        className="w-[800px] pb-10 flex flex-col items-center space-y-28 bg-[#30313b] rounded-xl relative">
+        className="w-[800px] pb-10 flex flex-col items-center space-y-28 bg-[#30313b] overflow-hidden rounded-xl relative">
 
         <div
           onClick={() => setBannerOpen(true)}

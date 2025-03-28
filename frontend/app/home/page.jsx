@@ -15,17 +15,19 @@ import {
   faArrowDownLong,
   faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
-import Navbar from "../components/Navbar";
+import useUserData from "../hooks/useUserData";
+import { useJoinedCommunities } from "../hooks/useJoinedCommunities";
+import { Commet } from "react-loading-indicators";
+import { useAllPosts } from "../hooks/useAllPosts";
+import { timeAgo } from "../helper/timeAgo";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const userData = {
-    bannerImage_url: "/defaultBanner.png",
-    profileImage_url: "/defaultProfile.png",
-    name: "Ram Kumar",
-    description: "Hi! I'm here to share my Tech knowledge to help newbies.",
-    clubsCreated: "1",
-    clubsJoined: "12",
-  };
+  const { userData, error } = useUserData();
+  const { communities, error2 } = useJoinedCommunities();
+  const { allPosts } = useAllPosts(communities);
+  const router = useRouter();
+  console.log(allPosts);
 
   const posts = [
     {
@@ -66,11 +68,21 @@ export default function Home() {
     },
   ];
 
-  const communities = {
-    profileImage_url: "/defaultProfile.png",
-    name: ["kumar", "cooper", "raj", "band", "hari", "sam", "vikram", "arjun", "naveen", "rohith", "tarun", "manoj"],
-    members: ["12,890", "10,500", "8,700", "15,300", "9,200", "11,400", "12,890", "10,500", "8,700", "15,300", "9,200", "11,400"],
-  };
+  // const communities = {
+  //   profileImage_url: "/defaultProfile.png",
+  //   name: ["kumar", "cooper", "raj", "band", "hari", "sam", "vikram", "arjun", "naveen", "rohith", "tarun", "manoj"],
+  //   members: ["12,890", "10,500", "8,700", "15,300", "9,200", "11,400", "12,890", "10,500", "8,700", "15,300", "9,200", "11,400"],
+  // };
+
+  const handleCommunity = (community_name) => {
+    router.push(`/community/${community_name}`); 
+  }
+
+  if (!communities) return (
+    <div className="flex justify-center items-center h-[80vh]">
+      <Commet size="small" color="#cac8ff" />
+    </div>
+  );
 
   return (
     <div>
@@ -84,23 +96,23 @@ export default function Home() {
               <img
                 src={userData.profileImage_url}
                 alt="User Profile"
-                className="absolute top-16 left-2 w-[110px] h-[110px] rounded-full"
+                className="absolute top-16 left-2 w-[110px] h-[110px] rounded-full object-cover"
               />
             </div>
             <div className="px-6 pt-20">
               <h3 className="text-accent text-lg font-bold">{userData.name}</h3>
-              <p className="text-sm mt-2">{userData.description}</p>
+              <p className="text-sm mt-2">{userData.bio}</p>
             </div>
 
             <div className="text-sm px-5">
               <hr className="my-4 border-gray-600" />
               <div className="flex justify-between">
-                <span>Clubs Created:</span>
-                <span className="text-accent">{userData.clubsCreated}</span>
+                <span>Communities Created:</span>
+                <span className="text-accent">{userData.community_created}</span>
               </div>
               <div className="flex justify-between mt-2">
-                <span>Clubs Joined:</span>
-                <span className="text-accent">{userData.clubsJoined}</span>
+                <span>Communities Joined:</span>
+                <span className="text-accent">{userData.community_joined}</span>
               </div>
             </div>
           </div>
@@ -114,18 +126,19 @@ export default function Home() {
 
         {/* Post Content */}
         <div className="w-[400px]">
-          {posts.map((post) => (
+          {allPosts.map((post) => (
             <div key={post.id} className="bg-[#30313b] px-8 py-4 mb-6 rounded-lg shadow-md">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <img src={post.profileImage_url} alt="Post Author" className="h-12 w-12 rounded-full bg-black" />
+                  <img src={post.community.profileImage_url} alt="Post Author" className="h-12 w-12 rounded-full bg-black" />
                   <div>
-                    <h3 className="text-lg font-bold text-gray-300">{post.name}</h3>
-                    <div className="flex flex-row justify-between gap-4">
+                    <h3 onClick={() => handleCommunity(post.community.name)} className="text-lg font-bold text-gray-300 cursor-pointer">{post.community.name}</h3>
+                    <div className="flex flex-row items-center gap-2">
                       <p className="text-sm text-gray-400">
-                        {post.username} <span className="ml-1 mr-3 text-xl"> |</span>
-                        <span className="text-sm text-gray-400">{post.created_at}</span>
+                        {post.author.name} 
                       </p>
+                        <span className="text-gray-400 text-xl">|</span>
+                        <span className="text-xs text-gray-400">{timeAgo(post.created_at)}</span>
                     </div>
                   </div>
                 </div>
@@ -135,9 +148,10 @@ export default function Home() {
                 </button>
               </div>
 
-              <p className="mt-5 ml-2 mb-4 text-gray-300">{post.desc}</p>
-              <img src={post.post_img} alt="Post" className="w-full h-[300px] bg-white mt-2 object-cover rounded-lg" />
-              <div className="flex gap-2 mt-3">
+              <p className="mt-5 ml-2 mb-4 text-gray-300 break-words">{post.text_field}</p>
+              {post.media_file && (
+                <img src={post.media_file} alt="Post" className="w-full h-[300px] bg-black mt-2 object-contain rounded-lg" />
+              )}<div className="flex gap-2 mt-3">
 
                 <div className="flex items-center gap-1 px-2 py-0 bg-gray-700 text-purple-400 rounded-full border border-gray-500 text-sm">
                   <button className="pl-[4px] pr-[4px]">
@@ -166,18 +180,19 @@ export default function Home() {
         {/* Communities Section */}
         <div className="flex flex-col gap-4 w-64 sticky top-[120px] h-full overflow-y-auto">
           <button className="p-2 font-bold text-white bg-accent rounded-md">Create a community</button>
-          <div className="bg-[#30313b] p-4 w-64 max-h-[500px] rounded-lg shadow-md">
+          <div className="bg-[#30313b] p-4 w-64 max-h-[410px] rounded-lg shadow-md">
             <h3 className="text-accent text-lg font-bold">Communities</h3>
-            <ul className="mt-4 space-y-5 h-[400px] overflow-y-auto">
-              {communities.name.map((club, index) => (
-                <li key={`${club}-${index}`} className="flex items-center gap-3">
-                  <img src={communities.profileImage_url} alt="Community" className="w-10 h-10 rounded-full" />
-                  <div>
-                    <span className="block font-bold text-purple-400 leading-tight">{club}</span>
-                    <p className="text-gray-400 text-sm">{communities.members[index]} members</p>
-                  </div>
-                </li>
-              ))}
+            <ul className="mt-4 space-y-2 h-[400px] overflow-y-auto relative">
+              {communities?.length == 0 ? <div className="absolute top-36 left-10">You've joined no communities</div>
+                : communities?.map((community) => (
+                  <li key={community?.id} onClick={() => handleCommunity(community?.name)} className="flex items-center gap-3 rounded-md hover:bg-[#1e1f26] p-2 transition duration-300 cursor-pointer">
+                    <img src={community?.communityImage_url} alt="Community" className="w-10 h-10 rounded-full" />
+                    <div>
+                      <span className="block font-bold text-purple-400 leading-tight">{community?.name.replace(/%20/g, " ")}</span>
+                      <p className="text-gray-400 text-sm">{community.members.length} {community.members.length > 1 ? "members" : "member"}</p>
+                    </div>
+                  </li>
+                ))}
             </ul>
           </div>
 
