@@ -22,7 +22,7 @@ export default function CommunityCard({ communities, handleFromChild }) {
           alt="Community"
           className="h-16 rounded-full"
         />
-        <p className="text-white text-lg truncate">{communities.name}</p>
+        <p className="text-white text-lg truncate">{communities.name.replace(/%20/g, " ")}</p>
       </div>
       <button
         className="px-4 py-2 bg-black text-white rounded-lg duration-300"

@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Commet } from "react-loading-indicators";
+import Navbar from "./Navbar";
 
 const tokenExpiry = (token) => {
     if (!token) return true;
@@ -47,6 +48,7 @@ export default function AuthGuard({ children }) {
     );
 
     return <div>
+        <Navbar />
         {children}
     </div>
 }
