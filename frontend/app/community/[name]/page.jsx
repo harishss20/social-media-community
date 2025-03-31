@@ -20,6 +20,7 @@ import {
   updateSave,
 } from "../../api/communityAPI";
 import { Commet } from "react-loading-indicators";
+import { handleUser, timeAgo } from "../../helper/helperFunctions";
 
 export default function CommunityPage() {
   const { name } = useParams();
@@ -214,27 +215,6 @@ export default function CommunityPage() {
     }
   };
 
-  const timeAgo = (created) => {
-    const currentTime = Date.now();
-    const createdTime = new Date(created).getTime();
-
-    let duration = (currentTime - createdTime) / (1000 * 60 * 60 * 24 * 365);
-    if (duration >= 1) return Math.floor(duration) + " years ago";
-
-    duration = (currentTime - createdTime) / (1000 * 60 * 60 * 24 * 30);
-    if (duration >= 1) return Math.floor(duration) + " months ago";
-
-    duration = (currentTime - createdTime) / (1000 * 60 * 60 * 24 * 7);
-    if (duration >= 1) return Math.floor(duration) + " weeks ago";
-
-    duration = (currentTime - createdTime) / (1000 * 60 * 60 * 24);
-    if (duration >= 1) return Math.floor(duration) + " days ago";
-
-    duration = (currentTime - createdTime) / (1000 * 60 * 60);
-    if (duration >= 1) return Math.floor(duration) + " hours ago";
-
-    return "Just now";
-  };
 
   const getFormattedTime = () => {
     const months = [
@@ -325,38 +305,33 @@ export default function CommunityPage() {
 
                 {/* Icons */}
                 <div className="absolute top-0 right-0 flex items-center gap-3 p-2">
-                  <button
-                    className="text-[#cac8ff] px-3 py-1 rounded-full text-xm border-2 border-primary"
+                  {isJoined && <button
+                    className="text-white px-3 py-1 rounded-full text-xm border-2 border-primary hover:bg-primary transition duration-300"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleCreatePostClick();
                     }}
                   >
-                    {isJoined && (
-                      <>
-                        <span className="text-primary">+</span> Post
-                      </>
+                    <><span className="text-white">+</span> Post</>
+                  </button>}
+                  {community_data?.owner?.id == localStorage.getItem("UserId")
+                    ? (
+                      <button
+                        className="text-white px-3 py-1 rounded-full text-xm border-2 border-primary hover:bg-primary transition duration-300"
+                        onClick={handleDeleteCommunity}>
+                        Delete
+                      </button>
+                    ) : (
+                      <button
+                        className="text-[#cac8ff] px-3 py-1 rounded-full text-xm border-2 border-primary hover:bg-primary transition duration-300"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleJoin();
+                        }}
+                      >
+                        {isJoined ? "Leave" : "Join"}
+                      </button>
                     )}
-                  </button>
-                  {community_data?.owner?.id ==
-                  localStorage.getItem("UserId") ? (
-                    <button
-                      className="text-white px-3 py-1 rounded-full text-xm"
-                      onClick={handleDeleteCommunity}
-                    >
-                      Delete
-                    </button>
-                  ) : (
-                    <button
-                      className="text-[#cac8ff] px-3 py-1 rounded-full text-xm border-2 border-primary "
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleJoin();
-                      }}
-                    >
-                      {isJoined ? "Leave" : "Join"}
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
@@ -379,7 +354,7 @@ export default function CommunityPage() {
           {/* Posts Container */}
           <div className="flex flex-col gap-5">
             {posts.map((post) => (
-              <div key={post.id} className="bg-gray-800 p-10 pt-8 rounded-md">
+              <div key={post.id} className="bg-[#30313b] p-10 pt-8 rounded-md">
                 <div className="flex items-center">
                   <img
                     src={post.author.profileImage_url}
@@ -395,17 +370,11 @@ export default function CommunityPage() {
                 </div>
                 <hr className="border-[1px] mt-2 rounded-md border-[#cac8ff]" />
                 <h1 className="text-xl pt-5 break-words">{post.title}</h1>
+                <p className="mt-2 text-sm pt-5 break-words break">{post.text_field}</p>
 
                 {post.media_file && (
-                  <img
-                    src={post.media_file}
-                    alt="Post"
-                    className="mt-2 w-full h-[500px] bg-black object-contain rounded-md"
-                  />
+                  <img src={post.media_file} alt="Post" className="mt-2 w-full h-[450px] bg-black object-contain rounded-md" />
                 )}
-                <p className="mt-2 text-sm pt-5 break-words break">
-                  {post.text_field}
-                </p>
 
                 <div className="flex items-center mt-5 text-gray-400 gap-6">
                   <div className="flex items-center gap-2">
@@ -447,42 +416,24 @@ export default function CommunityPage() {
         {/* Right Side */}
         <div className="w-full lg:w-1/3 flex flex-col space-y-4 sticky top-[88px] h-fit">
           {/* Rules */}
-          <div className="h-auto p-5 bg-gray-800 rounded-sm">
-            <h2 className="text-xl text-white font-bold">Rules</h2>
+          <div className="h-auto p-5 bg-[#30313b] rounded-sm">
+            <h2 className="text-xl text-accent font-bold">Rules</h2>
             <div className="max-h-[250px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-800">
               <p className="text-white mt-2">{community_data?.rules}</p>
             </div>
           </div>
 
           {/* Moderators */}
-          <div className="h-auto p-4 bg-gray-800 rounded-sm">
-            <h2 className="text-ls text-white font-bold mb-4">Moderators</h2>
+          <div className="h-auto p-4 bg-[#30313b] rounded-sm">
+            <h2 className="text-xl text-accent font-bold mb-4">Moderators</h2>
             <div className="max-h-[235px] overflow-y-auto scrollbar-thin text-white space-y-2">
-              <li className="flex items-center gap-2">
-                <img
-                  src={community_data?.owner?.profileImage_url}
-                  alt="Pr"
-                  className="w-8 h-8 rounded-full bg-black object-cover"
-                />
-                {/* </div> */}
-                <span className="text-xs">{community_data?.owner?.name}</span>
-              </li>
-              {community_data?.members
-                .slice(
-                  0,
-                  showAllModerators ? community_data?.members.length : 5
-                )
-                .map((member, index) => (
-                  <li key={index} className="flex items-center gap-2">
-                    <img
-                      src={member?.profileImage_url}
-                      alt="Pr"
-                      className="w-8 h-8 object-cover bg-black rounded-full"
-                    />
-                    {/* </div> */}
-                    <span className="text-xs">{member.name}</span>
-                  </li>
-                ))}
+
+              {community_data?.members.slice(0, showAllModerators ? community_data?.members.length : 5).map((member, index) => (
+                <li onClick={() => handleUser(member.id, router)} key={index} className="flex items-center gap-2 rounded-md hover:bg-[#1e1f26] p-2 transition duration-300 cursor-pointer">
+                  <img src={member?.profileImage_url} alt="Pr" className="w-8 h-8 object-cover bg-black rounded-full" />
+                  <span className="text-xs">{member.name} {member.name == community_data?.owner?.name && <span className="text-[9px] ml-2 p-1 border-[1px] border-primary rounded-full">Owner</span>}</span>
+                </li>
+              ))}
             </div>
             {community_data?.members.length > 5 && (
               <button
@@ -498,11 +449,8 @@ export default function CommunityPage() {
 
       {/* Post Popup */}
       {showPostPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md">
-          <div
-            className="bg-white p-8 rounded-lg w-full lg:w-1/2 max-w-2xl relative shadow-lg"
-            ref={popupRef}
-          >
+        <div className="mt-10 fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md">
+          <div className="bg-white p-8 rounded-lg w-full lg:w-1/2 max-w-2xl relative shadow-lg" ref={popupRef}>
             <h2 className="text-2xl font-bold mb-6">Create a Post</h2>
 
             {/* Post Title */}
@@ -524,7 +472,7 @@ export default function CommunityPage() {
 
             {/* Image Upload */}
             <div
-              className="border-dashed border-2 border-gray-300 rounded-lg p-1 text-center mb-4 cursor-pointer relative h-[150px] overflow-hidden"
+              className="border-dashed border-2 border-gray-300 rounded-lg p-1 text-center mb-4 cursor-pointer relative h-[200px] overflow-hidden"
               onDragOver={handleDragOver}
               onDrop={handleDrop}
             >
@@ -543,16 +491,9 @@ export default function CommunityPage() {
                   </button>
                 </div>
               ) : (
-                <label className="block cursor-pointer h-full flex items-center justify-center">
-                  <p className="text-gray-500 text-lg">
-                    Drag and drop or click to upload an image
-                  </p>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageChange}
-                  />
+                <label className="cursor-pointer h-full flex items-center justify-center">
+                  <p className="text-gray-500 text-lg">Drag and drop or click to upload an image</p>
+                  <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                 </label>
               )}
             </div>
@@ -584,7 +525,7 @@ export default function CommunityPage() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-[200px] h-[100px] rounded-md absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center space-y-3 p-2 bg-slate-700"
+            className={`w-[200px] ${community_data?.owner?.id == localStorage.getItem("UserId") ? "h-[100px]" : "h-[60px]"} rounded-md absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center space-y-3 p-2 bg-slate-700`}
           >
             <p
               className="cursor-pointer"
@@ -621,7 +562,7 @@ export default function CommunityPage() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-[200px] h-[100px] rounded-md absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center space-y-3 p-2 bg-slate-700"
+            className={`w-[200px] ${community_data?.owner?.id == localStorage.getItem("UserId") ? "h-[100px]" : "h-[60px]"} rounded-md absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center space-y-3 p-2 bg-slate-700`}
           >
             <p
               onClick={() => setIsProfileZoomed(!isProfileZoomed)}

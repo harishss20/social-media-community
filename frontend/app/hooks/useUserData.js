@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function useUserData() {
   const [userData, setUserData] = useState({});
   const [error, setError] = useState(null);
   const router = useRouter();
+  let {id} = useParams();
+  console.log(id);
+  id = id ? id : localStorage.getItem("UserId");
 
     useEffect(() => {
-        const id = localStorage.getItem("UserId");
         console.log(id);
         if (!id) {
             setError("Invalid user ID!");

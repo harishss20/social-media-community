@@ -69,6 +69,7 @@ export const updateLike = async (postId, action) => {
   return false;
 };
 
+
 export const updateSave = async (postId) => {
   const res = await fetch(
     `http://localhost:8000/api/posts/${postId}/toggle-save/`,
