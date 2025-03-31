@@ -19,13 +19,16 @@ import useUserData from "../hooks/useUserData";
 import { useJoinedCommunities } from "../hooks/useJoinedCommunities";
 import { Commet } from "react-loading-indicators";
 import { useAllPosts } from "../hooks/useAllPosts";
-import { timeAgo } from "../helper/timeAgo";
+import { timeAgo, handleUser } from "../helper/helperFunctions";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { updateLike, updateSave } from "../api/communityAPI";
 
 export default function Home() {
+  const [refresh, setRefresh] = useState(0);
   const { userData, error } = useUserData();
-  const { communities, error2 } = useJoinedCommunities();
-  const { allPosts } = useAllPosts(communities);
+  const { communities, error2 } = useJoinedCommunities(refresh);
+  const { allPosts } = useAllPosts(communities, refresh);
   const router = useRouter();
   console.log(allPosts);
 
@@ -75,8 +78,20 @@ export default function Home() {
   // };
 
   const handleCommunity = (community_name) => {
-    router.push(`/community/${community_name}`); 
+    router.push(`/community/${community_name}`);
   }
+
+  const toggleLike = async (id) => {
+    const success = await updateLike(id, { action: "like" });
+    console.log(success);
+    if (success) setRefresh((prev) => prev + 1);
+  };
+
+  const toggleSave = async (id) => {
+    updateSave(id);
+    setRefresh((prev) => prev + 1);
+  };
+
 
   if (!communities) return (
     <div className="flex justify-center items-center h-[80vh]">
@@ -87,8 +102,8 @@ export default function Home() {
   return (
     <div>
       {/* Left Content */}
-      <div className="text-white min-h-screen flex p-6 justify-center gap-16 mt-5">
-        <div className="flex flex-col items-center gap-4 w-60 sticky top-[120px] h-full overflow-y-auto">
+      <div className="text-white min-h-screen flex p-6 justify-center gap-10 mt-5">
+        <div className="flex flex-col items-center gap-4 min-w-72 sticky top-[120px] h-full overflow-y-auto overflow-x-hidden">
           <div className="bg-[#30313b] w-60 h-[370px] rounded-lg shadow-md">
             <div className="relative">
               <img
@@ -121,7 +136,7 @@ export default function Home() {
           </div>
 
           {/* Saved Items */}
-          <div className="bg-[#30313b] text-white w-60 h-14 p-4 rounded-lg flex items-center gap-3 shadow-md">
+          <div className="bg-[#30313b] text-white w-60 h-14 p-4 rounded-lg flex items-center gap-3 shadow-md overflow-x-hidden">
             <FontAwesomeIcon
               icon={faBookmark}
               className="text-purple-300 text-xl"
@@ -140,20 +155,21 @@ export default function Home() {
                   <div>
                     <h3 onClick={() => handleCommunity(post.community.name)} className="text-lg font-bold text-gray-300 cursor-pointer">{post.community.name}</h3>
                     <div className="flex flex-row items-center gap-2">
-                      <p className="text-sm text-gray-400">
-                        {post.author.name} 
+                      <p onClick={() => handleUser(post.author.id, router)} className="text-sm text-gray-400 cursor-pointer">
+                        {post.author.name}
                       </p>
-                        <span className="text-gray-400 text-xl">|</span>
-                        <span className="text-xs text-gray-400">{timeAgo(post.created_at)}</span>
+                      <span className="text-gray-400 text-xl">|</span>
+                      <span className="text-xs text-gray-400">{timeAgo(post.created_at)}</span>
                     </div>
                   </div>
                 </div>
                 <button
                   aria-label="Save post"
-                  className="ml-auto flex items-center gap-1 px-2 py-1 bg-gray-700 text-purple-400 rounded-full border border-gray-500 text-sm"
+                  onClick={() => toggleSave(post.id)}
+                  className={`ml-auto flex items-center gap-1 px-2 py-1 ${post.saved_by.includes(localStorage.getItem("UserId")) ? "text-gray-700 bg-purple-400" : "bg-gray-700 text-purple-400"  } rounded-full border border-gray-500 text-sm`}
                 >
                   <FontAwesomeIcon icon={faBookmark} className="text-xs" />
-                  <span className="font-medium">Save</span>
+                  <span className="font-medium">{post.saved_by.includes(localStorage.getItem("UserId")) ? "Saved" : "Save"}</span>
                 </button>
               </div>
 
@@ -163,13 +179,13 @@ export default function Home() {
               )}<div className="flex gap-2 mt-3">
 
                 <div className="flex items-center gap-1 px-2 py-0 bg-gray-700 text-purple-400 rounded-full border border-gray-500 text-sm">
-                  <button className="pl-[4px] pr-[4px]">
+                  <button onClick={() => toggleLike(post.id)} className={`pl-[4px] pr-[4px] ${post.likes.includes(localStorage.getItem("UserId")) ? "text-accent" : ""}`}>
                     <FontAwesomeIcon icon={faArrowUp} className="text-xs" />
                   </button>
                   <span className="font-medium border-l-2 pl-2 border-r-2 pr-2 border-gray-500">
                     Vote
                   </span>
-                  <button className="pl-[4px] pr-[4px]">
+                  <button className={`pl-[4px] pr-[4px] ${post.dislikes.includes(localStorage.getItem("UserId")) ? "text-accent" : ""}`}>
                     <FontAwesomeIcon icon={faArrowDown} className="text-xs" />
                   </button>
                 </div>
@@ -189,8 +205,8 @@ export default function Home() {
         </div>
 
         {/* Communities Section */}
-        <div className="flex flex-col gap-4 w-64 sticky top-[120px] h-full overflow-y-auto">
-          <button className="p-2 font-bold text-white bg-accent rounded-md">Create a community</button>
+        <div className="flex flex-col items-center gap-4 min-w-72 sticky top-[120px] h-full overflow-y-auto overflow-x-hidden">
+          <button onClick={() => router.push("/create-community")} className="w-64 p-2 font-bold text-white bg-accent rounded-md">Create a community</button>
           <div className="bg-[#30313b] p-4 w-64 max-h-[410px] rounded-lg shadow-md">
             <h3 className="text-accent text-lg font-bold">Communities</h3>
             <ul className="mt-4 space-y-2 h-[400px] overflow-y-auto relative">
@@ -219,10 +235,10 @@ export default function Home() {
                 Privacy & Terms
               </a>
             </div>
-            <div className="text-lg font-bold">
+            {/* <div className="text-lg font-bold">
               <span className="text-purple-400">LADSPA</span>{" "}
               <span className="text-gray-400">Corporation © 2025</span>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

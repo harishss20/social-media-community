@@ -20,7 +20,7 @@ import {
   updateSave,
 } from "../../api/communityAPI";
 import { Commet } from "react-loading-indicators";
-import { timeAgo } from "../../helper/timeAgo";
+import { handleUser, timeAgo } from "../../helper/helperFunctions";
 
 export default function CommunityPage() {
   const { name } = useParams();
@@ -315,23 +315,23 @@ export default function CommunityPage() {
                     <><span className="text-white">+</span> Post</>
                   </button>}
                   {community_data?.owner?.id == localStorage.getItem("UserId")
-                    ?
-                    <button
-                    className="text-white px-3 py-1 rounded-full text-xm border-2 border-primary hover:bg-primary transition duration-300"
-                    onClick={handleDeleteCommunity}>
-                      Delete
-                    </button>
-                  ) : (
-                    <button
-                      className="text-[#cac8ff] px-3 py-1 rounded-full text-xm border-2 border-primary hover:bg-primary transition duration-300"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleJoin();
-                      }}
-                    >
-                      {isJoined ? "Leave" : "Join"}
-                    </button>
-                  )}
+                    ? (
+                      <button
+                        className="text-white px-3 py-1 rounded-full text-xm border-2 border-primary hover:bg-primary transition duration-300"
+                        onClick={handleDeleteCommunity}>
+                        Delete
+                      </button>
+                    ) : (
+                      <button
+                        className="text-[#cac8ff] px-3 py-1 rounded-full text-xm border-2 border-primary hover:bg-primary transition duration-300"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleJoin();
+                        }}
+                      >
+                        {isJoined ? "Leave" : "Join"}
+                      </button>
+                    )}
                 </div>
               </div>
             </div>
@@ -429,7 +429,7 @@ export default function CommunityPage() {
             <div className="max-h-[235px] overflow-y-auto scrollbar-thin text-white space-y-2">
 
               {community_data?.members.slice(0, showAllModerators ? community_data?.members.length : 5).map((member, index) => (
-                <li key={index} className="flex items-center gap-2">
+                <li onClick={() => handleUser(member.id, router)} key={index} className="flex items-center gap-2 rounded-md hover:bg-[#1e1f26] p-2 transition duration-300 cursor-pointer">
                   <img src={member?.profileImage_url} alt="Pr" className="w-8 h-8 object-cover bg-black rounded-full" />
                   <span className="text-xs">{member.name} {member.name == community_data?.owner?.name && <span className="text-[9px] ml-2 p-1 border-[1px] border-primary rounded-full">Owner</span>}</span>
                 </li>
@@ -525,7 +525,7 @@ export default function CommunityPage() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-[200px] h-[100px] rounded-md absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center space-y-3 p-2 bg-slate-700"
+            className={`w-[200px] ${community_data?.owner?.id == localStorage.getItem("UserId") ? "h-[100px]" : "h-[60px]"} rounded-md absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center space-y-3 p-2 bg-slate-700`}
           >
             <p
               className="cursor-pointer"
@@ -562,7 +562,7 @@ export default function CommunityPage() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-[200px] h-[100px] rounded-md absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center space-y-3 p-2 bg-slate-700"
+            className={`w-[200px] ${community_data?.owner?.id == localStorage.getItem("UserId") ? "h-[100px]" : "h-[60px]"} rounded-md absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center space-y-3 p-2 bg-slate-700`}
           >
             <p
               onClick={() => setIsProfileZoomed(!isProfileZoomed)}

@@ -19,3 +19,8 @@ export const timeAgo = (created) => {
 
     return "Just now";
 }
+
+export const handleUser = (id, router) => {
+    if(id == localStorage.getItem("UserId")) router.push(`/profile`);
+    else router.push(`/userprofile/${id}`);
+  }

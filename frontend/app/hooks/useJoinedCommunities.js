@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export const useJoinedCommunities = () => {
+export const useJoinedCommunities = (refresh) => {
 
     const [communities, setCommunities] = useState([]);
     const [error2, setError2] = useState(null);
@@ -43,7 +43,7 @@ export const useJoinedCommunities = () => {
         }
 
         fetchCommunities();
-    }, [])
+    }, [refresh])
     console.log(communities);
     return {communities, error2};
 }

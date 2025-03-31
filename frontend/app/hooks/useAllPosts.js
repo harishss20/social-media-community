@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export const useAllPosts = (communities) => {
+export const useAllPosts = (communities, refresh) => {
     const [allPosts, setAllPosts] = useState([]);
     useEffect(() => {
         if(!communities) return;
@@ -21,7 +21,7 @@ export const useAllPosts = (communities) => {
         }
 
         fetchCommunities();
-    }, [communities])
+    }, [communities, refresh])
 
     return { allPosts };
 }
