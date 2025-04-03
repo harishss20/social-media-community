@@ -26,6 +26,7 @@ export default function JoinCommunity() {
   }, []);
 
   const [communityName, setCommunityName] = useState([]);
+
   const handleFromChild = (data) => {
     if (communityName.includes(data)) {
       let removedArray = communityName.filter((item) => item !== data);
@@ -46,16 +47,16 @@ export default function JoinCommunity() {
     </div>
   );
   return (
-    <div className="flex flex-grow justify-center items-center h-screen bg-[#1a1a1a]">
-      <div className="w-[90%] max-w-lg bg-[#343538] p-6 rounded-xl shadow-md">
+    <div className="flex flex-grow justify-center items-center h-screen bg-[#1E1F26]">
+      <div className="w-[90%] max-w-lg bg-[#343538] p-6 rounded-md shadow-md">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-white text-xl font-semibold">Join Community</h1>
-          <button onClick={handleSubmit} className="py-2 px-4 duration-300">
-            {communityName.length != 0 ? "continue" : "skip"}
+          <button onClick={handleSubmit} className="py-2 px-4 rounded-md transition duration-300 text-[#CAC8FF]">
+            {communityName.length !== 0 ? "Continue" : "Skip"}
           </button>
         </div>
 
-        <div className=" mt-12 space-y-6">
+        <div className="mt-12 space-y-6">
           {data.map((communities) => (
             <CommunityCard
               key={communities.id}
