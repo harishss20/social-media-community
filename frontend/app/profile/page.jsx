@@ -1,23 +1,22 @@
 "use client";
 
-import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import useUserData from "../../hooks/useUserData";
+import useUserData from "../hooks/useUserData";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import { Commet } from "react-loading-indicators";
 
 export default function ProfilePage() {
-  const { id } = useParams();
-  const { userData, error } = useUserData(id);
+  const { userData, error } = useUserData();
 
   const [bio, setBio] = useState(userData.bio);
+  const [tempBio, setTempBio] = useState("");
   const [bannerImage_url, setBannerImage_url] = useState(
     userData.bannerImage_url
   );
   const [profileImage_url, setProfileImage_url] = useState(
     userData.profileImage_url
   );
-  const [biotext, setBiotext] = useState("");
 
   const [bannerOpen, setBannerOpen] = useState(false);
   const [picOpen, setPicOpen] = useState(false);
@@ -29,33 +28,89 @@ export default function ProfilePage() {
   const profileFile = useRef(null);
 
   useEffect(() => {
-    setBio(userData.bio);
-    setBannerImage_url(userData.bannerImage_url);
-    setProfileImage_url(userData.profileImage_url);
-  }, [userData]);
+    if (userData.bio) setBio(userData.bio);
+    if (userData.bannerImage_url) setBannerImage_url(userData.bannerImage_url);
+    if (userData.profileImage_url)
+      setProfileImage_url(userData.profileImage_url);
+  }, [userData.bio, userData.bannerImage_url, userData.profileImage_url]);
 
-  const handleSubmit = async (e, bio) => {
-    e.preventDefault();
+  const updateBannerImage = async (imageUrl) => {
+    console.log(userData.id, imageUrl);
     try {
-      setBannerOpen(false);
-      setPicOpen(false);
-      setEditbio(false);
-
-      //PATCH method for editing profile page
       const response = await fetch(
         `http://localhost:8000/api/profile/?id=${userData.id}`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
           },
-          body: JSON.stringify({ bio }),
+          body: JSON.stringify({ bannerImage_url: imageUrl }),
         }
       );
-      console.log(bio);
 
       if (response.ok) {
-        alert("Profile edited!");
+        alert("Banner updated!");
+        setBannerOpen(false);
+        setBannerImage_url(imageUrl);
+      } else {
+        alert("Failed to update banner.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Server error. Please try again.");
+    }
+  };
+
+  const updateProfileImage = async (imageUrl) => {
+    console.log(userData.id, imageUrl);
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/profile/?id=${userData.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+          body: JSON.stringify({ profileImage_url: imageUrl }),
+        }
+      );
+
+      if (response.ok) {
+        alert("Profile picture updated!");
+        setPicOpen(false);
+        setProfileImage_url(imageUrl);
+      } else {
+        alert("Failed to update profile picture.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Server error. Please try again.");
+    }
+  };
+
+  const updateBio = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/profile/?id=${userData.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+          body: JSON.stringify({ bio: tempBio }),
+        }
+      );
+
+      if (response.ok) {
+        alert("Bio updated!");
+        setEditbio(false);
+        setBio(tempBio);
+        setEditbio(false);
+      } else {
+        alert("Failed to update bio.");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -92,8 +147,7 @@ export default function ProfilePage() {
 
     const imageUrl = await uploadToCloudinary(file);
     if (imageUrl) {
-      setBannerImage_url(imageUrl);
-      handleSubmit(e);
+      updateBannerImage(imageUrl);
     }
   };
 
@@ -102,21 +156,29 @@ export default function ProfilePage() {
     if (!file) return;
 
     const imageUrl = await uploadToCloudinary(file);
+    console.log(imageUrl);
     if (imageUrl) {
-      setProfileImage_url(imageUrl);
-      handleSubmit(e);
+      updateProfileImage(imageUrl);
     }
   };
 
+  if (!bannerImage_url || !profileImage_url)
+    return (
+      <div className="flex justify-center items-center h-[80vh]">
+        <Commet size="small" color="#cac8ff" />
+      </div>
+    );
   if (error) return null;
-  // if (!userData.bannerImage_url || !userData.profileImage_url)
-  //   return <p>Loading...</p>;
   return (
-    <div className="flex justify-center min-h-full pb-10 rounded-lg">
-      <div className="w-[800px] pb-10 flex flex-col items-center space-y-28 bg-[#343538] rounded-xl relative">
+    <div className="pt-4 flex justify-center min-h-full pb-0 rounded-lg overflow-hidden">
+
+
+      <div
+        className="w-[800px] pb-10 flex flex-col items-center space-y-28 bg-[#30313b] overflow-hidden rounded-xl relative">
+
         <div
           onClick={() => setBannerOpen(true)}
-          className="max-h-40 w-full bg-white overflow-hidden cursor-pointer"
+          className="h-40 w-full bg-white overflow-hidden cursor-pointer"
         >
           <img
             src={bannerImage_url || "defaultBanner.png"}
@@ -158,44 +220,39 @@ export default function ProfilePage() {
               </div>
               {editbio ? (
                 <div className="w-full h-36 ">
-                  <form
-                    method="patch"
-                    onSubmit={(e) => handleSubmit(e, biotext)}
-                  >
-                    <textarea
-                      maxLength={400}
-                      value={biotext}
-                      onChange={(e) => setBiotext(e.target.value)}
-                      className="w-full p-2 text-sm h-[80%] resize-none bg-transparent border-2 border-[#CAC8FF] rounded-sm outline-none text-white placeholder-white "
-                    ></textarea>
-                    <div className="w-full flex flex-row items-center justify-end space-x-5">
-                      <button
-                        className="text-white px-4 py-2 rounded-2xl hover:font-bold hover:bg-accent transition duration-300 mt-2"
-                        onClick={() => {
-                          setBio(userData.bio);
-                          setEditbio(false);
-                        }}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        className="text-white px-4 py-2 rounded-2xl hover:font-bold hover:bg-[#1E1F26] transition duration-300 mt-2"
-                        type="submit"
-                      >
-                        Save
-                      </button>
-                    </div>
-                  </form>
+                  <textarea
+                    maxLength={400}
+                    onChange={(e) => setTempBio(e.target.value)}
+                    className="w-full p-2 text-sm h-[80%] resize-none bg-transparent border-2 border-[#CAC8FF] rounded-sm outline-none text-white placeholder-white "
+                  ></textarea>
+                  <div className="w-full flex flex-row items-center justify-end space-x-5">
+                    <button
+                      className="text-white px-4 py-2 rounded-2xl font-bold hover:bg-accent transition duration-300 mt-2"
+                      onClick={() => {
+                        setBio(userData.bio);
+                        setEditbio(false);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="text-white px-4 py-2 rounded-2xl font-bold hover:bg-[#1E1F26] transition duration-300 mt-2"
+                      type="submit"
+                      onClick={updateBio}
+                    >
+                      Save
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <p className="text-lg px-4 text-white">{userData.bio}</p>
+                <p className="text-lg px-4 text-white">{bio}</p>
               )}
             </section>
             <div className="flex flex-row justify-between">
               <section className="">
-                <h1 className="text-xl text-secondary">Member since</h1>
+                <h1 className="text-xl text-secondary">Communities joined</h1>
                 <p className="text-lg px-4 text-white">
-                  {userData.date_joined}
+                  {userData.community_joined}
                 </p>
               </section>
 
@@ -206,6 +263,10 @@ export default function ProfilePage() {
                 </p>
               </section>
             </div>
+            <section className="">
+              <h1 className="text-xl text-secondary">Member since</h1>
+              <p className="text-lg px-4 text-white">{userData.date_joined}</p>
+            </section>
           </div>
         </div>
       </div>

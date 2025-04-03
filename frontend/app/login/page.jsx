@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -38,6 +39,11 @@ export default function LoginPage() {
         e.preventDefault();
         const userData = { email, password };
 
+        if(email.length < 3 || password.length < 3){
+            alert("Please fill all the fields");
+            return;
+          } 
+
         try {
             const response = await fetch("http://localhost:8000/api/login/", {
                 method: "POST",
@@ -50,7 +56,11 @@ export default function LoginPage() {
             const data = await response.json();
             if (response.status === 200) {
                 alert("Login successful!");
-                router.push("/home");
+                console.log(data.tokens);
+                localStorage.setItem("refresh_token", data.tokens?.refresh);
+                localStorage.setItem("access_token", data.tokens?.access);
+                localStorage.setItem("UserId", data?.user_id);
+                data.user_status == true ? router.push("/join-community") : router.push("/home");
             } else {
                 alert(data.error || "Something went wrong");
             }
@@ -59,6 +69,7 @@ export default function LoginPage() {
             alert("Server error. Please try again.");
         }
     };
+
     return (
         <div className="mainContainer">
             <div>
