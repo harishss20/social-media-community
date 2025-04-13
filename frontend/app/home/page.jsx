@@ -30,56 +30,14 @@ export default function Home() {
   const { communities, error2 } = useJoinedCommunities(refresh);
   const { allPosts } = useAllPosts(communities, refresh);
   const router = useRouter();
-  console.log(allPosts);
-
-  const posts = [
-    {
-      id: 1,
-      profileImage_url: "/defaultProfile.png",
-      name: "Rahul",
-      created_at: "10/03/2025",
-      post_img: "/dummyBanner.png",
-      username: "Ravi",
-      desc: "The greatest film of all time",
-    },
-    {
-      id: 2,
-      profileImage_url: "/defaultProfile.png",
-      name: "Rahul",
-      created_at: "10/03/2025",
-      post_img: "/dummyBanner.png",
-      username: "Ravi",
-      desc: "The greatest film of all time",
-    },
-    {
-      id: 3,
-      profileImage_url: "/defaultProfile.png",
-      name: "Rahul",
-      created_at: "10/03/2025",
-      post_img: "/dummyBanner.png",
-      username: "Ravi",
-      desc: "The greatest film of all time",
-    },
-    {
-      id: 4,
-      profileImage_url: "/defaultProfile.png",
-      name: "Rahul",
-      created_at: "10/03/2025",
-      post_img: "/dummyBanner.png",
-      username: "Ravi",
-      desc: "The greatest film of all time",
-    },
-  ];
-
-  // const communities = {
-  //   profileImage_url: "/defaultProfile.png",
-  //   name: ["kumar", "cooper", "raj", "band", "hari", "sam", "vikram", "arjun", "naveen", "rohith", "tarun", "manoj"],
-  //   members: ["12,890", "10,500", "8,700", "15,300", "9,200", "11,400", "12,890", "10,500", "8,700", "15,300", "9,200", "11,400"],
-  // };
 
   const handleCommunity = (community_name) => {
     router.push(`/community/${community_name}`);
-  }
+  };
+
+  const handleDiscussion = async (post_id) => {
+    router.push(`/posts/${post_id}/comments`);
+  };
 
   const toggleLike = async (id) => {
     const success = await updateLike(id, { action: "like" });
@@ -92,12 +50,12 @@ export default function Home() {
     setRefresh((prev) => prev + 1);
   };
 
-
-  if (!communities) return (
-    <div className="flex justify-center items-center h-[80vh]">
-      <Commet size="small" color="#cac8ff" />
-    </div>
-  );
+  if (!communities)
+    return (
+      <div className="flex justify-center items-center h-[80vh]">
+        <Commet size="small" color="#cac8ff" />
+      </div>
+    );
 
   return (
     <div>
@@ -126,7 +84,9 @@ export default function Home() {
               <hr className="my-4 border-gray-600" />
               <div className="flex justify-between">
                 <span>Communities Created:</span>
-                <span className="text-accent">{userData.community_created}</span>
+                <span className="text-accent">
+                  {userData.community_created}
+                </span>
               </div>
               <div className="flex justify-between mt-2">
                 <span>Communities Joined:</span>
@@ -146,51 +106,86 @@ export default function Home() {
         </div>
 
         {/* Post Content */}
-        <div className="w-[400px]">
+        <div className="w-[550px]">
           {allPosts.map((post) => (
-            <div key={post.id} className="bg-[#30313b] px-8 py-4 mb-6 rounded-lg shadow-md">
+            <div
+              key={post.id}
+              className="bg-[#30313b] px-8 py-4 mb-6 rounded-lg shadow-md"
+            >
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <img src={post.community.profileImage_url} alt="Post Author" className="h-12 w-12 rounded-full bg-black" />
+                  <img
+                    src={post.community.profileImage_url}
+                    alt="Post Author"
+                    className="h-12 w-12 rounded-full bg-black"
+                  />
                   <div>
-                    <h3 onClick={() => handleCommunity(post.community.name)} className="text-lg font-bold text-gray-300 cursor-pointer">{post.community.name}</h3>
+                    <h3
+                      onClick={() => handleCommunity(post.community.name)}
+                      className="text-lg font-bold text-gray-300 cursor-pointer"
+                    >
+                      {post.community.name}
+                    </h3>
                     <div className="flex flex-row items-center gap-2">
-                      <p onClick={() => handleUser(post.author.id, router)} className="text-sm text-gray-400 cursor-pointer">
+                      <p
+                        onClick={() => handleUser(post.author.id, router)}
+                        className="text-sm text-gray-400 cursor-pointer"
+                      >
                         {post.author.name}
                       </p>
                       <span className="text-gray-400 text-xl">|</span>
-                      <span className="text-xs text-gray-400">{timeAgo(post.created_at)}</span>
+                      <span className="text-xs text-gray-400">
+                        {timeAgo(post.created_at)}
+                      </span>
                     </div>
                   </div>
                 </div>
                 <button
                   aria-label="Save post"
                   onClick={() => toggleSave(post.id)}
-                  className={`ml-auto flex items-center gap-1 px-2 py-1 ${post.saved_by.includes(localStorage.getItem("UserId")) ? "text-gray-700 bg-purple-400" : "bg-gray-700 text-purple-400"  } rounded-full border border-gray-500 text-sm`}
+                  className={`ml-auto flex items-center gap-1 px-2 py-1 ${post.saved_by.includes(localStorage.getItem("UserId")) ? "text-gray-700 bg-purple-400" : "bg-gray-700 text-purple-400"} rounded-full border border-gray-500 text-sm`}
                 >
                   <FontAwesomeIcon icon={faBookmark} className="text-xs" />
-                  <span className="font-medium">{post.saved_by.includes(localStorage.getItem("UserId")) ? "Saved" : "Save"}</span>
+                  <span className="font-medium">
+                    {post.saved_by.includes(localStorage.getItem("UserId"))
+                      ? "Saved"
+                      : "Save"}
+                  </span>
                 </button>
               </div>
 
-              <p className="mt-5 ml-2 mb-4 text-gray-300 break-words">{post.text_field}</p>
+              <p className="mt-5 ml-2 mb-4 text-gray-300 break-words">
+                {post.text_field}
+              </p>
               {post.media_file && (
-                <img src={post.media_file} alt="Post" className="w-full h-[300px] bg-black mt-2 object-contain rounded-lg" />
-              )}<div className="flex gap-2 mt-3">
-
+                <img
+                  src={post.media_file}
+                  alt="Post"
+                  className="w-full h-[300px] bg-black mt-2 object-contain rounded-lg"
+                />
+              )}
+              <div className="flex gap-2 mt-3">
                 <div className="flex items-center gap-1 px-2 py-0 bg-gray-700 text-purple-400 rounded-full border border-gray-500 text-sm">
-                  <button onClick={() => toggleLike(post.id)} className={`pl-[4px] pr-[4px] ${post.likes.includes(localStorage.getItem("UserId")) ? "text-accent" : ""}`}>
+                  <button
+                    onClick={() => toggleLike(post.id)}
+                    className={`pl-[4px] pr-[4px] ${post.likes.includes(localStorage.getItem("UserId")) ? "text-accent" : ""}`}
+                  >
                     <FontAwesomeIcon icon={faArrowUp} className="text-xs" />
                   </button>
                   <span className="font-medium border-l-2 pl-2 border-r-2 pr-2 border-gray-500">
                     Vote
                   </span>
-                  <button className={`pl-[4px] pr-[4px] ${post.dislikes.includes(localStorage.getItem("UserId")) ? "text-accent" : ""}`}>
+                  <button
+                    className={`pl-[4px] pr-[4px] ${post.dislikes.includes(localStorage.getItem("UserId")) ? "text-accent" : ""}`}
+                  >
                     <FontAwesomeIcon icon={faArrowDown} className="text-xs" />
                   </button>
                 </div>
 
-                <button className="flex items-center gap-1 px-2 py-1 bg-gray-700 text-purple-400 rounded-full border border-gray-500 text-sm">
+                <button
+                  className="flex items-center gap-1 px-2 py-1 bg-gray-700 text-purple-400 rounded-full border border-gray-500 text-sm"
+                  onClick={() => handleDiscussion(post.id)}
+                >
                   <FontAwesomeIcon icon={faComment} className="text-xs" />
                   <span className="font-medium">Discussion</span>
                 </button>
@@ -206,20 +201,43 @@ export default function Home() {
 
         {/* Communities Section */}
         <div className="flex flex-col items-center gap-4 min-w-72 sticky top-[120px] h-full overflow-y-auto overflow-x-hidden">
-          <button onClick={() => router.push("/create-community")} className="w-64 p-2 font-bold text-white bg-accent rounded-md">Create a community</button>
+          <button
+            onClick={() => router.push("/create-community")}
+            className="w-64 p-2 font-bold text-white bg-accent rounded-md"
+          >
+            Create a community
+          </button>
           <div className="bg-[#30313b] p-4 w-64 max-h-[410px] rounded-lg shadow-md">
             <h3 className="text-accent text-lg font-bold">Communities</h3>
             <ul className="mt-4 space-y-2 h-[400px] overflow-y-auto relative">
-              {communities?.length == 0 ? <div className="absolute top-36 left-10">You've joined no communities</div>
-                : communities?.map((community) => (
-                  <li key={community?.id} onClick={() => handleCommunity(community?.name)} className="flex items-center gap-3 rounded-md hover:bg-[#1e1f26] p-2 transition duration-300 cursor-pointer">
-                    <img src={community?.communityImage_url} alt="Community" className="w-10 h-10 rounded-full" />
+              {communities?.length == 0 ? (
+                <div className="absolute top-36 left-10">
+                  You've joined no communities
+                </div>
+              ) : (
+                communities?.map((community) => (
+                  <li
+                    key={community?.id}
+                    onClick={() => handleCommunity(community?.name)}
+                    className="flex items-center gap-3 rounded-md hover:bg-[#1e1f26] p-2 transition duration-300 cursor-pointer"
+                  >
+                    <img
+                      src={community?.communityImage_url}
+                      alt="Community"
+                      className="w-10 h-10 rounded-full"
+                    />
                     <div>
-                      <span className="block font-bold text-purple-400 leading-tight">{community?.name.replace(/%20/g, " ")}</span>
-                      <p className="text-gray-400 text-sm">{community.members.length} {community.members.length > 1 ? "members" : "member"}</p>
+                      <span className="block font-bold text-purple-400 leading-tight">
+                        {community?.name.replace(/%20/g, " ")}
+                      </span>
+                      <p className="text-gray-400 text-sm">
+                        {community.members.length}{" "}
+                        {community.members.length > 1 ? "members" : "member"}
+                      </p>
                     </div>
                   </li>
-                ))}
+                ))
+              )}
             </ul>
           </div>
 
