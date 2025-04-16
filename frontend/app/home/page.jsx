@@ -200,22 +200,24 @@ export default function Home() {
         </div>
 
         {/* Communities Section */}
-        <div className="flex flex-col items-center gap-4 min-w-72 sticky top-[120px] h-full overflow-y-auto overflow-x-hidden">
+        <div className="flex flex-col items-center gap-4 min-w-72 sticky top-[120px] max-h-[calc(100vh-120px)] overflow-y-auto overflow-x-hidden">
           <button
             onClick={() => router.push("/create-community")}
             className="w-64 p-2 font-bold text-white bg-accent rounded-md"
           >
             Create a community
           </button>
-          <div className="bg-[#30313b] p-4 w-64 max-h-[410px] rounded-lg shadow-md">
+
+          <div className="bg-[#30313b] p-4 w-64 rounded-lg shadow-md flex flex-col flex-1 overflow-hidden">
             <h3 className="text-accent text-lg font-bold">Communities</h3>
-            <ul className="mt-4 space-y-2 h-[400px] overflow-y-auto relative">
-              {communities?.length == 0 ? (
-                <div className="absolute top-36 left-10">
+
+            <ul className="mt-4 space-y-2 flex-1 overflow-y-auto">
+              {communities?.length === 0 ? (
+                <div className="text-center text-gray-400 mt-10">
                   You've joined no communities
                 </div>
               ) : (
-                communities?.map((community) => (
+                communities.map((community) => (
                   <li
                     key={community?.id}
                     onClick={() => handleCommunity(community?.name)}
@@ -242,21 +244,17 @@ export default function Home() {
           </div>
 
           {/* Footer */}
-          <div className="text-gray-300 text-center py-4">
+          <div className="text-gray-300 text-center py-4 w-64">
             <div className="flex justify-center space-x-6 text-white mb-4">
               <a href="/about" className="flex items-center">
-                <span className="w-2 h-2 bg-white rounded-full inline-block mr-2"></span>{" "}
+                <span className="w-2 h-2 bg-white rounded-full inline-block mr-2"></span>
                 About
               </a>
               <a href="/privacy" className="flex items-center">
-                <span className="w-2 h-2 bg-white rounded-full inline-block mr-2"></span>{" "}
+                <span className="w-2 h-2 bg-white rounded-full inline-block mr-2"></span>
                 Privacy & Terms
               </a>
             </div>
-            {/* <div className="text-lg font-bold">
-              <span className="text-purple-400">LADSPA</span>{" "}
-              <span className="text-gray-400">Corporation © 2025</span>
-            </div> */}
           </div>
         </div>
       </div>
